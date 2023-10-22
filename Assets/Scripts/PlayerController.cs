@@ -4,8 +4,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public static PlayerController instance;
+
     [Header("Movement")]
     public float moveSpeed;
+    public float combatSpeed;
+    public float freeSpeed;
 
     public float groundDrag;
 
@@ -39,10 +43,16 @@ public class PlayerController : MonoBehaviour
     public Animator animator;
     private void Start()
     {
+        if (!instance)
+            instance = this;
+        else
+            Destroy(this);
+
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
 
         readyToJump = true;
+        moveSpeed = freeSpeed;
     }
 
     private void Update()
@@ -58,6 +68,22 @@ public class PlayerController : MonoBehaviour
             speedPercent = new Vector2(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).x, -1f, 1f), Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).z, -1f, 1f));
             animator.SetFloat("Xaxis", speedPercent.x, 0.1f, Time.deltaTime);
             animator.SetFloat("Yaxis", speedPercent.y, 0.1f, Time.deltaTime);
+
+            if (Input.GetMouseButtonDown(0) && AbleToMove())
+            {
+                //Debug.Log("Light" + MouseController.instance.GetInputDirection().ToString());
+           
+                animator.SetTrigger("LIGHT");
+                animator.SetTrigger(MouseController.instance.GetInputDirection().ToString());
+            }
+            if (Input.GetMouseButtonDown(1) && AbleToMove())
+            {
+                Debug.Log("Heavy" + MouseController.instance.GetInputDirection().ToString());
+
+                //animator.SetTrigger("LIGHT");
+                //animator.SetTrigger(MouseController.instance.GetInputDirection().ToString());
+            }
+
         }
         else
         {
@@ -75,6 +101,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!AbleToMove())
+            return;
         MovePlayer();
     }
 
@@ -83,15 +111,15 @@ public class PlayerController : MonoBehaviour
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
-        // when to jump
-        if (Input.GetKey(jumpKey) && readyToJump && grounded)
-        {
-            readyToJump = false;
+        //// when to jump
+        //if (Input.GetKey(jumpKey) && readyToJump && grounded)
+        //{
+        //    readyToJump = false;
 
-            Jump();
+        //    Jump();
 
-            Invoke(nameof(ResetJump), jumpCooldown);
-        }
+        //    Invoke(nameof(ResetJump), jumpCooldown);
+        //}
     }
 
     private void MovePlayer()
@@ -130,5 +158,21 @@ public class PlayerController : MonoBehaviour
     private void ResetJump()
     {
         readyToJump = true;
+    }
+
+    private bool AbleToMove()
+    {
+        if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Movement") && !animator.GetCurrentAnimatorStateInfo(0).IsName("CombatMovement"))
+            return false;
+        return true;
+    }
+    public void ChangeSpeed()
+    {
+        if (CameraController.instance.CombatMode)
+        {
+            moveSpeed = combatSpeed;
+        }
+        else
+            moveSpeed = freeSpeed;
     }
 }

@@ -60,6 +60,7 @@ public class CameraController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
             combatMode = !combatMode;
+            PlayerController.instance.ChangeSpeed();
             if (!combatMode)
             {
                 SwitchCameraStyle(CameraStyle.Basic);
@@ -68,6 +69,7 @@ public class CameraController : MonoBehaviour
                 thirdPersonCam.GetComponent<CinemachineFreeLook>().m_YAxis.Value = 0.6f;
                 animator.SetFloat("Xaxis", 0, 0, Time.deltaTime);
                 animator.SetFloat("Yaxis", 0, 0, Time.deltaTime);
+                animator.SetBool("CombatStance", false);
                 MouseController.instance.ShowDirectionals(false);
             }
             else
@@ -75,6 +77,7 @@ public class CameraController : MonoBehaviour
                 SwitchCameraStyle(CameraStyle.Combat);
                 MouseController.instance.ShowDirectionals(true);
                 MouseController.instance.ResetCursor();
+                animator.SetBool("CombatStance", true);
                 playerDirectional.transform.position = Camera.main.WorldToScreenPoint(player.position);
             }
         }

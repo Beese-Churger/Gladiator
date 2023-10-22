@@ -12,7 +12,7 @@ public class MouseController : MonoBehaviour
         LEFT,
         RIGHT,
     }
-
+    DirectionalInput inputDirection;
     public static MouseController instance;
     [SerializeField] Image cursor;
     [SerializeField] LayerMask layerMask;
@@ -79,18 +79,21 @@ public class MouseController : MonoBehaviour
             directions[0].SetActive(true);
             directions[1].SetActive(false);
             directions[2].SetActive(false);
+            inputDirection = DirectionalInput.TOP;
         }
         else if (angle >= 120 && angle < 240 && !directions[1].activeInHierarchy)
         {
             directions[0].SetActive(false);
             directions[1].SetActive(true);
             directions[2].SetActive(false);
+            inputDirection = DirectionalInput.LEFT;
         }
         else if (angle >= 240 && angle < 360 && !directions[2].activeInHierarchy)
         {
             directions[0].SetActive(false);
             directions[1].SetActive(false);
             directions[2].SetActive(true);
+            inputDirection = DirectionalInput.RIGHT;
         }
 
         // set previous direction;
@@ -110,5 +113,10 @@ public class MouseController : MonoBehaviour
     public void ResetCursor()
     {
         pos = center;
+    }
+
+    public DirectionalInput GetInputDirection()
+    {
+        return inputDirection;
     }
 }

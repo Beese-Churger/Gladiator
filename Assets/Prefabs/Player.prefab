@@ -311,6 +311,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  combatSpeed: 2
+  freeSpeed: 5
   groundDrag: 1
   jumpForce: 1
   jumpCooldown: 0
