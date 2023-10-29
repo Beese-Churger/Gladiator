@@ -105,7 +105,7 @@ public class CameraController : MonoBehaviour
                 orientation.forward = dirToCombatLookAt.normalized;
 
                 playerObj.forward = dirToCombatLookAt.normalized;
-                combatLookAt.position = player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(Enemy.position, player.position), 4);
+                combatLookAt.position = player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(Enemy.position, player.position), 2);
                 combatLookAt.rotation = playerObj.rotation;
 
                 playerDirectional.transform.position = Vector2.Lerp(playerDirectional.transform.position,Camera.main.WorldToScreenPoint(player.position), 10 * Time.deltaTime);

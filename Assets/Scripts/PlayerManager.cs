@@ -21,14 +21,16 @@ public class PlayerManager : MonoBehaviour
 
     private void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
+        player = gameObject;
     }
     // Update is called once per frame
     void Update()
     {
         if (player != null)
         {
-            healthbar.transform.position = Vector3.Lerp(healthbar.transform.position,Camera.main.WorldToScreenPoint(player.transform.position + new Vector3(0, 1.2f, 0)), 10* Time.deltaTime);
+
+            healthbar.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
+            
         }
 
         if(Input.GetKeyDown(KeyCode.N))
