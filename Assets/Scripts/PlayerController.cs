@@ -1,10 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
+using Photon.Pun;
 public class PlayerController : MonoBehaviour
 {
-    public static PlayerController instance;
+    //public static PlayerController instance;
+
+    [Header("Stats")]
+    public GameObject healthbar;
+    public Slider healthBarFill;
+    public Slider staminaBarFill;
+
+    public float maxHealth = 100f;
+    private float currentHealth;
 
     [Header("Movement")]
     public float moveSpeed;
@@ -21,6 +30,9 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public float walkSpeed;
     [HideInInspector] public float sprintSpeed;
 
+    [Header("Camera")]
+    [SerializeField] GameObject cameraHolder;
+    CameraController cameraController;
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
 
@@ -35,35 +47,51 @@ public class PlayerController : MonoBehaviour
     float verticalInput;
 
     Vector3 moveDirection;
-
     Rigidbody rb;
-
     Vector2 speedPercent;
 
+    PhotonView PV;
     public Animator animator;
     private void Start()
     {
-        if (!instance)
-            instance = this;
-        else
-            Destroy(this);
+        //if (!instance)
+        //    instance = this;
+        //else
+        //    Destroy(this);
 
+        if(!PV.IsMine)
+        {
+            foreach (Transform child in cameraHolder.transform)
+            Destroy(child.gameObject);
+        }
+    }
+
+    private void Awake()
+    {
+        PV = GetComponent<PhotonView>();
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+        cameraController = cameraHolder.GetComponent<CameraController>();
 
         readyToJump = true;
         moveSpeed = freeSpeed;
+
+        currentHealth = maxHealth;
     }
 
     private void Update()
     {
+        if (!PV.IsMine)
+            return;
+
+        UpdateUI();
         // ground check
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
 
         MyInput();
         SpeedControl();
 
-        if(CameraController.instance.CombatMode)
+        if(cameraController.CombatMode)
         {
             speedPercent = new Vector2(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).x, -1f, 1f), Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).z, -1f, 1f));
             animator.SetFloat("Xaxis", speedPercent.x, 0.1f, Time.deltaTime);
@@ -97,10 +125,14 @@ public class PlayerController : MonoBehaviour
             rb.drag = groundDrag;
         else
             rb.drag = 0;
+
     }
 
     private void FixedUpdate()
     {
+        if (!PV.IsMine)
+            return;
+
         if (!AbleToMove())
             return;
         MovePlayer();
@@ -110,16 +142,6 @@ public class PlayerController : MonoBehaviour
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
-
-        //// when to jump
-        //if (Input.GetKey(jumpKey) && readyToJump && grounded)
-        //{
-        //    readyToJump = false;
-
-        //    Jump();
-
-        //    Invoke(nameof(ResetJump), jumpCooldown);
-        //}
     }
 
     private void MovePlayer()
@@ -148,18 +170,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Jump()
-    {
-        // reset y velocity
-        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-
-        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-    }
-    private void ResetJump()
-    {
-        readyToJump = true;
-    }
-
     private bool AbleToMove()
     {
         if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Movement") && !animator.GetCurrentAnimatorStateInfo(0).IsName("CombatMovement"))
@@ -168,11 +178,32 @@ public class PlayerController : MonoBehaviour
     }
     public void ChangeSpeed()
     {
-        if (CameraController.instance.CombatMode)
+        if (cameraController.CombatMode)
         {
             moveSpeed = combatSpeed;
         }
         else
             moveSpeed = freeSpeed;
+    }
+
+    public void UpdateUI()
+    {
+
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            SetHealth(currentHealth - 10);
+        }
+    }
+
+    public void SetHealth(float health)
+    {
+        currentHealth = health;
+        UpdateHealthBar();
+    }
+
+    private void UpdateHealthBar()
+    {
+        float fillAmount = currentHealth / maxHealth;
+        healthBarFill.value = fillAmount;
     }
 }

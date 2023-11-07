@@ -1519,7 +1519,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &717840769
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1889,6 +1889,7 @@ MonoBehaviour:
   playerListContent: {fileID: 984132667}
   roomListItemPrefab: {fileID: 2985613373212720274, guid: 0f550f491747596499b9c22a5f2e8fc5, type: 3}
   playerListItemPrefab: {fileID: 6375864951908466319, guid: 9a780e1b0c6c9f64ab8bfb72d6891035, type: 3}
+  startGameButton: {fileID: 1132228401}
 --- !u!114 &995793082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2147,7 +2148,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1132228402
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2215,7 +2216,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 995793081}
         m_TargetAssemblyTypeName: Launcher, Assembly-CSharp
-        m_MethodName: LeaveRoom
+        m_MethodName: StartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -2,17 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
-
+using Photon.Pun;
 public class CameraController : MonoBehaviour
 {
-    public static CameraController instance;
+    //public static CameraController instance;
 
     [Header("References")]
     public Transform orientation;
     public Transform player;
     public Transform playerObj;
     public Rigidbody rb;
-
+    PlayerController playerController;
     public float rotationSpeed;
 
     public Transform combatLookAt;
@@ -30,6 +30,7 @@ public class CameraController : MonoBehaviour
     bool combatMode = false;
     public bool CombatMode { get { return combatMode; } private set { CombatMode = value; } }
 
+    PhotonView PV;
     public enum CameraStyle
     {
         Basic,
@@ -38,29 +39,32 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        if (!instance)
-            instance = this;
-        else
-            Destroy(this);
+        //if (!instance)
+        //    instance = this;
+        //else
+        //    Destroy(this);
 
         //playerDirectional = MouseController.instance.GetPlayerDirectional();
-        animator = player.gameObject.GetComponent<Animator>();
     }
 
     private void Awake()
     {
-        
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        animator = player.gameObject.GetComponent<Animator>();
+        playerController = player.gameObject.GetComponent<PlayerController>();
+        PV = GetComponent<PhotonView>();
     }
     private void Update()
     {
+        if (!PV.IsMine)
+            return;
         // switch styles
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
             combatMode = !combatMode;
-            PlayerController.instance.ChangeSpeed();
+            playerController.ChangeSpeed();
             if (!combatMode)
             {
                 SwitchCameraStyle(CameraStyle.Basic);
@@ -83,10 +87,10 @@ public class CameraController : MonoBehaviour
         }
 
         // rotate orientation
-        Vector3 viewDir = player.position - new Vector3(transform.position.x, player.position.y, transform.position.z);
+        Vector3 viewDir = player.position - new Vector3(Camera.main.transform.position.x, player.position.y, Camera.main.transform.position.z);
         orientation.forward = viewDir.normalized;
 
-        // roate player object
+        // rotate player object
         switch(currentStyle)
         {
             case CameraStyle.Basic:
@@ -101,6 +105,9 @@ public class CameraController : MonoBehaviour
             }
             case CameraStyle.Combat:
             {
+                if (!Enemy)
+                    Enemy = combatLookAt;
+                
                 Vector3 dirToCombatLookAt = Enemy.position - new Vector3(player.position.x, Enemy.position.y, player.position.z);
                 orientation.forward = dirToCombatLookAt.normalized;
 
