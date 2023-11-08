@@ -130,6 +130,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4062625727083792519, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 4540969333336853538, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
       propertyPath: sceneViewId
       value: 1
@@ -144,11 +148,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5635569066544543225, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.00000003418209
+      value: -0.000000034182086
       objectReference: {fileID: 0}
     - target: {fileID: 5635569066544543225, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.000000003977852
+      value: 0.0000000039778514
       objectReference: {fileID: 0}
     - target: {fileID: 5635569067390719464, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
       propertyPath: m_RootOrder
@@ -212,11 +216,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5635569068080064204, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.000000017091047
+      value: -0.00000001709104
       objectReference: {fileID: 0}
     - target: {fileID: 5635569068080064204, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.0000000019889261
+      value: 0.0000000019889252
       objectReference: {fileID: 0}
     - target: {fileID: 5780464441667626499, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
       propertyPath: sceneViewId
@@ -6496,7 +6500,7 @@ GameObject:
   - component: {fileID: 8849065064514298640}
   - component: {fileID: 8849065064514298654}
   - component: {fileID: 6082170464288190798}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}

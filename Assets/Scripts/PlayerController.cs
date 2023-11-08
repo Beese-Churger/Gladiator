@@ -188,7 +188,7 @@ public class PlayerController : MonoBehaviour
 
             else
             {
-                Debug.Log("L");
+                //Debug.Log("L");
                 opponentsInFOV.Remove(detectionRadius.opponentsInRange[i]);
             }
 
