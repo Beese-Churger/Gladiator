@@ -13,7 +13,7 @@ public class MouseController : MonoBehaviour
         RIGHT,
     }
     DirectionalInput inputDirection;
-    public static MouseController instance;
+    //public static MouseController instance;
     [SerializeField] Image cursor;
     [SerializeField] LayerMask layerMask;
     [SerializeField] GameObject piechart;
@@ -33,10 +33,10 @@ public class MouseController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (!instance)
-            instance = this;
-        else
-            Destroy(this);
+        //if (!instance)
+        //    instance = this;
+        //else
+        //    Destroy(this);
 
         Cursor.lockState = CursorLockMode.Locked;
         int x = (Screen.width / 2);

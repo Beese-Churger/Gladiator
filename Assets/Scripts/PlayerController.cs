@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour
     [Header("Camera")]
     [SerializeField] GameObject cameraHolder;
     CameraController cameraController;
+    MouseController mouseController;
+
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
 
@@ -49,6 +51,10 @@ public class PlayerController : MonoBehaviour
     Vector3 moveDirection;
     Rigidbody rb;
     Vector2 speedPercent;
+
+    [Header("CombatStuff")]
+    [SerializeField] Detect detectionRadius;
+    public List<GameObject> opponentsInFOV = new();
 
     PhotonView PV;
     public Animator animator;
@@ -70,9 +76,11 @@ public class PlayerController : MonoBehaviour
     {
         PV = GetComponent<PhotonView>();
         rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
+
+        mouseController = GetComponent<MouseController>();
         cameraController = cameraHolder.GetComponent<CameraController>();
 
+        rb.freezeRotation = true;
         readyToJump = true;
         moveSpeed = freeSpeed;
 
@@ -102,11 +110,11 @@ public class PlayerController : MonoBehaviour
                 //Debug.Log("Light" + MouseController.instance.GetInputDirection().ToString());
            
                 animator.SetTrigger("LIGHT");
-                animator.SetTrigger(MouseController.instance.GetInputDirection().ToString());
+                animator.SetTrigger(mouseController.GetInputDirection().ToString());
             }
             if (Input.GetMouseButtonDown(1) && AbleToMove())
             {
-                Debug.Log("Heavy" + MouseController.instance.GetInputDirection().ToString());
+                Debug.Log("Heavy" + mouseController.GetInputDirection().ToString());
 
                 //animator.SetTrigger("LIGHT");
                 //animator.SetTrigger(MouseController.instance.GetInputDirection().ToString());
@@ -156,6 +164,44 @@ public class PlayerController : MonoBehaviour
         // in air
         else if (!grounded)
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
+    }
+
+    public void LockOntoOpponent()
+    {
+        CheckWhoCanLock();
+        if(!cameraController.currentLock)
+        {
+            if(opponentsInFOV.Count > 0)
+                cameraController.currentLock = opponentsInFOV[0].transform;
+        }
+        
+    }
+    public void CheckWhoCanLock()
+    {
+        for(int i = 0; i < detectionRadius.opponentsInRange.Count; ++i)
+        {
+            if (IsInCameraFrustum(i))
+            {
+                if(!opponentsInFOV.Contains(detectionRadius.opponentsInRange[i]))
+                    opponentsInFOV.Add(detectionRadius.opponentsInRange[i]);
+            }
+
+            else
+            {
+                Debug.Log("L");
+                opponentsInFOV.Remove(detectionRadius.opponentsInRange[i]);
+            }
+
+        }
+    }
+    private bool IsInCameraFrustum(int index)
+    {
+        Plane[] planes = GeometryUtility.CalculateFrustumPlanes(Camera.main);
+
+        if (GeometryUtility.TestPlanesAABB(planes, detectionRadius.opponentsInRange[index].GetComponent<Collider>().bounds))
+            return true; // Object is within the camera's frustum
+
+        return false; // Object is not within the camera's frustum
     }
 
     private void SpeedControl()

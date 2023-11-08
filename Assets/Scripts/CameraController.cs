@@ -8,6 +8,7 @@ public class CameraController : MonoBehaviour
     //public static CameraController instance;
 
     [Header("References")]
+    MouseController mouseController;
     public Transform orientation;
     public Transform player;
     public Transform playerObj;
@@ -23,7 +24,7 @@ public class CameraController : MonoBehaviour
     public GameObject playerDirectional;
     public GameObject enemyDirectional;
 
-    public Transform Enemy;
+    public Transform currentLock;
     public CameraStyle currentStyle;
 
     private Animator animator;
@@ -54,6 +55,8 @@ public class CameraController : MonoBehaviour
 
         animator = player.gameObject.GetComponent<Animator>();
         playerController = player.gameObject.GetComponent<PlayerController>();
+        mouseController = player.gameObject.GetComponent<MouseController>();
+
         PV = GetComponent<PhotonView>();
     }
     private void Update()
@@ -65,8 +68,10 @@ public class CameraController : MonoBehaviour
         {
             combatMode = !combatMode;
             playerController.ChangeSpeed();
+
             if (!combatMode)
             {
+                currentLock = null;
                 SwitchCameraStyle(CameraStyle.Basic);
                 var heading = Mathf.Atan2(orientation.right.z, orientation.right.x) * Mathf.Rad2Deg;
                 thirdPersonCam.GetComponent<CinemachineFreeLook>().m_XAxis.Value = -heading;
@@ -74,13 +79,14 @@ public class CameraController : MonoBehaviour
                 animator.SetFloat("Xaxis", 0, 0, Time.deltaTime);
                 animator.SetFloat("Yaxis", 0, 0, Time.deltaTime);
                 animator.SetBool("CombatStance", false);
-                MouseController.instance.ShowDirectionals(false);
+                mouseController.ShowDirectionals(false);
             }
             else
             {
+                playerController.LockOntoOpponent();
                 SwitchCameraStyle(CameraStyle.Combat);
-                MouseController.instance.ShowDirectionals(true);
-                MouseController.instance.ResetCursor();
+                mouseController.ShowDirectionals(true);
+                mouseController.ResetCursor();
                 animator.SetBool("CombatStance", true);
                 playerDirectional.transform.position = Camera.main.WorldToScreenPoint(player.position);
             }
@@ -105,14 +111,14 @@ public class CameraController : MonoBehaviour
             }
             case CameraStyle.Combat:
             {
-                if (!Enemy)
-                    Enemy = combatLookAt;
+                if (!currentLock)
+                    currentLock = combatLookAt;
                 
-                Vector3 dirToCombatLookAt = Enemy.position - new Vector3(player.position.x, Enemy.position.y, player.position.z);
+                Vector3 dirToCombatLookAt = currentLock.position - new Vector3(player.position.x, currentLock.position.y, player.position.z);
                 orientation.forward = dirToCombatLookAt.normalized;
 
                 playerObj.forward = dirToCombatLookAt.normalized;
-                combatLookAt.position = player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(Enemy.position, player.position), 2);
+                combatLookAt.position = player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(currentLock.position, player.position), 2);
                 combatLookAt.rotation = playerObj.rotation;
 
                 playerDirectional.transform.position = Vector2.Lerp(playerDirectional.transform.position,Camera.main.WorldToScreenPoint(player.position), 10 * Time.deltaTime);
