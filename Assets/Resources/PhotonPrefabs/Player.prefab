@@ -5484,6 +5484,7 @@ MonoBehaviour:
     m_Bits: 8
   orientation: {fileID: 5635569067445041447}
   detectionRadius: {fileID: 6170855969775771635}
+  opponentsInFOV: []
   animator: {fileID: 5635569067390719461}
 --- !u!114 &7167737441030003614
 MonoBehaviour:
