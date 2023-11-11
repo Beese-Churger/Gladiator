@@ -28,6 +28,11 @@ public class CameraController : MonoBehaviour
     public CameraStyle currentStyle;
 
     private Animator animator;
+
+    [SerializeField] Transform canvas;
+    [SerializeField] GameObject directionalUIprefab;
+    public List<GameObject> indicators = new();
+
     bool combatMode = false;
     public bool CombatMode { get { return combatMode; } private set { CombatMode = value; } }
 
@@ -63,6 +68,8 @@ public class CameraController : MonoBehaviour
     {
         if (!PV.IsMine)
             return;
+
+        
         // switch styles
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
@@ -73,6 +80,7 @@ public class CameraController : MonoBehaviour
             {
                 currentLock = null;
                 SwitchCameraStyle(CameraStyle.Basic);
+                TurnOffIndicators();
                 var heading = Mathf.Atan2(orientation.right.z, orientation.right.x) * Mathf.Rad2Deg;
                 thirdPersonCam.GetComponent<CinemachineFreeLook>().m_XAxis.Value = -heading;
                 thirdPersonCam.GetComponent<CinemachineFreeLook>().m_YAxis.Value = 0.6f;
@@ -84,6 +92,7 @@ public class CameraController : MonoBehaviour
             else
             {
                 playerController.LockOntoOpponent();
+                TurnOnIndicators();
                 SwitchCameraStyle(CameraStyle.Combat);
                 mouseController.ShowDirectionals(true);
                 mouseController.ResetCursor();
@@ -113,6 +122,20 @@ public class CameraController : MonoBehaviour
             {
                 if (!currentLock)
                     currentLock = combatLookAt;
+
+                if(Input.GetMouseButtonDown(2))
+                {
+                    if(playerController.opponentsInFOV.Count > 0)
+                    {
+                        int currIndex = playerController.opponentsInFOV.IndexOf(currentLock.gameObject);
+                        if (currIndex == playerController.opponentsInFOV.Count - 1)
+                            currIndex = 0;
+                        else
+                            currIndex++;
+
+                        currentLock = playerController.opponentsInFOV[currIndex].transform;
+                    } 
+                }
                 
                 Vector3 dirToCombatLookAt = currentLock.position - new Vector3(player.position.x, currentLock.position.y, player.position.z);
                 orientation.forward = dirToCombatLookAt.normalized;
@@ -136,5 +159,35 @@ public class CameraController : MonoBehaviour
         if (newStyle == CameraStyle.Combat) combatCam.SetActive(true);
 
         currentStyle = newStyle;
+    }
+
+    private void TurnOnIndicators()
+    {
+        if (indicators.Count <= 0)
+            return;
+
+        for(int i = 0; i < indicators.Count; ++i)
+        {
+            //if (!playerController.opponentsInFOV.Contains(indicators[i].GetComponent<Indicator>().GetTarget()))
+            //{
+            //    indicators[i].SetActive(false);
+            //}
+            //else
+            //{
+            //    indicators[i].SetActive(true);
+            //}
+            indicators[i].SetActive(true);
+        }
+    }
+
+    private void TurnOffIndicators()
+    {
+        if (indicators.Count <= 0)
+            return;
+
+        for (int i = 0; i < indicators.Count; ++i)
+        {
+            indicators[i].SetActive(false);
+        }
     }
 }

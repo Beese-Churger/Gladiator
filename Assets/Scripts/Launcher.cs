@@ -19,6 +19,8 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] GameObject playerListItemPrefab;
     [SerializeField] GameObject startGameButton;
 
+    [SerializeField] Transform p1, p2;
+    
     private void Awake()
     {
         if (!instance)

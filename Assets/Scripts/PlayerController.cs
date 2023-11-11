@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
     //public static PlayerController instance;
-
+    [SerializeField] PlayerManager playerManager;
     [Header("Stats")]
     public GameObject healthbar;
     public Slider healthBarFill;
@@ -68,7 +68,9 @@ public class PlayerController : MonoBehaviour
         if(!PV.IsMine)
         {
             foreach (Transform child in cameraHolder.transform)
-            Destroy(child.gameObject);
+            {
+                Destroy(child.gameObject);
+            }
         }
     }
 
@@ -89,9 +91,32 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        // animate player movement
+        if (animator != null && animator.isActiveAndEnabled)
+        {
+            if (cameraController.CombatMode)
+            {
+                speedPercent = new Vector2(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).x, -1f, 1f), Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).z, -1f, 1f));
+                animator.SetFloat("Xaxis", speedPercent.x, 0.1f, Time.deltaTime);
+                animator.SetFloat("Yaxis", speedPercent.y, 0.1f, Time.deltaTime);
+            }
+            else
+            {
+                speedPercent = new Vector2(Mathf.Abs(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).x, -1f, 1f)), Mathf.Abs(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).z, -1f, 1f)));
+                animator.SetFloat("Yaxis", Mathf.Max(speedPercent.x, speedPercent.y), 0.1f, Time.deltaTime);
+            }
+        }
+
+        // handle drag
+        if (grounded)
+            rb.drag = groundDrag;
+        else
+            rb.drag = 0;
+
         if (!PV.IsMine)
             return;
 
+        CheckWhoCanLock();
         UpdateUI();
         // ground check
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
@@ -101,9 +126,9 @@ public class PlayerController : MonoBehaviour
 
         if(cameraController.CombatMode)
         {
-            speedPercent = new Vector2(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).x, -1f, 1f), Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).z, -1f, 1f));
-            animator.SetFloat("Xaxis", speedPercent.x, 0.1f, Time.deltaTime);
-            animator.SetFloat("Yaxis", speedPercent.y, 0.1f, Time.deltaTime);
+            //speedPercent = new Vector2(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).x, -1f, 1f), Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).z, -1f, 1f));
+            //animator.SetFloat("Xaxis", speedPercent.x, 0.1f, Time.deltaTime);
+            //animator.SetFloat("Yaxis", speedPercent.y, 0.1f, Time.deltaTime);
 
             if (Input.GetMouseButtonDown(0) && AbleToMove())
             {
@@ -123,16 +148,12 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            speedPercent = new Vector2(Mathf.Abs(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).x, -1f, 1f)), Mathf.Abs(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).z, -1f, 1f)));
-            //animator.SetFloat("Xaxis", speedPercent.x, 0.1f, Time.deltaTime);
-            animator.SetFloat("Yaxis", Mathf.Max(speedPercent.x,speedPercent.y), 0.1f, Time.deltaTime);
+            //speedPercent = new Vector2(Mathf.Abs(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).x, -1f, 1f)), Mathf.Abs(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).z, -1f, 1f)));
+            ////animator.SetFloat("Xaxis", speedPercent.x, 0.1f, Time.deltaTime);
+            //animator.SetFloat("Yaxis", Mathf.Max(speedPercent.x,speedPercent.y), 0.1f, Time.deltaTime);
         }
 
-        // handle drag
-        if (grounded)
-            rb.drag = groundDrag;
-        else
-            rb.drag = 0;
+
 
     }
 
@@ -180,6 +201,13 @@ public class PlayerController : MonoBehaviour
     {
         for(int i = 0; i < detectionRadius.opponentsInRange.Count; ++i)
         {
+            if (!detectionRadius.opponentsInRange[i])
+            {
+                detectionRadius.opponentsInRange.Remove(detectionRadius.opponentsInRange[i]);
+                continue;
+            }
+
+
             if (IsInCameraFrustum(i))
             {
                 if(!opponentsInFOV.Contains(detectionRadius.opponentsInRange[i]))
@@ -249,7 +277,30 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateHealthBar()
     {
-        float fillAmount = currentHealth / maxHealth;
-        healthBarFill.value = fillAmount;
+        healthBarFill.value = currentHealth / maxHealth;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        PV.RPC(nameof(RPC_TakeDamage), PV.Owner, damage);
+    }
+
+    [PunRPC]
+    void RPC_TakeDamage(float damage, PhotonMessageInfo info)
+    {
+        currentHealth -= damage;
+
+        UpdateHealthBar();
+
+        if (currentHealth <= 0)
+        {
+            Die();
+            PlayerManager.Find(info.Sender).GetKill();
+        }
+    }
+
+    void Die()
+    {
+        playerManager.Die();
     }
 }
