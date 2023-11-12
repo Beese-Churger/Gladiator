@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
-
-public class MouseController : MonoBehaviour
+public class MouseController : MonoBehaviourPunCallbacks
 {
     public enum DirectionalInput
     {
@@ -14,6 +14,8 @@ public class MouseController : MonoBehaviour
     }
     DirectionalInput inputDirection;
     //public static MouseController instance;
+    [SerializeField] PlayerController playerController;
+    [SerializeField] CameraController cameraController;
     [SerializeField] Image cursor;
     [SerializeField] LayerMask layerMask;
     [SerializeField] GameObject piechart;
@@ -29,6 +31,8 @@ public class MouseController : MonoBehaviour
 
     Vector2 prevDir;
     public int sensitivity = 10;
+
+    PhotonView PV;
 
     // Start is called before the first frame update
     void Start()
@@ -48,9 +52,20 @@ public class MouseController : MonoBehaviour
         prevDir = pos - center;
     }
 
+    private void Awake()
+    {
+        PV = GetComponent<PhotonView>();
+        inputDirection = DirectionalInput.TOP;
+    }
     // Update is called once per frame
     void Update()
     {
+        if (!PV.IsMine)
+            return;
+
+        if (!cameraController.CombatMode)
+            return;
+
         // get mouse input
         pos.x += Input.GetAxis("Mouse X") * sensitivity;
         pos.y += Input.GetAxis("Mouse Y") * sensitivity;
@@ -80,6 +95,7 @@ public class MouseController : MonoBehaviour
             directions[1].SetActive(false);
             directions[2].SetActive(false);
             inputDirection = DirectionalInput.TOP;
+            UpdateDirection();
         }
         else if (angle >= 120 && angle < 240 && !directions[1].activeInHierarchy)
         {
@@ -87,6 +103,7 @@ public class MouseController : MonoBehaviour
             directions[1].SetActive(true);
             directions[2].SetActive(false);
             inputDirection = DirectionalInput.LEFT;
+            UpdateDirection();
         }
         else if (angle >= 240 && angle < 360 && !directions[2].activeInHierarchy)
         {
@@ -94,6 +111,7 @@ public class MouseController : MonoBehaviour
             directions[1].SetActive(false);
             directions[2].SetActive(true);
             inputDirection = DirectionalInput.RIGHT;
+            UpdateDirection();
         }
 
         // set previous direction;
@@ -118,5 +136,19 @@ public class MouseController : MonoBehaviour
     public DirectionalInput GetInputDirection()
     {
         return inputDirection;
+    }
+
+    public void UpdateDirection()
+    {
+
+        if (PV.IsMine)
+            PV.RPC(nameof(RPC_UpdateIndicatorDirection), RpcTarget.All,inputDirection);
+    }
+
+    [PunRPC]
+    public void RPC_UpdateIndicatorDirection(DirectionalInput input)
+    {
+         //Debug.Log($"Player {photonView.Owner.NickName} took {input}");
+         playerController.SetDir(input);
     }
 }

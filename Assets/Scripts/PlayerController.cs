@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using Photon.Realtime;
+
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
     //public static PlayerController instance;
@@ -34,6 +36,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     [SerializeField] GameObject cameraHolder;
     CameraController cameraController;
     MouseController mouseController;
+    public MouseController.DirectionalInput currDir;
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -64,7 +67,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         //    instance = this;
         //else
         //    Destroy(this);
-
+        
         if(!PV.IsMine)
         {
             foreach (Transform child in cameraHolder.transform)
@@ -87,6 +90,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         moveSpeed = freeSpeed;
 
         currentHealth = maxHealth;
+        currDir = MouseController.DirectionalInput.TOP;
     }
 
     private void Update()
@@ -260,6 +264,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             moveSpeed = freeSpeed;
     }
 
+    public void SetDir(MouseController.DirectionalInput _dir)
+    {
+        currDir = _dir;
+        //Debug.Log("Hit");
+    }
+
+    public MouseController.DirectionalInput GetDir()
+    {
+        return currDir;
+    }
     public void UpdateUI()
     {
 
@@ -303,4 +317,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         playerManager.Die();
     }
+
+
 }
