@@ -4483,7 +4483,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569066303058731}
-  m_LocalRotation: {x: -0.07841043, y: 0.87339026, z: -0.4566766, w: -0.14995931}
+  m_LocalRotation: {x: -0.07841045, y: 0.87339026, z: -0.45667657, w: -0.14995934}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4702,7 +4702,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569066544543228}
-  m_LocalRotation: {x: -0.07769057, y: 0.8755697, z: -0.45248398, w: -0.15033354}
+  m_LocalRotation: {x: -0.0776906, y: 0.87556976, z: -0.45248392, w: -0.15033358}
   m_LocalPosition: {x: 1.1463039, y: 1.8973722, z: 3.5945485}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5510,6 +5510,7 @@ MonoBehaviour:
   healthBarFill: {fileID: 5883366469602725929}
   staminaBarFill: {fileID: 6477239341178899517}
   maxHealth: 100
+  maxStamina: 100
   moveSpeed: 5
   combatSpeed: 2
   freeSpeed: 5
@@ -5527,6 +5528,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   orientation: {fileID: 5635569067445041447}
+  model: {fileID: 6756295419733340701}
   detectionRadius: {fileID: 6170855969775771635}
   opponentsInFOV: []
   animator: {fileID: 5635569067390719461}
@@ -5692,7 +5694,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569067606744101}
-  m_LocalRotation: {x: -0.071355656, y: 0.89367247, z: -0.4155883, w: -0.15344174}
+  m_LocalRotation: {x: -0.07135566, y: 0.89367247, z: -0.4155883, w: -0.15344176}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

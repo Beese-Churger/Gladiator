@@ -42,6 +42,7 @@ MonoBehaviour:
   - RPC_GetKill
   - RPC_TakeDamage
   - RPC_UpdateIndicatorDirection
+  - RPC_LightAttack
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

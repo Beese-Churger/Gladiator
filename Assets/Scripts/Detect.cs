@@ -28,7 +28,7 @@ public class Detect : MonoBehaviour
 
         opponentsInRange.Add(other.gameObject);
         GameObject go = Instantiate(indicatorPrefab, Camera.main.WorldToScreenPoint(other.transform.position), Quaternion.identity, canvas);
-        go.GetComponent<Indicator>().InitTarget(other.gameObject);
+        go.GetComponent<Indicator>().InitTarget(other.gameObject, gameObject);
         //go.SetActive(false);
         cameraController.indicators.Add(go);
     }

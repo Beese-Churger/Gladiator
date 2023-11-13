@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     public float maxHealth = 100f;
     private float currentHealth;
 
+    public float maxStamina = 100f;
+    private float currentStamina;
+
     [Header("Movement")]
     public float moveSpeed;
     public float combatSpeed;
@@ -47,6 +50,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     bool grounded;
 
     public Transform orientation;
+    [SerializeField] Transform model;
 
     float horizontalInput;
     float verticalInput;
@@ -58,6 +62,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     [Header("CombatStuff")]
     [SerializeField] Detect detectionRadius;
     public List<GameObject> opponentsInFOV = new();
+    
 
     PhotonView PV;
     public Animator animator;
@@ -137,9 +142,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             if (Input.GetMouseButtonDown(0) && AbleToMove())
             {
                 //Debug.Log("Light" + MouseController.instance.GetInputDirection().ToString());
-           
-                animator.SetTrigger("LIGHT");
-                animator.SetTrigger(mouseController.GetInputDirection().ToString());
+
+                LightAttack();
             }
             if (Input.GetMouseButtonDown(1) && AbleToMove())
             {
@@ -164,7 +168,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     private void FixedUpdate()
     {
         if (!PV.IsMine)
+        {
+            orientation.rotation = model.rotation;
             return;
+        }
+
 
         if (!AbleToMove())
             return;
@@ -191,6 +199,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
     }
 
+    public void LightAttack()
+    {
+        PV.RPC(nameof(RPC_LightAttack), RpcTarget.All, mouseController.GetInputDirection().ToString());
+    }
+    [PunRPC]
+    public void RPC_LightAttack(string direction)
+    {
+        animator.SetTrigger("LIGHT");
+        animator.SetTrigger(direction);
+    }
     public void LockOntoOpponent()
     {
         CheckWhoCanLock();
@@ -294,6 +312,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         healthBarFill.value = currentHealth / maxHealth;
     }
 
+    private void UpdateStaminaBar()
+    {
+        staminaBarFill.value = currentHealth / maxHealth;
+    }
+
     public void TakeDamage(float damage)
     {
         PV.RPC(nameof(RPC_TakeDamage), PV.Owner, damage);
@@ -313,10 +336,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
     }
 
+    //public void UseStamina
+    //[PunRPC]
+    //void RPC_UseStamina(float amount)
+    //{
+    //    currentStamina -= amount;
+
+    //    UpdateStaminaBar();
+
+    //}
+
     void Die()
     {
         playerManager.Die();
     }
-
-
 }
