@@ -4,6 +4,8 @@ using UnityEngine;
 using Photon.Pun;
 using TMPro;
 using Photon.Realtime;
+using UnityEngine.UI;
+using ExitGames.Client.Photon;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
@@ -19,7 +21,16 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] GameObject playerListItemPrefab;
     [SerializeField] GameObject startGameButton;
 
-    [SerializeField] Transform p1, p2;
+
+    [Header("CreateRoom")]
+    [SerializeField] Toggle isPrivate;
+
+
+    [Header("JoinRoom")]
+    [SerializeField] TMP_InputField roomCodeInputField;
+    List<RoomInfo> cachedRoomList = new();
+
+    //[SerializeField] Transform p1, p2;
     
     private void Awake()
     {
@@ -47,17 +58,42 @@ public class Launcher : MonoBehaviourPunCallbacks
         Debug.Log("Joined Lobby");
         PhotonNetwork.NickName = "Player " + Random.Range(0, 1000).ToString("0000");
     }
-    
+
     public void CreateRoom()
     {
-        if(string.IsNullOrEmpty(roomNameInputField.text))
+        if (string.IsNullOrEmpty(roomNameInputField.text))
         {
             return;
         }
-        PhotonNetwork.CreateRoom(roomNameInputField.text);
+        RoomOptions roomOptions = new RoomOptions
+        {
+            MaxPlayers = 2,
+            IsVisible = !isPrivate.isOn,
+
+            CustomRoomProperties = new ExitGames.Client.Photon.Hashtable()
+            {
+                { "IsPrivate", isPrivate.isOn },
+                { "RoomCode", GenerateRoomCode(6) } // Set the room code here
+            },
+            CustomRoomPropertiesForLobby = new string[] { "IsPrivate", "RoomCode" }
+        };
+        PhotonNetwork.CreateRoom(roomNameInputField.text, roomOptions);
         MenuManager.instance.OpenMenu("loading");
     }
 
+    string GenerateRoomCode(int length)
+    {
+        const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        char[] code = new char[length];
+        System.Random random = new System.Random();
+
+        for (int i = 0; i < length; i++)
+        {
+            code[i] = characters[random.Next(characters.Length)];
+        }
+
+        return new string(code);
+    }
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
         errorText.text = "Room Creation Failed" + message;
@@ -69,10 +105,28 @@ public class Launcher : MonoBehaviourPunCallbacks
         MenuManager.instance.OpenMenu("loading");
     }
 
+    public void JoinRoomByCode()
+    {
+        if(string.IsNullOrEmpty(roomCodeInputField.text))
+        {
+            return;
+        }
+        // Search for a room with the specified name (room code)
+        //RoomInfo[] rooms = roomlist;
+        foreach (RoomInfo room in cachedRoomList)
+        {
+            if (room.CustomProperties.ContainsKey("RoomCode") && room.CustomProperties["RoomCode"].ToString() == roomCodeInputField.text)
+            {
+                PhotonNetwork.JoinRoom(room.Name);
+                return;
+            }
+        }
+    }
     public override void OnJoinedRoom()
     {
         MenuManager.instance.OpenMenu("room");
         roomName.text = PhotonNetwork.CurrentRoom.Name;
+        roomCode.text = PhotonNetwork.CurrentRoom.CustomProperties["RoomCode"].ToString();
 
         Player[] players = PhotonNetwork.PlayerList;
 
@@ -109,6 +163,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
+        cachedRoomList.Clear();
         foreach (Transform trans in roomListContent)
         {
             Destroy(trans.gameObject);
@@ -118,7 +173,9 @@ public class Launcher : MonoBehaviourPunCallbacks
             if (roomList[i].RemovedFromList)
                 continue;
             Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp(roomList[i]);
+            cachedRoomList.Add(roomList[i]);
         }
+        
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
