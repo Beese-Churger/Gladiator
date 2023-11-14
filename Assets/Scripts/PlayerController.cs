@@ -7,6 +7,14 @@ using Photon.Realtime;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
+    public enum PlayerStates
+    {
+        IDLE,
+        COMBAT,
+        ATTACKING,
+        HIT
+    }
+
     //public static PlayerController instance;
     [SerializeField] PlayerManager playerManager;
     [Header("Stats")]
@@ -41,9 +49,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     MouseController mouseController;
     public MouseController.DirectionalInput currDir;
 
-    [Header("Keybinds")]
-    public KeyCode jumpKey = KeyCode.Space;
-
     [Header("Ground Check")]
     public float playerHeight;
     public LayerMask whatIsGround;
@@ -67,17 +72,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     public float lightHitboxActivationTime = 0.3f;
     public float lightHitboxDeactivationTime = 0.7f;
 
+    public List<float> lightStaminaCost = new() { 8f, 6f, 6f };
     bool isAttacking = false;
+    float lastAttack;
+    float regenDelay = 1f;
+    float staminaRegenAmount = 20f;
+    bool canRegenStamina = true;
+    bool hasHyperArmor = false;
+    bool tookHit = false;
+    bool isCombo = false;
 
     PhotonView PV;
     public Animator animator;
     private void Start()
     {
-        //if (!instance)
-        //    instance = this;
-        //else
-        //    Destroy(this);
-        
         if(!PV.IsMine)
         {
             foreach (Transform child in cameraHolder.transform)
@@ -95,12 +103,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         mouseController = GetComponent<MouseController>();
         cameraController = cameraHolder.GetComponent<CameraController>();
         playerManager = FindObjectOfType<PlayerManager>();
+
         rb.freezeRotation = true;
         readyToJump = true;
         moveSpeed = freeSpeed;
 
         currentHealth = maxHealth;
+        currentStamina = maxStamina;
         currDir = MouseController.DirectionalInput.TOP;
+        lastAttack = Time.time;
     }
 
     private void Update()
@@ -121,6 +132,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             }
         }
 
+        // hit taken
+        if (!isAttacking)
+        {
+            if (tookHit == true)
+            {
+                tookHit = false;
+                animator.SetTrigger("HIT");
+            }
+        }
+
+        // ground check
+        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
+
         // handle drag
         if (grounded)
             rb.drag = groundDrag;
@@ -132,22 +156,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         CheckWhoCanLock();
         UpdateUI();
-        // ground check
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
-
         MyInput();
         SpeedControl();
 
         if(cameraController.CombatMode)
         {
-            //speedPercent = new Vector2(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).x, -1f, 1f), Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).z, -1f, 1f));
-            //animator.SetFloat("Xaxis", speedPercent.x, 0.1f, Time.deltaTime);
-            //animator.SetFloat("Yaxis", speedPercent.y, 0.1f, Time.deltaTime);
-
             if (Input.GetMouseButtonDown(0) && AbleToMove())
             {
                 //Debug.Log("Light" + MouseController.instance.GetInputDirection().ToString());
-
                 LightAttack();
             }
             if (Input.GetMouseButtonDown(1) && AbleToMove())
@@ -157,7 +173,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 //animator.SetTrigger("LIGHT");
                 //animator.SetTrigger(MouseController.instance.GetInputDirection().ToString());
             }
-
         }
         else
         {
@@ -165,13 +180,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             ////animator.SetFloat("Xaxis", speedPercent.x, 0.1f, Time.deltaTime);
             //animator.SetFloat("Yaxis", Mathf.Max(speedPercent.x,speedPercent.y), 0.1f, Time.deltaTime);
         }
-
-
-
     }
 
     private void FixedUpdate()
     {
+        if(canRegenStamina && lastAttack + regenDelay < Time.time)
+        {
+            RegenStamina(staminaRegenAmount);
+        }
         if (!PV.IsMine)
         {
             orientation.rotation = model.rotation;
@@ -217,21 +233,45 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         // choose collider to activate
         Collider collider;
+        float staminaCost = 0f;
         switch(direction)
         {
+            case MouseController.DirectionalInput.TOP:
+                collider = rHand;
+                staminaCost = lightStaminaCost[0];
+                break;
             case MouseController.DirectionalInput.LEFT:
                 collider = lHand;
+                staminaCost = lightStaminaCost[1];
+                break;
+            case MouseController.DirectionalInput.RIGHT:
+                collider = rHand;
+                staminaCost = lightStaminaCost[2];
                 break;
             default:
                 collider = rHand;
                 break;
         }
+        UseStaminaAttack(staminaCost);
         // Schedule hitbox activation and deactivation using animation events
         StartCoroutine(PerformLightAttack(collider));
     } 
 
     IEnumerator PerformLightAttack(Collider collider)
     {
+        isAttacking = true;
+        if(ShouldInterruptAttack())
+        {
+            isAttacking = false;
+            lastAttack = Time.time;
+            animator.SetTrigger("HIT");
+            yield break;
+        }
+
+        yield return null; // yield 1 frame to ensure animation starts;
+
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+
         yield return new WaitForSeconds(lightHitboxActivationTime);
 
         collider.enabled = true;
@@ -239,8 +279,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         yield return new WaitForSeconds(lightHitboxDeactivationTime - lightHitboxActivationTime);
 
         collider.enabled = false;
+
+        // when animation ends disable set isattacking to false
+        yield return new WaitForSeconds(stateInfo.length);
+
+        isAttacking = false;
+        lastAttack = Time.time;
     }
 
+    bool ShouldInterruptAttack()
+    {
+        return tookHit && !hasHyperArmor;
+    }
     public void LockOntoOpponent()
     {
         CheckWhoCanLock();
@@ -345,7 +395,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     private void UpdateStaminaBar()
     {
-        staminaBarFill.value = currentHealth / maxHealth;
+        staminaBarFill.value = currentStamina / maxStamina;
     }
 
     public void TakeDamage(float damage)
@@ -356,12 +406,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     [PunRPC]
     void RPC_TakeDamage(float damage, PhotonMessageInfo info)
     {
-        currentHealth -= damage;
+        tookHit = true;
 
+        currentHealth -= damage;
         UpdateHealthBar();
 
-        if (!PV.IsMine)
-            return;
+        //Debug.Log($"Hit by {info.Sender}");
+
         if (currentHealth <= 0)
         {
             Die();
@@ -369,15 +420,41 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
     }
 
-    //public void UseStamina
-    //[PunRPC]
-    //void RPC_UseStamina(float amount)
-    //{
-    //    currentStamina -= amount;
+    public void UseStaminaAttack(float amount)
+    {
+        lastAttack = Time.time;
+        currentStamina -= amount;
+        currentStamina = Mathf.Clamp(currentStamina, 0f, 100f);
+        UpdateStaminaBar();
+        //PV.RPC(nameof(RPC_UseStamina), RpcTarget.All, amount);
+    }
 
-    //    UpdateStaminaBar();
+    public void UseStamina(float amount)
+    {
+        PV.RPC(nameof(RPC_UseStamina), RpcTarget.All, amount);
+    }
+    [PunRPC]
+    void RPC_UseStamina(float amount)
+    {
+        currentStamina -= amount;
 
-    //}
+        UpdateStaminaBar();
+    }
+
+    public void RegenStamina(float amount)
+    {
+        if(currentStamina < maxStamina)
+            currentStamina += amount * Time.fixedDeltaTime;
+        currentStamina = Mathf.Clamp(currentStamina, 0f, 100f);
+        UpdateStaminaBar();
+    }
+
+
+    [PunRPC]
+    void RPC_RegenStamina(bool can)
+    {
+
+    }
 
     void Die()
     {

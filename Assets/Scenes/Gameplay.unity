@@ -150,6 +150,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5351187218215784011, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
+      propertyPath: sceneViewId
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 5635569066303058725, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
       propertyPath: m_LocalRotation.w
       value: -0.14995934
@@ -261,6 +265,10 @@ PrefabInstance:
     - target: {fileID: 6237053766158682791, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6973935120982526823, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
+      propertyPath: sceneViewId
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 8810993735960914035, guid: 8d12c8b431ada7b4e84fd710e2b55252, type: 3}
       propertyPath: m_AnchorMax.x

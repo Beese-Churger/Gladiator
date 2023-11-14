@@ -43,6 +43,8 @@ MonoBehaviour:
   - RPC_TakeDamage
   - RPC_UpdateIndicatorDirection
   - RPC_LightAttack
+  - RPC_UseStamina
+  - RPC_RegenStamina
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

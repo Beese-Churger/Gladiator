@@ -5524,7 +5524,6 @@ MonoBehaviour:
   sprintSpeed: 0
   cameraHolder: {fileID: 5635569066273235211}
   currDir: 0
-  jumpKey: 32
   playerHeight: 1
   whatIsGround:
     serializedVersion: 2
@@ -5537,6 +5536,10 @@ MonoBehaviour:
   lHand: {fileID: 6610068262487649943}
   lightHitboxActivationTime: 0.3
   lightHitboxDeactivationTime: 0.7
+  lightStaminaCost:
+  - 8
+  - 6
+  - 6
   animator: {fileID: 5635569067390719461}
 --- !u!114 &7167737441030003614
 MonoBehaviour:
