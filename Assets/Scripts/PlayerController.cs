@@ -62,7 +62,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     [Header("CombatStuff")]
     [SerializeField] Detect detectionRadius;
     public List<GameObject> opponentsInFOV = new();
-    
+    [SerializeField] Collider rHand, lHand;
+
+    public float lightHitboxActivationTime = 0.3f;
+    public float lightHitboxDeactivationTime = 0.7f;
+
+    bool isAttacking = false;
 
     PhotonView PV;
     public Animator animator;
@@ -89,7 +94,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         mouseController = GetComponent<MouseController>();
         cameraController = cameraHolder.GetComponent<CameraController>();
-
+        playerManager = FindObjectOfType<PlayerManager>();
         rb.freezeRotation = true;
         readyToJump = true;
         moveSpeed = freeSpeed;
@@ -201,14 +206,41 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     public void LightAttack()
     {
-        PV.RPC(nameof(RPC_LightAttack), RpcTarget.All, mouseController.GetInputDirection().ToString());
+        isAttacking = true;
+        PV.RPC(nameof(RPC_LightAttack), RpcTarget.All, mouseController.GetInputDirection());
     }
     [PunRPC]
-    public void RPC_LightAttack(string direction)
+    public void RPC_LightAttack(MouseController.DirectionalInput direction)
     {
         animator.SetTrigger("LIGHT");
-        animator.SetTrigger(direction);
+        animator.SetTrigger(direction.ToString());
+
+        // choose collider to activate
+        Collider collider;
+        switch(direction)
+        {
+            case MouseController.DirectionalInput.LEFT:
+                collider = lHand;
+                break;
+            default:
+                collider = rHand;
+                break;
+        }
+        // Schedule hitbox activation and deactivation using animation events
+        StartCoroutine(PerformLightAttack(collider));
+    } 
+
+    IEnumerator PerformLightAttack(Collider collider)
+    {
+        yield return new WaitForSeconds(lightHitboxActivationTime);
+
+        collider.enabled = true;
+
+        yield return new WaitForSeconds(lightHitboxDeactivationTime - lightHitboxActivationTime);
+
+        collider.enabled = false;
     }
+
     public void LockOntoOpponent()
     {
         CheckWhoCanLock();
@@ -285,7 +317,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     public void SetDir(MouseController.DirectionalInput _dir)
     {
         currDir = _dir;
-        //Debug.Log("Hit");
     }
 
     public MouseController.DirectionalInput GetDir()
@@ -319,7 +350,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     public void TakeDamage(float damage)
     {
-        PV.RPC(nameof(RPC_TakeDamage), PV.Owner, damage);
+        PV.RPC(nameof(RPC_TakeDamage), RpcTarget.All, damage);
     }
 
     [PunRPC]
@@ -329,6 +360,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         UpdateHealthBar();
 
+        if (!PV.IsMine)
+            return;
         if (currentHealth <= 0)
         {
             Die();
