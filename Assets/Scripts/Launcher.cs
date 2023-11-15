@@ -73,11 +73,11 @@ public class Launcher : MonoBehaviourPunCallbacks
             CustomRoomProperties = new ExitGames.Client.Photon.Hashtable()
             {
                 { "IsPrivate", isPrivate.isOn },
-                { "RoomCode", GenerateRoomCode(6) } // Set the room code here
+                { "RoomName", roomNameInputField.text } // Set the room code here
             },
-            CustomRoomPropertiesForLobby = new string[] { "IsPrivate", "RoomCode" }
+            CustomRoomPropertiesForLobby = new string[] { "IsPrivate", "RoomName" }
         };
-        PhotonNetwork.CreateRoom(roomNameInputField.text, roomOptions);
+        PhotonNetwork.CreateRoom(GenerateRoomCode(4), roomOptions);
         MenuManager.instance.OpenMenu("loading");
     }
 
@@ -113,20 +113,15 @@ public class Launcher : MonoBehaviourPunCallbacks
         }
         // Search for a room with the specified name (room code)
         //RoomInfo[] rooms = roomlist;
-        foreach (RoomInfo room in cachedRoomList)
-        {
-            if (room.CustomProperties.ContainsKey("RoomCode") && room.CustomProperties["RoomCode"].ToString() == roomCodeInputField.text)
-            {
-                PhotonNetwork.JoinRoom(room.Name);
-                return;
-            }
-        }
+
+        PhotonNetwork.JoinRoom(roomCodeInputField.text);
+
     }
     public override void OnJoinedRoom()
     {
         MenuManager.instance.OpenMenu("room");
-        roomName.text = PhotonNetwork.CurrentRoom.Name;
-        roomCode.text = PhotonNetwork.CurrentRoom.CustomProperties["RoomCode"].ToString();
+        roomName.text = PhotonNetwork.CurrentRoom.CustomProperties["RoomName"].ToString();
+        roomCode.text = PhotonNetwork.CurrentRoom.Name;
 
         Player[] players = PhotonNetwork.PlayerList;
 
@@ -163,7 +158,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        cachedRoomList.Clear();
+        //cachedRoomList.Clear();
         foreach (Transform trans in roomListContent)
         {
             Destroy(trans.gameObject);
@@ -173,7 +168,7 @@ public class Launcher : MonoBehaviourPunCallbacks
             if (roomList[i].RemovedFromList)
                 continue;
             Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp(roomList[i]);
-            cachedRoomList.Add(roomList[i]);
+            //cachedRoomList.Add(roomList[i]);
         }
         
     }

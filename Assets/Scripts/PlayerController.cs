@@ -320,7 +320,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
             else
             {
-                //Debug.Log("L");
                 opponentsInFOV.Remove(detectionRadius.opponentsInRange[i]);
             }
 
