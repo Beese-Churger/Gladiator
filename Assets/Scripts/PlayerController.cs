@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     public float lightHitboxDeactivationTime = 0.7f;
 
     public List<float> lightStaminaCost = new() { 8f, 6f, 6f };
-    bool isAttacking = false;
+    public bool isAttacking = false;
     float lastAttack;
     float regenDelay = 1f;
     float staminaRegenAmount = 20f;
@@ -252,6 +252,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 collider = rHand;
                 break;
         }
+        
         UseStaminaAttack(staminaCost);
         // Schedule hitbox activation and deactivation using animation events
         StartCoroutine(PerformLightAttack(collider));
@@ -268,6 +269,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             yield break;
         }
 
+        //UpdateAttackIndicator();
         yield return null; // yield 1 frame to ensure animation starts;
 
         AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
@@ -291,6 +293,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         return tookHit && !hasHyperArmor;
     }
+
+    //public void UpdateAttackIndicator(GameObject theAttacker)
+    //{
+
+    //}
     public void LockOntoOpponent()
     {
         CheckWhoCanLock();
@@ -425,7 +432,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         currentStamina -= amount;
         currentStamina = Mathf.Clamp(currentStamina, 0f, 100f);
         UpdateStaminaBar();
-        //PV.RPC(nameof(RPC_UseStamina), RpcTarget.All, amount);
     }
 
     public void UseStamina(float amount)
@@ -446,13 +452,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             currentStamina += amount * Time.fixedDeltaTime;
         currentStamina = Mathf.Clamp(currentStamina, 0f, 100f);
         UpdateStaminaBar();
-    }
-
-
-    [PunRPC]
-    void RPC_RegenStamina(bool can)
-    {
-
     }
 
     void Die()

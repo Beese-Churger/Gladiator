@@ -88,32 +88,34 @@ public class MouseController : MonoBehaviourPunCallbacks
             angle += 360;
         }
 
-        // Determine the hovered section based on the angle
-        if (angle >= 0 && angle < 120 && !directions[0].activeInHierarchy)
+        if (!playerController.isAttacking)
         {
-            directions[0].SetActive(true);
-            directions[1].SetActive(false);
-            directions[2].SetActive(false);
-            inputDirection = DirectionalInput.TOP;
-            UpdateDirection();
+            // Determine the hovered section based on the angle
+            if (angle >= 0 && angle < 120 && !directions[0].activeInHierarchy)
+            {
+                directions[0].SetActive(true);
+                directions[1].SetActive(false);
+                directions[2].SetActive(false);
+                inputDirection = DirectionalInput.TOP;
+                UpdateDirection();
+            }
+            else if (angle >= 120 && angle < 240 && !directions[1].activeInHierarchy)
+            {
+                directions[0].SetActive(false);
+                directions[1].SetActive(true);
+                directions[2].SetActive(false);
+                inputDirection = DirectionalInput.LEFT;
+                UpdateDirection();
+            }
+            else if (angle >= 240 && angle < 360 && !directions[2].activeInHierarchy)
+            {
+                directions[0].SetActive(false);
+                directions[1].SetActive(false);
+                directions[2].SetActive(true);
+                inputDirection = DirectionalInput.RIGHT;
+                UpdateDirection();
+            }
         }
-        else if (angle >= 120 && angle < 240 && !directions[1].activeInHierarchy)
-        {
-            directions[0].SetActive(false);
-            directions[1].SetActive(true);
-            directions[2].SetActive(false);
-            inputDirection = DirectionalInput.LEFT;
-            UpdateDirection();
-        }
-        else if (angle >= 240 && angle < 360 && !directions[2].activeInHierarchy)
-        {
-            directions[0].SetActive(false);
-            directions[1].SetActive(false);
-            directions[2].SetActive(true);
-            inputDirection = DirectionalInput.RIGHT;
-            UpdateDirection();
-        }
-
         // set previous direction;
         prevDir = direction.normalized;
     }
