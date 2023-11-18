@@ -20,7 +20,9 @@ public class Hitbox : MonoBehaviour
             Debug.Log("hit");
 
             PlayerController target = other.GetComponent<PlayerController>();
-            target.TakeDamage(10);
+
+            target.CheckIfBlocked(playerController, playerController.GetDir(), 10);
+            //target.TakeDamage(10);
         }
     }
 }

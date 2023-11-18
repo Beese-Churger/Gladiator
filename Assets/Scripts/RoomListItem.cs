@@ -11,7 +11,7 @@ public class RoomListItem : MonoBehaviour
     public void SetUp(RoomInfo _info)
     {
         info = _info;
-        text.text = info.Name;
+        text.text = info.CustomProperties["RoomName"].ToString();
     }
 
     public void OnClick()

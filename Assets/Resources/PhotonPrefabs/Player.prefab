@@ -5540,6 +5540,7 @@ MonoBehaviour:
   - 8
   - 6
   - 6
+  isAttacking: 0
   animator: {fileID: 5635569067390719461}
 --- !u!114 &7167737441030003614
 MonoBehaviour:
@@ -5644,6 +5645,9 @@ MonoBehaviour:
   - Type: 9
     SynchronizeType: 0
     Name: HEAVY
+  - Type: 9
+    SynchronizeType: 0
+    Name: HIT
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

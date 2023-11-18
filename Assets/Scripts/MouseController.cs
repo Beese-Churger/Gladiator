@@ -82,14 +82,28 @@ public class MouseController : MonoBehaviourPunCallbacks
         // set cursor pos
         cursor.transform.position = center + (direction.normalized * WithinBounds);
 
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        if (angle < 0)
-        {
-            angle += 360;
-        }
 
+        if (playerController.isAttacking)
+        {
+            directions[0].GetComponent<Image>().color = new Color(1, 0, 0, 100);
+            directions[1].GetComponent<Image>().color = new Color(1, 0, 0, 100);
+            directions[2].GetComponent<Image>().color = new Color(1, 0, 0, 100);
+        }
+        else
+        {
+            directions[0].GetComponent<Image>().color = new Color(1, 1, 1, 100);
+            directions[1].GetComponent<Image>().color = new Color(1, 1, 1, 100);
+            directions[2].GetComponent<Image>().color = new Color(1, 1, 1, 100);
+        }
         if (!playerController.isAttacking)
         {
+
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            if (angle < 0)
+            {
+                angle += 360;
+            }
+
             // Determine the hovered section based on the angle
             if (angle >= 0 && angle < 120 && !directions[0].activeInHierarchy)
             {

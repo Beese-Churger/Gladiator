@@ -161,7 +161,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         if(cameraController.CombatMode)
         {
-            if (Input.GetMouseButtonDown(0) && AbleToMove())
+            if (Input.GetMouseButtonDown(0) && AbleToMove() && !isAttacking)
             {
                 //Debug.Log("Light" + MouseController.instance.GetInputDirection().ToString());
                 LightAttack();
@@ -228,6 +228,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     [PunRPC]
     public void RPC_LightAttack(MouseController.DirectionalInput direction)
     {
+        isAttacking = true;
         animator.SetTrigger("LIGHT");
         animator.SetTrigger(direction.ToString());
 
@@ -260,7 +261,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     IEnumerator PerformLightAttack(Collider collider)
     {
-        isAttacking = true;
+
         if(ShouldInterruptAttack())
         {
             isAttacking = false;
@@ -282,11 +283,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         collider.enabled = false;
 
-        // when animation ends disable set isattacking to false
-        yield return new WaitForSeconds(stateInfo.length);
-
+        yield return new WaitForSeconds(0.1f);
         isAttacking = false;
         lastAttack = Time.time;
+        // when animation ends disable set isattacking to false
+        //yield return new WaitForSeconds(stateInfo.length * 0.8f);
+
+        //isAttacking = false;
+
     }
 
     bool ShouldInterruptAttack()
@@ -356,7 +360,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     private bool AbleToMove()
     {
-        if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Movement") && !animator.GetCurrentAnimatorStateInfo(0).IsName("CombatMovement"))
+        if (isAttacking)
             return false;
         return true;
     }
@@ -404,6 +408,34 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         staminaBarFill.value = currentStamina / maxStamina;
     }
 
+    public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage)
+    {
+        //check where its coming from with respect to player
+        Vector3 directionToPlayer = enemy.transform.position - transform.position;
+        float dotProduct = Vector3.Dot(enemy.orientation.forward, directionToPlayer.normalized);
+
+        MouseController.DirectionalInput incomingDir = enemyDir;
+        if(dotProduct < 0)
+        {
+            switch(enemyDir)
+            {
+                case MouseController.DirectionalInput.LEFT:
+                    incomingDir = MouseController.DirectionalInput.RIGHT;
+                    break;
+                case MouseController.DirectionalInput.RIGHT:
+                    incomingDir = MouseController.DirectionalInput.LEFT;
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (currDir == incomingDir)
+        {
+            // blocked
+        }
+        else
+            TakeDamage(damage);
+    }
     public void TakeDamage(float damage)
     {
         PV.RPC(nameof(RPC_TakeDamage), RpcTarget.All, damage);

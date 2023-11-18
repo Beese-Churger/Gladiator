@@ -27,60 +27,64 @@ public class Indicator: MonoBehaviour
             float dotProduct = Vector3.Dot(targetPlayerController.orientation.forward, directionToPlayer.normalized);
 
             // if facing player swap left and right to show correctly
-            if(targetPlayerController.isAttacking)
+            if (targetPlayerController.isAttacking)
             {
-
-            }
-            if (dotProduct > 0f) 
-            {
-                if (!directions[0].activeInHierarchy && targetPlayerController.GetDir() == MouseController.DirectionalInput.TOP)
-                {
-                    directions[0].SetActive(true);
-                    directions[1].SetActive(false);
-                    directions[2].SetActive(false);
-                    if(targetPlayerController.isAttacking)
-                    {
-                        directions[0].GetComponent<Image>().color = new Color(1, 0, 0,100);
-                    }
-                    else
-                        directions[0].GetComponent<Image>().color = new Color(1, 1, 1, 100);
-                }
-                else if (!directions[1].activeInHierarchy && targetPlayerController.GetDir() == MouseController.DirectionalInput.LEFT)
-                {
-                    directions[0].SetActive(false);
-                    directions[1].SetActive(true);
-                    directions[2].SetActive(false);
-                }
-                else if (!directions[2].activeInHierarchy && targetPlayerController.GetDir() == MouseController.DirectionalInput.RIGHT)
-                {
-                    directions[0].SetActive(false);
-                    directions[1].SetActive(false);
-                    directions[2].SetActive(true);
-                }
+                directions[0].GetComponent<Image>().color = new Color(1, 0, 0, 100);
+                directions[1].GetComponent<Image>().color = new Color(1, 0, 0, 100);
+                directions[2].GetComponent<Image>().color = new Color(1, 0, 0, 100);
             }
             else
             {
-                if (!directions[0].activeInHierarchy && targetPlayerController.GetDir() == MouseController.DirectionalInput.TOP)
-                {
-                    directions[0].SetActive(true);
-                    directions[1].SetActive(false);
-                    directions[2].SetActive(false);
-                }
-                else if (!directions[2].activeInHierarchy && targetPlayerController.GetDir() == MouseController.DirectionalInput.LEFT)
-                {
-                    directions[0].SetActive(false);
-                    directions[1].SetActive(false);
-                    directions[2].SetActive(true);
-                }
-                else if (!directions[1].activeInHierarchy && targetPlayerController.GetDir() == MouseController.DirectionalInput.RIGHT)
-                {
-                    directions[0].SetActive(false);
-                    directions[1].SetActive(true);
-                    directions[2].SetActive(false);
-                }
-                
+                directions[0].GetComponent<Image>().color = new Color(1, 1, 1, 100);
+                directions[1].GetComponent<Image>().color = new Color(1, 1, 1, 100);
+                directions[2].GetComponent<Image>().color = new Color(1, 1, 1, 100);
             }
+            if (!targetPlayerController.isAttacking)
+            { 
+                if (dotProduct > 0f)
+                {
+                    if (!directions[0].activeInHierarchy && targetPlayerController.GetDir() == MouseController.DirectionalInput.TOP)
+                    {
+                        directions[0].SetActive(true);
+                        directions[1].SetActive(false);
+                        directions[2].SetActive(false);
+                    }
+                    else if (!directions[1].activeInHierarchy && targetPlayerController.GetDir() == MouseController.DirectionalInput.LEFT)
+                    {
+                        directions[0].SetActive(false);
+                        directions[1].SetActive(true);
+                        directions[2].SetActive(false);
+                    }
+                    else if (!directions[2].activeInHierarchy && targetPlayerController.GetDir() == MouseController.DirectionalInput.RIGHT)
+                    {
+                        directions[0].SetActive(false);
+                        directions[1].SetActive(false);
+                        directions[2].SetActive(true);
+                    }
+                }
+                else
+                {
+                    if (!directions[0].activeInHierarchy && targetPlayerController.GetDir() == MouseController.DirectionalInput.TOP)
+                    {
+                        directions[0].SetActive(true);
+                        directions[1].SetActive(false);
+                        directions[2].SetActive(false);
+                    }
+                    else if (!directions[2].activeInHierarchy && targetPlayerController.GetDir() == MouseController.DirectionalInput.LEFT)
+                    {
+                        directions[0].SetActive(false);
+                        directions[1].SetActive(false);
+                        directions[2].SetActive(true);
+                    }
+                    else if (!directions[1].activeInHierarchy && targetPlayerController.GetDir() == MouseController.DirectionalInput.RIGHT)
+                    {
+                        directions[0].SetActive(false);
+                        directions[1].SetActive(true);
+                        directions[2].SetActive(false);
+                    }
 
+                }
+            }
         }
         else
         {
