@@ -410,9 +410,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage)
     {
-        //check where its coming from with respect to player
-        Vector3 directionToPlayer = enemy.transform.position - transform.position;
-        float dotProduct = Vector3.Dot(enemy.orientation.forward, directionToPlayer.normalized);
+        //check if player is facing enemy
+        Vector3 directionToPlayer = transform.position - enemy.transform.position;
+        float dotProduct = Vector3.Dot(orientation.forward, directionToPlayer.normalized);
 
         MouseController.DirectionalInput incomingDir = enemyDir;
         if(dotProduct < 0)
@@ -431,7 +431,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         if (currDir == incomingDir)
         {
-            // blocked
+            animator.SetTrigger("BLOCK");
         }
         else
             TakeDamage(damage);

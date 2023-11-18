@@ -22,7 +22,7 @@ public class Indicator: MonoBehaviour
         if (targetFollow != null)
         {
             transform.position = Camera.main.WorldToScreenPoint(targetFollow.transform.position);
-
+            // check if enemy is facing player
             Vector3 directionToPlayer = targetFollow.transform.position - host.transform.position;
             float dotProduct = Vector3.Dot(targetPlayerController.orientation.forward, directionToPlayer.normalized);
 
