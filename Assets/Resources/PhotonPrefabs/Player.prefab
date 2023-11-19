@@ -4430,6 +4430,7 @@ MonoBehaviour:
   rb: {fileID: 5635569067390719470}
   rotationSpeed: 7
   combatLookAt: {fileID: 5635569067113481856}
+  orientationInitialFwd: {x: 0, y: 0, z: 0}
   thirdPersonCam: {fileID: 5635569067871618058}
   combatCam: {fileID: 5635569066389160104}
   playerDirectional: {fileID: 5635569066911460420}
@@ -5530,10 +5531,12 @@ MonoBehaviour:
     m_Bits: 8
   orientation: {fileID: 5635569067445041447}
   model: {fileID: 6756295419733340701}
+  playerCollider: {fileID: 0}
   detectionRadius: {fileID: 6170855969775771635}
   opponentsInFOV: []
   rHand: {fileID: 8427858061803160642}
   lHand: {fileID: 6610068262487649943}
+  iFrameDuration: 0.2
   lightHitboxActivationTime: 0.3
   lightHitboxDeactivationTime: 0.7
   lightStaminaCost:

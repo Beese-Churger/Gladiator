@@ -65,9 +65,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     Vector2 speedPercent;
 
     [Header("CombatStuff")]
+    [SerializeField] Collider playerCollider;
     [SerializeField] Detect detectionRadius;
     public List<GameObject> opponentsInFOV = new();
     [SerializeField] Collider rHand, lHand;
+
+    bool isDodging = false;
+    bool dodgeLeft = false;
+    bool isInvincible = false;
+    Vector3 dodgePoint;
+    public float dodgeSpeed = 5.0f;
+    public float dodgeRadius = 50.0f;
+    public float iFrameDuration = 0.2f;
 
     public float lightHitboxActivationTime = 0.3f;
     public float lightHitboxDeactivationTime = 0.7f;
@@ -161,7 +170,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         if(cameraController.CombatMode)
         {
-            if (Input.GetMouseButtonDown(0) && AbleToMove() && !isAttacking)
+            if (Input.GetMouseButtonDown(0) && AbleToMove())
             {
                 //Debug.Log("Light" + MouseController.instance.GetInputDirection().ToString());
                 LightAttack();
@@ -193,13 +202,36 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             orientation.rotation = model.rotation;
             return;
         }
-
+        if (isDodging)
+        {
+            MoveTowards(dodgeLeft);
+        }
 
         if (!AbleToMove())
             return;
+
         MovePlayer();
+
+
     }
 
+    private void MoveTowards(bool left)
+    {
+        //// Calculate the direction to the target
+        //Vector3 direction = (targetPosition - transform.position).normalized;
+        //Debug.Log("dodging");
+        //// Move the player
+        //transform.position = Vector3.Lerp(transform.position, targetPosition, dodgeSpeed * Time.deltaTime);
+        if(left)
+        {
+            rb.AddForce(-orientation.right * 100f, ForceMode.Force);
+        }
+        else
+        {
+            rb.AddForce(orientation.right * 100f, ForceMode.Force);
+        }
+
+    }
     private void MyInput()
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -213,7 +245,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         // on ground
         if (grounded)
+        {
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                if (Input.GetKey(KeyCode.A))
+                {
+                    Dodge(true);
+                }
+                else if(Input.GetKey(KeyCode.D))
+                {
+                    Dodge(false);
+                }
+            }
+
+        }
+
 
         // in air
         else if (!grounded)
@@ -262,7 +310,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     IEnumerator PerformLightAttack(Collider collider)
     {
 
-        if(ShouldInterruptAttack())
+        if(ShouldInterruptAction())
         {
             isAttacking = false;
             lastAttack = Time.time;
@@ -290,18 +338,64 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         //yield return new WaitForSeconds(stateInfo.length * 0.8f);
 
         //isAttacking = false;
-
     }
 
-    bool ShouldInterruptAttack()
+    bool ShouldInterruptAction()
     {
-        return tookHit && !hasHyperArmor;
+        return tookHit && !hasHyperArmor && !isDodging;
     }
 
-    //public void UpdateAttackIndicator(GameObject theAttacker)
-    //{
+    public void Dodge(bool _dodgeLeft)
+    {
+        isDodging = true;
+        dodgeLeft = _dodgeLeft;
+        dodgePoint = transform.position + new Vector3(horizontalInput, 0, verticalInput).normalized * dodgeRadius;
+        PV.RPC(nameof(RPC_Dodge), RpcTarget.All, _dodgeLeft);
+    }
+    [PunRPC]
+    public void RPC_Dodge(bool dodgeLeft)
+    {
+        isDodging = true;
+        isInvincible = true;
+        //animator.SetTrigger("LIGHT");
+        if(dodgeLeft)
+            animator.SetTrigger("DODGELEFT");
+        else
+            animator.SetTrigger("DODGERIGHT");
 
-    //}
+        // choose collider to activate
+      
+
+        //UseStaminaAttack(staminaCost);
+        // Schedule hitbox activation and deactivation using animation events
+        StartCoroutine(PerformDodge());
+    }
+
+    IEnumerator PerformDodge()
+    {
+
+
+        if (ShouldInterruptAction())
+        {
+            isDodging = false;
+            //lastAttack = Time.time;
+            animator.SetTrigger("HIT");
+            yield break;
+        }
+
+        //UpdateAttackIndicator();
+        yield return null; // yield 1 frame to ensure animation starts;
+
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+
+        yield return new WaitForSeconds(iFrameDuration);
+
+        isInvincible = false;
+
+        yield return new WaitForSeconds(stateInfo.length * 0.5f);
+
+        isDodging = false;
+    }
     public void LockOntoOpponent()
     {
         if(detectionRadius.opponentsInRange.Count > 0)
@@ -365,7 +459,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     private bool AbleToMove()
     {
-        if (isAttacking)
+        if (isAttacking || isDodging)
             return false;
         return true;
     }
