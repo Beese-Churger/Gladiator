@@ -69,20 +69,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     [SerializeField] Detect detectionRadius;
     public List<GameObject> opponentsInFOV = new();
     [SerializeField] Collider rHand, lHand;
+    float lastHitTime;
+    float timeToMove = 0.05f;
 
     bool isDodging = false;
     bool dodgeLeft = false;
     bool isInvincible = false;
-    Vector3 dodgePoint;
-    public float dodgeSpeed = 5.0f;
-    public float dodgeRadius = 50.0f;
     public float iFrameDuration = 0.2f;
-
+    float lastDodgeTime;
+    float dodgeCD = 0.3f;
     public float lightHitboxActivationTime = 0.3f;
     public float lightHitboxDeactivationTime = 0.7f;
 
     public List<float> lightStaminaCost = new() { 8f, 6f, 6f };
+    public List<float> heavyStaminaCost = new() { 18f, 12f, 12f };
     public bool isAttacking = false;
+    public bool isHeavy = false;
     float lastAttack;
     float regenDelay = 1f;
     float staminaRegenAmount = 20f;
@@ -121,6 +123,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         currentStamina = maxStamina;
         currDir = MouseController.DirectionalInput.TOP;
         lastAttack = Time.time;
+        lastDodgeTime = Time.time;
+        lastHitTime = Time.time;
     }
 
     private void Update()
@@ -182,6 +186,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 //animator.SetTrigger("LIGHT");
                 //animator.SetTrigger(MouseController.instance.GetInputDirection().ToString());
             }
+
+            if(lastDodgeTime + dodgeCD < Time.time && AbleToMove())
+            {
+                if (Input.GetKey(KeyCode.A) && Input.GetKeyDown(KeyCode.Space))
+                {
+                    Dodge(true);
+                }
+                else if (Input.GetKey(KeyCode.D) && Input.GetKeyDown(KeyCode.Space))
+                {
+                    Dodge(false);
+                }
+            }
         }
         else
         {
@@ -242,25 +258,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (grounded)
         {
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
-
-            if(Input.GetKeyDown(KeyCode.Space))
-            {
-                if (Input.GetKey(KeyCode.A))
-                {
-                    Dodge(true);
-                }
-                else if(Input.GetKey(KeyCode.D))
-                {
-                    Dodge(false);
-                }
-            }
-
         }
 
 
-        // in air
-        else if (!grounded)
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
+        //// in air
+        //else if (!grounded)
+        //    rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
     }
 
     public void LightAttack()
@@ -344,7 +347,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         isDodging = true;
         dodgeLeft = _dodgeLeft;
-        dodgePoint = transform.position + new Vector3(horizontalInput, 0, verticalInput).normalized * dodgeRadius;
         PV.RPC(nameof(RPC_Dodge), RpcTarget.All, _dodgeLeft);
     }
     [PunRPC]
@@ -352,28 +354,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         isDodging = true;
         isInvincible = true;
-        //animator.SetTrigger("LIGHT");
+
         if(dodgeLeft)
             animator.SetTrigger("DODGELEFT");
         else
             animator.SetTrigger("DODGERIGHT");
 
-        // choose collider to activate
-      
-
-        //UseStaminaAttack(staminaCost);
-        // Schedule hitbox activation and deactivation using animation events
         StartCoroutine(PerformDodge());
     }
 
     IEnumerator PerformDodge()
     {
-
-
         if (ShouldInterruptAction())
         {
             isDodging = false;
-            //lastAttack = Time.time;
+            lastDodgeTime = Time.time;
             animator.SetTrigger("HIT");
             yield break;
         }
@@ -390,6 +385,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         yield return new WaitForSeconds(stateInfo.length * 0.5f);
 
         isDodging = false;
+        lastDodgeTime = Time.time;
     }
     public void LockOntoOpponent()
     {
@@ -456,6 +452,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         if (isAttacking || isDodging)
             return false;
+
+        if (lastHitTime + timeToMove > Time.time)
+            return false;
+
         return true;
     }
     public void ChangeSpeed()
@@ -539,6 +539,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     void RPC_TakeDamage(float damage, PhotonMessageInfo info)
     {
         tookHit = true;
+        lastHitTime = Time.time;
 
         currentHealth -= damage;
         UpdateHealthBar();
