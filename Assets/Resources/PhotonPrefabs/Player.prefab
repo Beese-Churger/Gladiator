@@ -5536,8 +5536,6 @@ MonoBehaviour:
   opponentsInFOV: []
   rHand: {fileID: 8427858061803160642}
   lHand: {fileID: 6610068262487649943}
-  dodgeSpeed: 5
-  dodgeRadius: 10
   iFrameDuration: 0.2
   lightHitboxActivationTime: 0.3
   lightHitboxDeactivationTime: 0.7
@@ -5545,7 +5543,12 @@ MonoBehaviour:
   - 8
   - 6
   - 6
+  heavyStaminaCost:
+  - 18
+  - 12
+  - 12
   isAttacking: 0
+  isHeavy: 0
   animator: {fileID: 5635569067390719461}
 --- !u!114 &7167737441030003614
 MonoBehaviour:
