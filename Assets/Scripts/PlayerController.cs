@@ -396,7 +396,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         if(!cameraController.currentLock)
         {
-            if (opponentsInFOV.Count > 0)
+            if (opponentsInFOV.Count > 0 && opponentsInFOV[0])
                 cameraController.currentLock = opponentsInFOV[0].transform;
             else
                 cameraController.orientationInitialFwd = orientation.forward;
@@ -502,7 +502,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         staminaBarFill.value = currentStamina / maxStamina;
     }
 
-    public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage)
+    public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
     {
         //check if player is facing enemy
         Vector3 directionToPlayer = transform.position - enemy.transform.position;
@@ -525,11 +525,28 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         if (currDir == incomingDir)
         {
-            animator.SetTrigger("BLOCK");
+            BlockAttack(damage, _isHeavy);
         }
         else
             TakeDamage(damage);
     }
+    public void BlockAttack(float damage, bool _isHeavy)
+    {
+        PV.RPC(nameof(RPC_BlockAttack), RpcTarget.All, damage, _isHeavy);
+    }
+    [PunRPC]
+    void RPC_BlockAttack(float damage, bool _isHeavy, PhotonMessageInfo info)
+    {
+        lastHitTime = Time.time;
+        if(_isHeavy)
+        {
+            // take reduced damage if isHeavy
+            //currentHealth -= damage;
+            //UpdateHealthBar();
+        }
+        animator.SetTrigger("BLOCK");
+    }
+
     public void TakeDamage(float damage)
     {
         PV.RPC(nameof(RPC_TakeDamage), RpcTarget.All, damage);

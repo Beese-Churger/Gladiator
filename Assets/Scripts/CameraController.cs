@@ -126,24 +126,19 @@ public class CameraController : MonoBehaviour
                 {
                     currentLock = combatLookAt;
                 }
+
                 if(playerController.opponentsInFOV.Count <= 0)
                 {
                     combatLookAt.position = playerObj.position + (orientationInitialFwd * 4);
                 }
-                      
+                else if(playerController.opponentsInFOV.Count == 1)
+                {
+                    SwapTarget();
+                }
 
                 if (Input.GetMouseButtonDown(2))
                 {
-                    if(playerController.opponentsInFOV.Count > 0)
-                    {
-                        int currIndex = playerController.opponentsInFOV.IndexOf(currentLock.gameObject);
-                        if (currIndex == playerController.opponentsInFOV.Count - 1)
-                            currIndex = 0;
-                        else
-                            currIndex++;
-
-                        currentLock = playerController.opponentsInFOV[currIndex].transform;
-                    } 
+                    SwapTarget();
                 }
                 
                 Vector3 dirToCombatLookAt = currentLock.position - new Vector3(player.position.x, currentLock.position.y, player.position.z);
@@ -171,6 +166,19 @@ public class CameraController : MonoBehaviour
         currentStyle = newStyle;
     }
 
+    public void SwapTarget()
+    {
+        if (playerController.opponentsInFOV.Count > 0)
+        {
+            int currIndex = playerController.opponentsInFOV.IndexOf(currentLock.gameObject);
+            if (currIndex == playerController.opponentsInFOV.Count - 1)
+                currIndex = 0;
+            else
+                currIndex++;
+
+            currentLock = playerController.opponentsInFOV[currIndex].transform;
+        }
+    }
     private void TurnOnIndicators()
     {
         if (indicators.Count <= 0)
