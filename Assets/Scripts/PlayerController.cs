@@ -304,13 +304,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     //}
     public void LockOntoOpponent()
     {
-        CheckWhoCanLock();
+        if(detectionRadius.opponentsInRange.Count > 0)
+        {
+            CheckWhoCanLock();
+        }
+
         if(!cameraController.currentLock)
         {
-            if(opponentsInFOV.Count > 0)
+            if (opponentsInFOV.Count > 0)
                 cameraController.currentLock = opponentsInFOV[0].transform;
-        }
-        
+            else
+                cameraController.orientationInitialFwd = orientation.forward;
+        }        
     }
     public void CheckWhoCanLock()
     {

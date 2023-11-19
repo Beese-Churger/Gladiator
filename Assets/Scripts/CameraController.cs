@@ -17,6 +17,7 @@ public class CameraController : MonoBehaviour
     public float rotationSpeed;
 
     public Transform combatLookAt;
+    public Vector3 orientationInitialFwd;
 
     public GameObject thirdPersonCam;
     public GameObject combatCam;
@@ -120,10 +121,18 @@ public class CameraController : MonoBehaviour
             }
             case CameraStyle.Combat:
             {
+                    
                 if (!currentLock)
+                {
                     currentLock = combatLookAt;
+                }
+                if(playerController.opponentsInFOV.Count <= 0)
+                {
+                    combatLookAt.position = playerObj.position + (orientationInitialFwd * 4);
+                }
+                      
 
-                if(Input.GetMouseButtonDown(2))
+                if (Input.GetMouseButtonDown(2))
                 {
                     if(playerController.opponentsInFOV.Count > 0)
                     {
@@ -141,6 +150,7 @@ public class CameraController : MonoBehaviour
                 orientation.forward = dirToCombatLookAt.normalized;
 
                 playerObj.forward = dirToCombatLookAt.normalized;
+
                 combatLookAt.position = player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(currentLock.position, player.position), 2);
                 combatLookAt.rotation = playerObj.rotation;
 
