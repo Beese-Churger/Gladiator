@@ -217,11 +217,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     private void MoveTowards(bool left)
     {
-        //// Calculate the direction to the target
-        //Vector3 direction = (targetPosition - transform.position).normalized;
-        //Debug.Log("dodging");
-        //// Move the player
-        //transform.position = Vector3.Lerp(transform.position, targetPosition, dodgeSpeed * Time.deltaTime);
         if(left)
         {
             rb.AddForce(-orientation.right * 100f, ForceMode.Force);
