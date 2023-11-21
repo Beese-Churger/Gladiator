@@ -193,6 +193,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             }
             if (Input.GetMouseButtonDown(1) && AbleToMove())
             {
+                bool hasParry = false;
                 for(int i = 0; i < opponentsInAttackRange.Count; ++i)
                 {
                     PlayerController enemyController = opponentsInAttackRange[i];
@@ -200,12 +201,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                     {
                         if(opponentsInAttackRange[i].canParry)
                         {
-                            CheckIfCanParry(enemyController, enemyController.GetDir(), enemyController.isHeavy);
+                            if(CheckIfCanParry(enemyController, enemyController.GetDir(), enemyController.isHeavy))
+                            {
+                                ParryAttack(enemyController.isHeavy);
+                                hasParry = true;
+                            }
                         }
                     }
                 }
-
-                HeavyAttack();
+                if(!hasParry)   
+                    HeavyAttack();
             }
 
             if(canFeint && Input.GetKeyDown(KeyCode.E))
@@ -622,7 +627,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         staminaBarFill.value = currentStamina / maxStamina;
     }
-    public void CheckIfCanParry(PlayerController enemy, MouseController.DirectionalInput enemyDir, bool _isHeavy)
+    public bool CheckIfCanParry(PlayerController enemy, MouseController.DirectionalInput enemyDir, bool _isHeavy)
     {
         //check if player is facing enemy
         Vector3 directionToPlayer = transform.position - enemy.transform.position;
@@ -643,10 +648,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                     break;
             }
         }
-        if(currDir == incomingDir)
+        if (currDir == incomingDir)
         {
-            ParryAttack(_isHeavy);
+            //ParryAttack(_isHeavy);
+            return true;
         }
+        else
+            return false;
     }
     public bool DoParry()
     {
