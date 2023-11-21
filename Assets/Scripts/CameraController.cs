@@ -177,7 +177,7 @@ public class CameraController : MonoBehaviour
                 currIndex++;
 
             currentLock = playerController.opponentsInFOV[currIndex].transform;
-            UpdateTarget(currentLock);
+            //UpdateTarget(currentLock);
         }
     }
     private void TurnOnIndicators()
@@ -210,15 +210,5 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    public void UpdateTarget(Transform target)
-    {
-        PV.RPC(nameof(RPC_UpdateTarget), RpcTarget.All, target);
-    }
-
-    [PunRPC]
-    public void RPC_UpdateTarget(Transform target)
-    {
-        currentLock = target;
-    }
 }
 
