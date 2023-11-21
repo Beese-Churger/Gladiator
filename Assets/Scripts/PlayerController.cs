@@ -199,8 +199,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                     PlayerController enemyController = opponentsInAttackRange[i];
                     if (transform == enemyController.cameraController.currentLock)
                     {
-                        if(opponentsInAttackRange[i].canParry)
+                        if(enemyController.canParry)
                         {
+                            Debug.Log("hi");
                             if(CheckIfCanParry(enemyController, enemyController.GetDir(), enemyController.isHeavy))
                             {
                                 ParryAttack(enemyController.isHeavy);
