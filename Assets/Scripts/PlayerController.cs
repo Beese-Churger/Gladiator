@@ -204,6 +204,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                             if(CheckIfCanParry(enemyController, enemyController.GetDir(), enemyController.isHeavy))
                             {
                                 ParryAttack(enemyController.isHeavy);
+                                Debug.Log("hi");
                                 hasParry = true;
                             }
                         }
