@@ -7,11 +7,11 @@ using Photon.Realtime;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
-    public enum PlayerStates
+    public enum PlayerState
     {
-        IDLE,
         COMBAT,
-        ATTACKING,
+        PARRIED,
+        EXHAUSTED,
         HIT
     }
 
@@ -78,8 +78,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     public float iFrameDuration = 0.2f;
     float lastDodgeTime;
     float dodgeCD = 0.3f;
-    public float lightHitboxActivationTime = 0.3f;
-    public float lightHitboxDeactivationTime = 0.7f;
+    public float lightHitboxActivationTime = 0.5f;
+    public float lightHitboxDeactivationTime = 0.6f;
+
+    public float heavyHitboxActivationTime = 0.8f;
+    public float heavyHitboxDeactivationTime = 0.9f;
 
     public List<float> lightStaminaCost = new() { 8f, 6f, 6f };
     public List<float> heavyStaminaCost = new() { 18f, 12f, 12f };
@@ -92,7 +95,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     bool hasHyperArmor = false;
     bool tookHit = false;
     bool isCombo = false;
-
+    public bool canParry = false;
+    bool canFeint = false;
+    bool feint = false;
+    Coroutine heavyAttack;
     PhotonView PV;
     public Animator animator;
     private void Start()
@@ -185,12 +191,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             }
             if (Input.GetMouseButtonDown(1) && AbleToMove())
             {
-                Debug.Log("Heavy" + mouseController.GetInputDirection().ToString());
-
-                //animator.SetTrigger("LIGHT");
-                //animator.SetTrigger(MouseController.instance.GetInputDirection().ToString());
+                //Debug.Log("Heavy" + mouseController.GetInputDirection().ToString());
+                HeavyAttack();
             }
 
+            if(canFeint && Input.GetKeyDown(KeyCode.E))
+            {
+                feint = true;
+                canFeint = false;
+            }
             if(lastDodgeTime + dodgeCD < Time.time && AbleToMove())
             {
                 if (Input.GetKey(KeyCode.A) && Input.GetKeyDown(KeyCode.Space))
@@ -342,11 +351,104 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         //isAttacking = false;
     }
 
+    public void HeavyAttack()
+    {
+        isAttacking = true;
+        PV.RPC(nameof(RPC_HeavyAttack), RpcTarget.All, mouseController.GetInputDirection());
+    }
+    [PunRPC]
+    public void RPC_HeavyAttack(MouseController.DirectionalInput direction)
+    {
+        isAttacking = true;
+        animator.SetTrigger("HEAVY");
+        animator.SetTrigger(direction.ToString());
+
+        // choose collider to activate
+        Collider collider;
+        float staminaCost = 0f;
+        switch (direction)
+        {
+            case MouseController.DirectionalInput.TOP:
+                collider = rHand;
+                staminaCost = lightStaminaCost[0];
+                break;
+            case MouseController.DirectionalInput.LEFT:
+                collider = lHand;
+                staminaCost = lightStaminaCost[1];
+                break;
+            case MouseController.DirectionalInput.RIGHT:
+                collider = rHand;
+                staminaCost = lightStaminaCost[2];
+                break;
+            default:
+                collider = rHand;
+                break;
+        }
+
+        UseStaminaAttack(staminaCost);
+        // Schedule hitbox activation and deactivation using animation events
+        StartCoroutine(PerformHeavyAttack(collider));
+    }
+
+    IEnumerator PerformHeavyAttack(Collider collider)
+    {
+
+        if (ShouldInterruptAction())
+        {
+            isAttacking = false;
+            lastAttack = Time.time;
+            animator.SetTrigger("HIT");
+            yield break;
+        }
+
+        yield return null; // yield 1 frame to ensure animation starts;
+
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        canFeint = true;
+
+        yield return new WaitForSeconds(0.4f); // feint 400ms before attack would land
+
+        if(doFeint())
+        {
+            isAttacking = false;
+            lastAttack = Time.time;
+            canFeint = false;
+            feint = false;
+            animator.SetTrigger("FEINT");
+            yield break;
+        }
+        canFeint = false;
+
+        yield return new WaitForSeconds(0.1f); // parry starts 300ms before attack lands
+
+        canParry = true;
+
+        yield return new WaitForSeconds(0.2f); // parry ends 100ms before attack lands lasts 200ms
+
+        canParry = false;
+
+        yield return new WaitForSeconds(0.1f);
+
+        collider.enabled = true;
+
+        yield return new WaitForSeconds(0.1f);
+
+        collider.enabled = false;
+
+        yield return new WaitForSeconds(0.3f);
+        isAttacking = false;
+        lastAttack = Time.time;
+    }
+
     bool ShouldInterruptAction()
     {
         return tookHit && !hasHyperArmor && !isDodging;
     }
 
+    bool doFeint()
+    {
+        return feint;
+    }
     public void Dodge(bool _dodgeLeft)
     {
         isDodging = true;

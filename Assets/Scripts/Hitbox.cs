@@ -6,6 +6,8 @@ public class Hitbox : MonoBehaviour
 {
     [SerializeField] PlayerController playerController;
     [SerializeField] PhotonView PV;
+
+
     private void Awake()
     {
         PV = GetComponent<PhotonView>();

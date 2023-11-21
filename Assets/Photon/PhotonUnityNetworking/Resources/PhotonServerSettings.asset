@@ -47,6 +47,7 @@ MonoBehaviour:
   - RPC_RegenStamina
   - RPC_Dodge
   - RPC_BlockAttack
+  - RPC_HeavyAttack
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

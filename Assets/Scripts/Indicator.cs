@@ -29,15 +29,18 @@ public class Indicator: MonoBehaviour
             // if facing player swap left and right to show correctly
             if (targetPlayerController.isAttacking)
             {
-                directions[0].GetComponent<Image>().color = new Color(1, 0, 0, 100);
-                directions[1].GetComponent<Image>().color = new Color(1, 0, 0, 100);
-                directions[2].GetComponent<Image>().color = new Color(1, 0, 0, 100);
+                if (targetPlayerController.canParry)
+                {
+                    ChangeIndicatorColor(new Color(0, 1, 0, 100));
+                }
+                else
+                {
+                    ChangeIndicatorColor(new Color(1, 0, 0, 100));
+                }
             }
             else
             {
-                directions[0].GetComponent<Image>().color = new Color(1, 1, 1, 100);
-                directions[1].GetComponent<Image>().color = new Color(1, 1, 1, 100);
-                directions[2].GetComponent<Image>().color = new Color(1, 1, 1, 100);
+                ChangeIndicatorColor(new Color(1, 1, 1, 100));
             }
             if (!targetPlayerController.isAttacking)
             { 
@@ -92,6 +95,13 @@ public class Indicator: MonoBehaviour
         }
     }
 
+    private void ChangeIndicatorColor(Color _color)
+    {
+        for(int i = 0; i < 3; ++i)
+        {
+            directions[i].GetComponent<Image>().color = _color;
+        }
+    }
     public GameObject GetTarget()
     {
         return targetFollow;
