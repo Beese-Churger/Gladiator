@@ -12,6 +12,11 @@ public class Hitbox : MonoBehaviour
     {
         PV = GetComponent<PhotonView>();
     }
+
+    private void Update()
+    {
+
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (!PV.IsMine)

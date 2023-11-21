@@ -68,6 +68,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     [SerializeField] Collider playerCollider;
     [SerializeField] Detect detectionRadius;
     public List<GameObject> opponentsInFOV = new();
+    public List<PlayerController> opponentsInAttackRange = new();
     [SerializeField] Collider rHand, lHand;
     float lastHitTime;
     float timeToMove = 0.05f;
@@ -98,6 +99,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     public bool canParry = false;
     bool canFeint = false;
     bool feint = false;
+    bool parry = true;
     Coroutine heavyAttack;
     PhotonView PV;
     public Animator animator;
@@ -191,7 +193,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             }
             if (Input.GetMouseButtonDown(1) && AbleToMove())
             {
-                //Debug.Log("Heavy" + mouseController.GetInputDirection().ToString());
+                for(int i = 0; i < opponentsInAttackRange.Count; ++i)
+                {
+                    PlayerController enemyController = opponentsInAttackRange[i];
+                    if (transform == enemyController.cameraController.currentLock)
+                    {
+                        if(opponentsInAttackRange[i].canParry)
+                        {
+                            CheckIfCanParry(enemyController, enemyController.GetDir(), enemyController.isHeavy);
+                        }
+                    }
+                }
+
                 HeavyAttack();
             }
 
@@ -405,10 +418,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
         canFeint = true;
-
+        parry = false;
         yield return new WaitForSeconds(0.4f); // feint 400ms before attack would land
 
-        if(doFeint())
+        if(DoFeint())
         {
             isAttacking = false;
             lastAttack = Time.time;
@@ -445,10 +458,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         return tookHit && !hasHyperArmor && !isDodging;
     }
 
-    bool doFeint()
+    bool DoFeint()
     {
         return feint;
     }
+
+
     public void Dodge(bool _dodgeLeft)
     {
         isDodging = true;
@@ -607,7 +622,54 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         staminaBarFill.value = currentStamina / maxStamina;
     }
+    public void CheckIfCanParry(PlayerController enemy, MouseController.DirectionalInput enemyDir, bool _isHeavy)
+    {
+        //check if player is facing enemy
+        Vector3 directionToPlayer = transform.position - enemy.transform.position;
+        float dotProduct = Vector3.Dot(orientation.forward, directionToPlayer.normalized);
 
+        MouseController.DirectionalInput incomingDir = enemyDir;
+        if (dotProduct < 0)
+        {
+            switch (enemyDir)
+            {
+                case MouseController.DirectionalInput.LEFT:
+                    incomingDir = MouseController.DirectionalInput.RIGHT;
+                    break;
+                case MouseController.DirectionalInput.RIGHT:
+                    incomingDir = MouseController.DirectionalInput.LEFT;
+                    break;
+                default:
+                    break;
+            }
+        }
+        if(currDir == incomingDir)
+        {
+            ParryAttack(_isHeavy);
+        }
+    }
+    public bool DoParry()
+    {
+        return parry;
+    }
+    public void ParryAttack(bool _isHeavy)
+    {
+        PV.RPC(nameof(RPC_ParryAttack), RpcTarget.All, _isHeavy);
+    }
+    [PunRPC]
+    public void RPC_ParryAttack(bool _isHeavy)
+    {
+        lastHitTime = Time.time;
+        if (_isHeavy)
+        {
+            // longer stun time if is heavy
+            animator.SetTrigger("PARRY");
+        }
+        else
+        {
+            animator.SetTrigger("PARRY");
+        }
+    }
     public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
     {
         //check if player is facing enemy
@@ -636,6 +698,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         else
             TakeDamage(damage);
     }
+
     public void BlockAttack(float damage, bool _isHeavy)
     {
         PV.RPC(nameof(RPC_BlockAttack), RpcTarget.All, damage, _isHeavy);

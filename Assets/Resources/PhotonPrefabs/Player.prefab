@@ -5438,6 +5438,7 @@ Transform:
   - {fileID: 5635569067236700030}
   - {fileID: 5635569066273235210}
   - {fileID: 8938435339983793912}
+  - {fileID: 2769368182452772575}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5534,6 +5535,7 @@ MonoBehaviour:
   playerCollider: {fileID: 0}
   detectionRadius: {fileID: 6170855969775771635}
   opponentsInFOV: []
+  opponentsInAttackRange: []
   rHand: {fileID: 8427858061803160642}
   lHand: {fileID: 6610068262487649943}
   iFrameDuration: 0.2
@@ -5659,6 +5661,21 @@ MonoBehaviour:
   - Type: 9
     SynchronizeType: 0
     Name: HIT
+  - Type: 9
+    SynchronizeType: 0
+    Name: BLOCK
+  - Type: 9
+    SynchronizeType: 0
+    Name: DODGELEFT
+  - Type: 9
+    SynchronizeType: 0
+    Name: DODGERIGHT
+  - Type: 9
+    SynchronizeType: 0
+    Name: DEATH
+  - Type: 9
+    SynchronizeType: 0
+    Name: FEINT
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
@@ -7824,6 +7841,65 @@ Transform:
   m_Father: {fileID: 1207175808189646742}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7919296508432176177
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2769368182452772575}
+  - component: {fileID: 3823699320113524234}
+  - component: {fileID: 2182225026007170090}
+  m_Layer: 6
+  m_Name: InAttackRadius
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2769368182452772575
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7919296508432176177}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5635569067390719464}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &3823699320113524234
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7919296508432176177}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2182225026007170090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7919296508432176177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd8a527b8e9f0774f8e399f99974ed4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerController: {fileID: 5635569067390719466}
 --- !u!1 &7993129840781707928
 GameObject:
   m_ObjectHideFlags: 0

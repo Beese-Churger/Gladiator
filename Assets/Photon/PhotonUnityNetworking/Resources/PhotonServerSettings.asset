@@ -48,6 +48,7 @@ MonoBehaviour:
   - RPC_Dodge
   - RPC_BlockAttack
   - RPC_HeavyAttack
+  - RPC_ParryAttack
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
