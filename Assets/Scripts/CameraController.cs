@@ -131,7 +131,7 @@ public class CameraController : MonoBehaviour
                 {
                     combatLookAt.position = playerObj.position + (orientationInitialFwd * 4);
                 }
-                else if(playerController.opponentsInFOV.Count == 1)
+                else if(playerController.opponentsInFOV.Count == 1 && currentLock != combatLookAt)
                 {
                     SwapTarget();
                 }
@@ -176,8 +176,8 @@ public class CameraController : MonoBehaviour
             else
                 currIndex++;
 
-            //currentLock = playerController.opponentsInFOV[currIndex].transform;
-            UpdateTarget(playerController.opponentsInFOV[currIndex].transform);
+            currentLock = playerController.opponentsInFOV[currIndex].transform;
+            UpdateTarget(currentLock);
         }
     }
     private void TurnOnIndicators()
