@@ -344,7 +344,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             isAttacking = false;
             lastAttack = Time.time;
-            animator.SetTrigger("HIT");
+            //animator.SetTrigger("HIT");
+            animator.Play("GetHit");
             yield break;
         }
 
@@ -416,7 +417,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             isAttacking = false;
             lastAttack = Time.time;
-            animator.SetTrigger("HIT");
+            //animator.SetTrigger("HIT");
+            animator.Play("GetHit");
             yield break;
         }
 
