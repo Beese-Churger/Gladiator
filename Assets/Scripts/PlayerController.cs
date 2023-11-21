@@ -672,6 +672,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     }
     public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
     {
+        if (isAttacking)
+        {
+            TakeDamage(damage);
+            return;
+        }
+
+
         //check if player is facing enemy
         Vector3 directionToPlayer = transform.position - enemy.transform.position;
         float dotProduct = Vector3.Dot(orientation.forward, directionToPlayer.normalized);
