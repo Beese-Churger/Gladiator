@@ -216,7 +216,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
             if(canFeint && Input.GetKeyDown(KeyCode.E))
             {
-                feint = true;
+                Feint(true);
                 canFeint = false;
             }
             if(lastDodgeTime + dodgeCD < Time.time && AbleToMove())
@@ -469,6 +469,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         return feint;
     }
 
+    void Feint(bool isFeint)
+    {
+        PV.RPC(nameof(RPC_Feint), RpcTarget.All, isFeint);
+    }
+
+    [PunRPC]
+    public void RPC_Feint(bool isFeint)
+    {
+        feint = isFeint;
+    }
 
     public void Dodge(bool _dodgeLeft)
     {
