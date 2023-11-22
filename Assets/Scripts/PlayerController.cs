@@ -100,6 +100,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     bool canFeint = false;
     bool feint = false;
     bool parry = true;
+    bool isParried = false;
     public int lockOnPlayerID = -1;
 
     Coroutine heavyAttack;
@@ -190,7 +191,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             if (Input.GetMouseButtonDown(0) && AbleToMove())
             {
-                //Debug.Log("Light" + MouseController.instance.GetInputDirection().ToString());
                 LightAttack();
             }
             if (Input.GetMouseButtonDown(1) && AbleToMove())
@@ -203,11 +203,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                     {
                         if(enemyController.canParry)
                         {
-                            Debug.Log("hi");
                             if(CheckIfCanParry(enemyController, enemyController.GetDir(), enemyController.isHeavy))
                             {
                                 ParryAttack(enemyController.isHeavy);
-                                Debug.Log("hi");
                                 hasParry = true;
                             }
                         }
@@ -236,9 +234,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         else
         {
-            //speedPercent = new Vector2(Mathf.Abs(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).x, -1f, 1f)), Mathf.Abs(Mathf.Clamp(orientation.InverseTransformDirection(rb.velocity).z, -1f, 1f)));
-            ////animator.SetFloat("Xaxis", speedPercent.x, 0.1f, Time.deltaTime);
-            //animator.SetFloat("Yaxis", Mathf.Max(speedPercent.x,speedPercent.y), 0.1f, Time.deltaTime);
+
         }
     }
 
@@ -347,8 +343,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             isAttacking = false;
             lastAttack = Time.time;
-            //animator.SetTrigger("HIT");
-            animator.Play("GetHit");
+            animator.SetTrigger("HIT");
             yield break;
         }
 
@@ -420,16 +415,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             isAttacking = false;
             lastAttack = Time.time;
-            //animator.SetTrigger("HIT");
-            animator.Play("GetHit");
+            animator.SetTrigger("HIT");
             yield break;
         }
 
         yield return null; // yield 1 frame to ensure animation starts;
 
-        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
         canFeint = true;
-        parry = false;
+
         yield return new WaitForSeconds(0.4f); // feint 400ms before attack would land
 
         if(DoFeint())
@@ -554,7 +547,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 continue;
             }
 
-
             if (IsInCameraFrustum(i))
             {
                 if(!opponentsInFOV.Contains(detectionRadius.opponentsInRange[i]))
@@ -597,6 +589,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         if (lastHitTime + timeToMove > Time.time)
             return false;
+
+
 
         return true;
     }
@@ -666,15 +660,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         if (currDir == incomingDir)
         {
-            //ParryAttack(_isHeavy);
             return true;
         }
         else
             return false;
-    }
-    public bool DoParry()
-    {
-        return parry;
     }
     public void ParryAttack(bool _isHeavy)
     {
