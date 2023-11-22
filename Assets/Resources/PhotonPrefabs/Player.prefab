@@ -5677,6 +5677,15 @@ MonoBehaviour:
   - Type: 9
     SynchronizeType: 0
     Name: FEINT
+  - Type: 9
+    SynchronizeType: 0
+    Name: PARRY
+  - Type: 9
+    SynchronizeType: 0
+    Name: PARRIED
+  - Type: 9
+    SynchronizeType: 0
+    Name: ENDSTUN
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
