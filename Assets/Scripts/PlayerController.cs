@@ -100,6 +100,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     bool canFeint = false;
     bool feint = false;
     bool parry = true;
+    public int lockOnPlayerID = -1;
+
     Coroutine heavyAttack;
     PhotonView PV;
     public Animator animator;
@@ -197,7 +199,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
                 for(int i = 0; i < opponentsInAttackRange.Count; ++i)
                 {
                     PlayerController enemyController = opponentsInAttackRange[i];
-                    if (transform == enemyController.cameraController.currentLock)
+                    if (PV.ViewID == enemyController.lockOnPlayerID)
                     {
                         if(enemyController.canParry)
                         {

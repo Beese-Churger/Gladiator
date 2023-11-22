@@ -49,6 +49,8 @@ MonoBehaviour:
   - RPC_BlockAttack
   - RPC_HeavyAttack
   - RPC_ParryAttack
+  - RPC_Feint
+  - RPC_UpdateTarget
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

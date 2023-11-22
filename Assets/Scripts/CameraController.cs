@@ -177,8 +177,19 @@ public class CameraController : MonoBehaviour
                 currIndex++;
 
             currentLock = playerController.opponentsInFOV[currIndex].transform;
-            //UpdateTarget(currentLock);
+            UpdateTarget(currentLock.GetComponent<PhotonView>().ViewID);
         }
+    }
+
+    public void UpdateTarget(int id)
+    {
+        PV.RPC(nameof(RPC_UpdateTarget), RpcTarget.All, id);
+    }
+
+    [PunRPC]
+    public void RPC_UpdateTarget(int id)
+    {
+        playerController.lockOnPlayerID = id;
     }
     private void TurnOnIndicators()
     {
