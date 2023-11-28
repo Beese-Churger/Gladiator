@@ -165,7 +165,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
         else
         {
             // Reading from the network
-            if(PV.ViewID == playerIDParried)
+            //if(PV.ViewID == playerIDParried)
                 isAttackParried = (bool)stream.ReceiveNext();
             // Deserialize any additional data related to the parry action
         }
@@ -453,7 +453,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
             isAttacking = false;
             lastAttack = Time.time;
             Debug.Log("parried");
-            animator.SetTrigger("PARRIED"); //placeholder
+            animator.SetTrigger("HIT"); //placeholder
             yield break;
         }
 
