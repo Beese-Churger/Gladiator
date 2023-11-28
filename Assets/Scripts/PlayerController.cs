@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDamageable
+public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
     //public enum PlayerState
     //{
@@ -153,22 +153,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
         lastHitTime = Time.time;
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            // Writing to the network
-            stream.SendNext(isParried);
-            // Serialize any additional data related to the parry action
-        }
-        else
-        {
-            // Reading from the network
-            //if(PV.ViewID == playerIDParried)
-                isParried = (bool)stream.ReceiveNext();
-            // Deserialize any additional data related to the parry action
-        }
-    }
+    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    //{
+    //    if (stream.IsWriting)
+    //    {
+    //        // Writing to the network
+    //        stream.SendNext(isParried);
+    //        // Serialize any additional data related to the parry action
+    //    }
+    //    else
+    //    {
+    //        // Reading from the network
+    //        //if(PV.ViewID == playerIDParried)
+    //            isParried = (bool)stream.ReceiveNext();
+    //        // Deserialize any additional data related to the parry action
+    //    }
+    //}
     private void Update()
     {
 
