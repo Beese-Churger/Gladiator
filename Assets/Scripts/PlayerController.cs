@@ -718,6 +718,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
     [PunRPC]
     public void RPC_GetParried()
     {
+        Debug.Log("Parried");
         isParried = true;
     }
     public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
