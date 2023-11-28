@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
+public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDamageable
 {
     //public enum PlayerState
     //{
@@ -835,5 +835,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     void Die()
     {
         playerManager.Die();
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        throw new System.NotImplementedException();
     }
 }
