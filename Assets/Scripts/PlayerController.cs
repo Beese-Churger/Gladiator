@@ -368,6 +368,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
 
         if(ShouldInterruptAction())
         {
+            tookHit = false;
             isAttacking = false;
             lastAttack = Time.time;
             animator.SetTrigger("HIT");
@@ -440,6 +441,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
 
         if (ShouldInterruptAction())
         {
+            tookHit = false;
             isAttacking = false;
             lastAttack = Time.time;
             animator.SetTrigger("HIT");
