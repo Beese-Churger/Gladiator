@@ -679,6 +679,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     [PunRPC]
     public void RPC_ParryAttack(bool _isHeavy, int enemyParriedID) 
     {
+        Debug.Log(enemyParriedID + " " + PV.ViewID);
         lastHitTime = Time.time;
         if (_isHeavy)
         {
