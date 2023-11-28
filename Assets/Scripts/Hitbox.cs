@@ -24,11 +24,11 @@ public class Hitbox : MonoBehaviour
         if(other.CompareTag("Player") && other.gameObject != playerController.gameObject)
         {
             //Debug.Log($"Player {photonView.Owner.NickName} took {input}");
-            Debug.Log("hit");
+            //Debug.Log("hit");
 
             PlayerController target = other.GetComponent<PlayerController>();
 
-            if(!target.isparrying)
+            if(!target.isParrying)
                 target.CheckIfBlocked(playerController, playerController.GetDir(), 10, false);
             //target.TakeDamage(10);
         }
