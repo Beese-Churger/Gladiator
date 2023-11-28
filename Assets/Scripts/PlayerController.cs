@@ -99,7 +99,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
     public bool canParry = false;
     bool canFeint = false;
     bool feint = false;
-    bool parry = true;
+    public bool isParrying = false;
     bool isParried = false;
     public int lockOnPlayerID = -1;
     bool isBlocked = false;
@@ -626,7 +626,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
         if (lastHitTime + timeToMove > Time.time)
             return false;
 
-
+        isParrying = false;
 
         return true;
     }
@@ -710,6 +710,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
     [PunRPC]
     public void RPC_ParryAttack(bool _isHeavy) 
     {
+        isParrying = true;
         lastHitTime = Time.time;
         if (_isHeavy)
         {
