@@ -197,6 +197,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
         {
             tookHit = false;
             isAttacking = false;
+            isDodging = false;
             lastAttack = Time.time;
             animator.SetTrigger("HIT");
         }
@@ -528,14 +529,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
 
     IEnumerator PerformDodge()
     {
-        if (ShouldInterruptAction())
-        {
-            isDodging = false;
-            lastDodgeTime = Time.time;
-            animator.SetTrigger("HIT");
-            yield break;
-        }
-
         //UpdateAttackIndicator();
         yield return null; // yield 1 frame to ensure animation starts;
 
