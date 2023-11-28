@@ -19,6 +19,11 @@ public class RoomManager : MonoBehaviourPunCallbacks
             Destroy(this);
     }
 
+    private void Start()
+    {
+        //PhotonNetwork.SerializationRate = 30;
+    }
+
     public override void OnEnable()
     {
         base.OnEnable();

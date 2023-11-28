@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
+public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDamageable
 {
     public enum PlayerState
     {
@@ -106,6 +106,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     bool isAttackBlocked = false;
     bool isAttackParried = false;
     int playerIDParried = -1;
+
+    [Header("Lag Stuff")]
+    //Values that will be synced over network
+    Vector3 latestPos;
+    Quaternion latestRot;
+    //Lag compensation
+    float currentTime = 0;
+    double currentPacketTime = 0;
+    double lastPacketTime = 0;
+    Vector3 positionAtLastPacket = Vector3.zero;
+    Quaternion rotationAtLastPacket = Quaternion.identity;
+
+
     Coroutine heavyAttack;
     PhotonView PV;
     public Animator animator;
@@ -141,8 +154,25 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         lastHitTime = Time.time;
     }
 
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            // Writing to the network
+            stream.SendNext(isAttackParried);
+            // Serialize any additional data related to the parry action
+        }
+        else
+        {
+            // Reading from the network
+            if(PV.ViewID == playerIDParried)
+                isAttackParried = (bool)stream.ReceiveNext();
+            // Deserialize any additional data related to the parry action
+        }
+    }
     private void Update()
     {
+
         // animate player movement
         if (animator != null && animator.isActiveAndEnabled)
         {
@@ -423,7 +453,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             isAttacking = false;
             lastAttack = Time.time;
             Debug.Log("parried");
-            animator.SetTrigger("HIT"); //placeholder
+            animator.SetTrigger("PARRIED"); //placeholder
             yield break;
         }
 
