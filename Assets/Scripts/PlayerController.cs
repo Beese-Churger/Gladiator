@@ -103,6 +103,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     bool isParried = false;
     public int lockOnPlayerID = -1;
 
+    bool isAttackBlocked = false;
+    bool isAttackParried = false;
+    int playerIDParried = -1;
     Coroutine heavyAttack;
     PhotonView PV;
     public Animator animator;
@@ -290,11 +293,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
         }
-
-
-        //// in air
-        //else if (!grounded)
-        //    rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
     }
 
     public void LightAttack()
@@ -416,6 +414,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             isAttacking = false;
             lastAttack = Time.time;
             animator.SetTrigger("HIT");
+            yield break;
+        }
+
+        if(isAttackParried)
+        {
+            isAttacking = false;
+            lastAttack = Time.time;
+            animator.SetTrigger("HIT"); //placeholder
             yield break;
         }
 
@@ -660,6 +666,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         if (currDir == incomingDir)
         {
+            playerIDParried = enemy.PV.ViewID;
             return true;
         }
         else
@@ -667,10 +674,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     }
     public void ParryAttack(bool _isHeavy)
     {
-        PV.RPC(nameof(RPC_ParryAttack), RpcTarget.All, _isHeavy);
+        PV.RPC(nameof(RPC_ParryAttack), RpcTarget.All, _isHeavy, playerIDParried);
     }
     [PunRPC]
-    public void RPC_ParryAttack(bool _isHeavy)
+    public void RPC_ParryAttack(bool _isHeavy, int enemyParriedID) 
     {
         lastHitTime = Time.time;
         if (_isHeavy)
@@ -681,6 +688,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         else
         {
             animator.SetTrigger("PARRY");
+        }
+
+        if(PV.ViewID == enemyParriedID)
+        {
+            Debug.Log("parried");
         }
     }
     public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
