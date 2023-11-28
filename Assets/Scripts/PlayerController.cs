@@ -674,13 +674,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     }
     public void ParryAttack(bool _isHeavy)
     {
-        PV.RPC(nameof(RPC_ParryAttack), RpcTarget.All, _isHeavy, playerIDParried);
-        PV.RPC(nameof(RPC_GetParried), PhotonView.Find(playerIDParried).Owner);
+        PV.RPC(nameof(RPC_ParryAttack), RpcTarget.All, _isHeavy);
+        PV.RPC(nameof(RPC_GetParried), PhotonView.Find(playerIDParried).Owner); // parry reaction for the one who got parried
     }
     [PunRPC]
-    public void RPC_ParryAttack(bool _isHeavy, int enemyParriedID) 
+    public void RPC_ParryAttack(bool _isHeavy) 
     {
-        Debug.Log(enemyParriedID + " " + PV.ViewID);
         lastHitTime = Time.time;
         if (_isHeavy)
         {
@@ -698,7 +697,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     [PunRPC]
     public void RPC_GetParried()
     {
-        Debug.Log("Parried");
+        isAttackParried = true;
     }
     public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
     {
