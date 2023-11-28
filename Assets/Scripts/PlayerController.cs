@@ -7,13 +7,13 @@ using Photon.Realtime;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDamageable
 {
-    public enum PlayerState
-    {
-        COMBAT,
-        PARRIED,
-        EXHAUSTED,
-        HIT
-    }
+    //public enum PlayerState
+    //{
+    //    COMBAT,
+    //    PARRIED,
+    //    EXHAUSTED,
+    //    HIT
+    //}
 
     //public static PlayerController instance;
     [SerializeField] PlayerManager playerManager;
@@ -102,9 +102,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
     bool parry = true;
     bool isParried = false;
     public int lockOnPlayerID = -1;
+    bool isBlocked = false;
 
-    bool isAttackBlocked = false;
-    bool isAttackParried = false;
     int playerIDParried = -1;
 
     [Header("Lag Stuff")]
@@ -159,14 +158,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
         if (stream.IsWriting)
         {
             // Writing to the network
-            stream.SendNext(isAttackParried);
+            stream.SendNext(isParried);
             // Serialize any additional data related to the parry action
         }
         else
         {
             // Reading from the network
             //if(PV.ViewID == playerIDParried)
-                isAttackParried = (bool)stream.ReceiveNext();
+                isParried = (bool)stream.ReceiveNext();
             // Deserialize any additional data related to the parry action
         }
     }
@@ -447,12 +446,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
             yield break;
         }
 
-        if(isAttackParried)
+        if(isParried)
         {
-            isAttackParried = false;
+            isParried = false;
             isAttacking = false;
             lastAttack = Time.time;
-            Debug.Log("parried");
             animator.SetTrigger("HIT"); //placeholder
             yield break;
         }
