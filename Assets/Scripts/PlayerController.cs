@@ -198,8 +198,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
             tookHit = false;
             isAttacking = false;
             lastAttack = Time.time;
-            Debug.Log("damaged");
             animator.SetTrigger("HIT");
+        }
+
+        if (isParried)
+        {
+            isParried = false;
+            isAttacking = false;
+            lastAttack = Time.time;
+            animator.SetTrigger("HIT"); //placeholder
         }
 
         // ground check
@@ -366,15 +373,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
     IEnumerator PerformLightAttack(Collider collider)
     {
 
-        if(ShouldInterruptAction())
-        {
-            tookHit = false;
-            isAttacking = false;
-            lastAttack = Time.time;
-            Debug.Log("damaged");
-            animator.SetTrigger("HIT");
-            yield break;
-        }
+        //if(ShouldInterruptAction())
+        //{
+        //    tookHit = false;
+        //    isAttacking = false;
+        //    lastAttack = Time.time;
+        //    Debug.Log("damaged");
+        //    animator.SetTrigger("HIT");
+        //    yield break;
+        //}
 
         //UpdateAttackIndicator();
         yield return null; // yield 1 frame to ensure animation starts;
@@ -439,25 +446,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
 
     IEnumerator PerformHeavyAttack(Collider collider)
     {
-
-        if (ShouldInterruptAction())
-        {
-            tookHit = false;
-            isAttacking = false;
-            lastAttack = Time.time;
-  
-            animator.SetTrigger("HIT");
-            yield break;
-        }
-
-        if(isParried)
-        {
-            isParried = false;
-            isAttacking = false;
-            lastAttack = Time.time;
-            animator.SetTrigger("HIT"); //placeholder
-            yield break;
-        }
 
         yield return null; // yield 1 frame to ensure animation starts;
 
