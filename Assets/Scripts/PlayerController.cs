@@ -100,7 +100,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
     bool canFeint = false;
     bool feint = false;
     public bool isParrying = false;
-    bool isParried = false;
+    public bool isParried = false;
     public int lockOnPlayerID = -1;
     bool isBlocked = false;
 
