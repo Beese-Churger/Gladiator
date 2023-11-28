@@ -419,8 +419,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         if(isAttackParried)
         {
+            isAttackParried = false;
             isAttacking = false;
             lastAttack = Time.time;
+            Debug.Log("parried");
             animator.SetTrigger("HIT"); //placeholder
             yield break;
         }
@@ -690,8 +692,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             animator.SetTrigger("PARRY");
         }
-
-        
     }
 
     [PunRPC]
