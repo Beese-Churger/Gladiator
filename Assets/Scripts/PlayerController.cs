@@ -193,13 +193,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
         }
 
         // hit taken
-        if (!isAttacking)
+        if (ShouldInterruptAction())
         {
-            if (tookHit == true)
-            {
-                tookHit = false;
-                animator.SetTrigger("HIT");
-            }
+            tookHit = false;
+            isAttacking = false;
+            lastAttack = Time.time;
+            Debug.Log("damaged");
+            animator.SetTrigger("HIT");
         }
 
         // ground check
@@ -371,6 +371,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
             tookHit = false;
             isAttacking = false;
             lastAttack = Time.time;
+            Debug.Log("damaged");
             animator.SetTrigger("HIT");
             yield break;
         }
@@ -444,6 +445,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IDama
             tookHit = false;
             isAttacking = false;
             lastAttack = Time.time;
+  
             animator.SetTrigger("HIT");
             yield break;
         }
