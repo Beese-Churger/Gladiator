@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
+public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObservable
 {
     //public enum PlayerState
     //{
@@ -153,6 +153,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         lastHitTime = Time.time;
     }
 
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+       if(stream.IsWriting)
+       {
+            stream.SendNext(isParrying);
+            stream.SendNext(isParried);
+       }
+       else
+       {
+            isParrying = (bool)stream.ReceiveNext();
+            isParried = (bool)stream.ReceiveNext();
+       }
+    }
+
+
     private void Update()
     {
 
@@ -186,12 +201,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             animator.SetTrigger("HIT");
         }
 
-        if (isParried)
+        if (CheckIfParried())
         {
-            isParried = false;
             isAttacking = false;
             lastAttack = Time.time;
             animator.SetTrigger("HIT"); //placeholder
+            isParried = false;
+            if(PV.IsMine)
+            {
+                PV.RPC(nameof(RPC_DeReferenceParry), RpcTarget.All);
+            }
         }
 
         // ground check
@@ -674,7 +693,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     public void ParryAttack(bool _isHeavy)
     {
         PV.RPC(nameof(RPC_ParryAttack), RpcTarget.All, _isHeavy);
-        PV.RPC(nameof(RPC_GetParried), PhotonView.Find(playerIDParried).Owner); // parry reaction for the one who got parried
+        //PV.RPC(nameof(RPC_GetParried), PhotonView.Find(playerIDParried).Owner); // parry reaction for the one who got parried
     }
     [PunRPC]
     public void RPC_ParryAttack(bool _isHeavy) 
@@ -693,10 +712,29 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     }
 
     [PunRPC]
-    public void RPC_GetParried()
+    public void RPC_DeReferenceParry()
     {
-        Debug.Log("Parried");
-        isParried = true;
+        playerIDParried = -1;
+    }
+
+    public bool CheckIfParried()
+    {
+
+        if (!cameraController.currentLock)
+            return false;
+        PlayerController pc = cameraController.currentLock.GetComponent<PlayerController>();
+        if (!pc)
+            return false;
+
+        if (pc.playerIDParried != -1)
+            return false;
+
+        if(pc.playerIDParried == PV.ViewID && !isParried)
+        {
+            isParried = true;
+            return true;
+        }
+        return false;
     }
     public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
     {
@@ -807,5 +845,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         playerManager.Die();
     }
+
 
 }
