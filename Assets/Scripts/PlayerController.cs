@@ -295,8 +295,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             StopCoroutine(heavyAttack);
         if (dodging != null)
             StopCoroutine(dodging);
-
-        currentCollider.enabled = false;
+        if(currentCollider != null)
+            currentCollider.enabled = false;
 
     }
     private void FixedUpdate()
