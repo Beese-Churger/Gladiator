@@ -28,6 +28,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     public float maxStamina = 100f;
     private float currentStamina;
 
+    bool isDead = false;
+
     [Header("Movement")]
     public float moveSpeed;
     public float combatSpeed;
@@ -104,6 +106,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     public int lockOnPlayerID = -1;
     bool isBlocked = false;
 
+    Collider currentCollider;
+
     int playerIDParried = -1;
 
     [Header("Lag Stuff")]
@@ -117,8 +121,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     Vector3 positionAtLastPacket = Vector3.zero;
     Quaternion rotationAtLastPacket = Quaternion.identity;
 
+    IEnumerator lightAttack;
+    IEnumerator heavyAttack;
+    IEnumerator dodging;
 
-    Coroutine heavyAttack;
     PhotonView PV;
     public Animator animator;
     private void Start()
@@ -195,18 +201,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         if (ShouldInterruptAction())
         {
             tookHit = false;
-            isAttacking = false;
             isDodging = false;
-            lastAttack = Time.time;
-            animator.SetTrigger("HIT");
+            InterruptPlayer();
         }
 
         if (CheckIfParried())
         {
-            isAttacking = false;
-            lastAttack = Time.time;
-            animator.SetTrigger("HIT"); //placeholder
             isParried = false;
+            InterruptPlayer();
             if(PV.IsMine)
             {
                 PV.RPC(nameof(RPC_DeReferenceParry), RpcTarget.All);
@@ -281,6 +283,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         }
     }
 
+    private void InterruptPlayer()
+    {
+        isAttacking = false;
+        lastAttack = Time.time;
+        animator.SetTrigger("HIT");
+
+        if (lightAttack != null)
+            StopCoroutine(lightAttack);
+        if (heavyAttack != null)
+            StopCoroutine(heavyAttack);
+        if (dodging != null)
+            StopCoroutine(dodging);
+
+        currentCollider.enabled = false;
+
+    }
     private void FixedUpdate()
     {
         if(canRegenStamina && lastAttack + regenDelay < Time.time)
@@ -371,23 +389,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         
         UseStaminaAttack(staminaCost);
         // Schedule hitbox activation and deactivation using animation events
-        StartCoroutine(PerformLightAttack(collider));
+        currentCollider = collider;
+        lightAttack = PerformLightAttack(collider);
+        StartCoroutine(lightAttack);
     } 
 
     IEnumerator PerformLightAttack(Collider collider)
     {
-
-        //if(ShouldInterruptAction())
-        //{
-        //    tookHit = false;
-        //    isAttacking = false;
-        //    lastAttack = Time.time;
-        //    Debug.Log("damaged");
-        //    animator.SetTrigger("HIT");
-        //    yield break;
-        //}
-
-        //UpdateAttackIndicator();
         yield return null; // yield 1 frame to ensure animation starts;
 
         AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
@@ -403,10 +411,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         yield return new WaitForSeconds(0.1f);
         isAttacking = false;
         lastAttack = Time.time;
-        // when animation ends disable set isattacking to false
-        //yield return new WaitForSeconds(stateInfo.length * 0.8f);
 
-        //isAttacking = false;
+        lightAttack = null;
     }
 
     public void HeavyAttack()
@@ -445,12 +451,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
 
         UseStaminaAttack(staminaCost);
         // Schedule hitbox activation and deactivation using animation events
-        StartCoroutine(PerformHeavyAttack(collider));
+        currentCollider = collider;
+        heavyAttack = PerformHeavyAttack(collider);
+        StartCoroutine(heavyAttack);
     }
 
     IEnumerator PerformHeavyAttack(Collider collider)
     {
-
         yield return null; // yield 1 frame to ensure animation starts;
 
         canFeint = true;
@@ -487,6 +494,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         yield return new WaitForSeconds(0.3f);
         isAttacking = false;
         lastAttack = Time.time;
+
+        heavyAttack = null;
     }
 
     bool ShouldInterruptAction()
@@ -527,7 +536,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         else
             animator.SetTrigger("DODGERIGHT");
 
-        StartCoroutine(PerformDodge());
+        dodging = PerformDodge();
+        StartCoroutine(dodging);
     }
 
     IEnumerator PerformDodge()
@@ -545,6 +555,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
 
         isDodging = false;
         lastDodgeTime = Time.time;
+
+        dodging = null;
     }
     public void LockOntoOpponent()
     {
