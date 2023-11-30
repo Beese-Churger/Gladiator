@@ -626,8 +626,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         if (lastHitTime + timeToMove > Time.time)
             return false;
 
-        isParrying = false;
-
         return true;
     }
     public void ChangeSpeed()
@@ -721,8 +719,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         {
             animator.SetTrigger("PARRY");
         }
+        StartCoroutine(Parrying());
     }
 
+    IEnumerator Parrying()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        isParrying = false;
+    }
     [PunRPC]
     public void RPC_DeReferenceParry()
     {
