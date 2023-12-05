@@ -168,6 +168,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
                 stream.SendNext(isParrying);
                 stream.SendNext(isParried);
             }
+            if(tookHit)
+            {
+                stream.SendNext(tookHit);
+            }
 
        }
        else
@@ -176,6 +180,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             {
                 isParrying = (bool)stream.ReceiveNext();
                 isParried = (bool)stream.ReceiveNext();
+            }
+            if(tookHit)
+            {
+                tookHit = (bool)stream.ReceiveNext();
             }
        }
     }
