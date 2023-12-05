@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     public List<PlayerController> opponentsInAttackRange = new();
     [SerializeField] Collider rHand, lHand;
     float lastHitTime;
-    float timeToMove = 0.05f;
+    float timeToMove = 0.1f;
 
     bool isDodging = false;
     bool dodgeLeft = false;
@@ -628,6 +628,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         collider.enabled = false;
 
         yield return new WaitForSeconds(0.3f);
+
         isAttacking = false;
         lastAttack = Time.time;
 
