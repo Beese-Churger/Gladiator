@@ -357,7 +357,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
         if (CheckIfParried())
         {
-
+            PV.RPC(nameof(RPC_Parried), RpcTarget.All);
             
         }
         CheckWhoCanLock();
