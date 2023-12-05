@@ -920,6 +920,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         }
         if (currDir == incomingDir)
         {
+            isBlocked = true;
             BlockAttack(damage, _isHeavy);
         }
         else
@@ -941,8 +942,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             //UpdateHealthBar();
         }
         animator.SetTrigger("BLOCK");
+        StartCoroutine(Blocking());
     }
+    IEnumerator Blocking()
+    {
+        yield return new WaitForSeconds(0.05f);
 
+        isBlocked = false;
+    }
     public void TakeDamage(float damage)
     {
         PV.RPC(nameof(RPC_TakeDamage), RpcTarget.All, damage);
