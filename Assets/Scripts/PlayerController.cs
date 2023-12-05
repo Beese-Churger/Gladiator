@@ -344,11 +344,11 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         {
             isParried = false;
             InterruptPlayer();
-            Debug.Log("hi");
-            if(PV.IsMine)
-            {
-                PV.RPC(nameof(RPC_DeReferenceParry), RpcTarget.All);
-            }
+            //Debug.Log("hi");
+            //if(PV.IsMine)
+            //{
+            //    PV.RPC(nameof(RPC_DeReferenceParry), RpcTarget.All);
+            //}
         }
 
         // ground check
@@ -837,9 +837,14 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         else
             return false;
     }
+    //public void AttackParried()
+    //{
+    //    PV.RPC(nameof(RPC_AttackParried),RpcTarget.All)
+    //}
     public void ParryAttack(bool _isHeavy)
     {
         PV.RPC(nameof(RPC_ParryAttack), RpcTarget.All, _isHeavy);
+        PV.RPC(nameof(RPC_AttackParried), RpcTarget.All, playerIDParried);
         //PV.RPC(nameof(RPC_GetParried), PhotonView.Find(playerIDParried).Owner); // parry reaction for the one who got parried
     }
     [PunRPC]
@@ -859,10 +864,16 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         StartCoroutine(Parrying());
     }
 
+    [PunRPC]
+    public void RPC_AttackParried(int playerParried)
+    {
+        playerIDParried = playerParried;
+    }
+
     IEnumerator Parrying()
     {
         yield return new WaitForSeconds(0.5f);
-
+        playerIDParried = -1;
         isParrying = false;
     }
     [PunRPC]
@@ -880,8 +891,13 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         if (!pc)
             return false;
 
-        if (pc.playerIDParried != -1)
+        if (pc.playerIDParried == -1)
+        {
+            Debug.Log("hi");
             return false;
+        }
+
+
 
         if(pc.playerIDParried == PV.ViewID && !isParried)
         {
