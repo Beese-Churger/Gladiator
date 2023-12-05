@@ -110,7 +110,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
 
     int playerIDParried = -1;
 
-    [Header("Lag Stuff")]
     //Values that will be synced over network
     IEnumerator lightAttack;
     IEnumerator heavyAttack;
@@ -124,6 +123,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     private const byte PARRYING_FLAG = 1 << 4;
     private const byte PARRIED_FLAG = 1 << 5;
     private const byte BLOCKED_FLAG = 1 << 6;
+    private const byte TOOKHIT_FLAG = 1 << 7;
+
     Vector3 lastSyncedPosition;
     Quaternion lastSyncedRotation;
     float lastSyncedHealth;
@@ -131,6 +132,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     bool lastSyncedParrying;
     bool lastSyncedParried;
     bool lastSyncedBlock;
+    bool lastSyncedHit;
 
     private byte dataFlags;
 
@@ -178,6 +180,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
                 dataFlags |= BLOCKED_FLAG;
             }
 
+            if (isBlocked != lastSyncedHit)
+            {
+                dataFlags |= TOOKHIT_FLAG;
+            }
+
             stream.SendNext(dataFlags);
 
             if((dataFlags & POSITION_FLAG) != 0)
@@ -213,6 +220,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             if ((dataFlags & BLOCKED_FLAG) != 0)
             {
                 stream.SendNext(isBlocked);
+            }
+
+            if ((dataFlags & TOOKHIT_FLAG) != 0)
+            {
+                stream.SendNext(tookHit);
             }
 
         }
@@ -253,6 +265,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             if ((dataFlags & BLOCKED_FLAG) != 0)
             {
                 isBlocked = (bool)stream.ReceiveNext();
+            }
+
+            if ((dataFlags & TOOKHIT_FLAG) != 0)
+            {
+                tookHit = (bool)stream.ReceiveNext();
             }
 
         }
