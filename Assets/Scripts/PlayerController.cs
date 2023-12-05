@@ -112,15 +112,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
 
     [Header("Lag Stuff")]
     //Values that will be synced over network
-    Vector3 latestPos;
-    Quaternion latestRot;
-    //Lag compensation
-    float currentTime = 0;
-    double currentPacketTime = 0;
-    double lastPacketTime = 0;
-    Vector3 positionAtLastPacket = Vector3.zero;
-    Quaternion rotationAtLastPacket = Quaternion.identity;
-
     IEnumerator lightAttack;
     IEnumerator heavyAttack;
     IEnumerator dodging;
@@ -132,13 +123,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     private const byte STAMINA_FLAG = 1 << 3;
     private const byte PARRYING_FLAG = 1 << 4;
     private const byte PARRIED_FLAG = 1 << 5;
-
+    private const byte BLOCKED_FLAG = 1 << 6;
     Vector3 lastSyncedPosition;
     Quaternion lastSyncedRotation;
     float lastSyncedHealth;
     float lastSyncedStamina;
     bool lastSyncedParrying;
     bool lastSyncedParried;
+    bool lastSyncedBlock;
 
     private byte dataFlags;
 
@@ -181,6 +173,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
                 dataFlags |= PARRIED_FLAG;
             }
 
+            if(isBlocked != lastSyncedBlock)
+            {
+                dataFlags |= BLOCKED_FLAG;
+            }
+
             stream.SendNext(dataFlags);
 
             if((dataFlags & POSITION_FLAG) != 0)
@@ -211,6 +208,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             if ((dataFlags & PARRIED_FLAG) != 0)
             {
                 stream.SendNext(isParried);
+            }
+
+            if ((dataFlags & BLOCKED_FLAG) != 0)
+            {
+                stream.SendNext(isBlocked);
             }
 
         }
@@ -246,6 +248,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             if ((dataFlags & PARRIED_FLAG) != 0)
             {
                 isParried = (bool)stream.ReceiveNext();
+            }
+
+            if ((dataFlags & BLOCKED_FLAG) != 0)
+            {
+                isBlocked = (bool)stream.ReceiveNext();
             }
 
         }
