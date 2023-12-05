@@ -163,13 +163,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     {
        if(stream.IsWriting)
        {
-            stream.SendNext(isParrying);
-            stream.SendNext(isParried);
+            if(isParrying)
+            {
+                stream.SendNext(isParrying);
+                stream.SendNext(isParried);
+            }
+
        }
        else
        {
-            isParrying = (bool)stream.ReceiveNext();
-            isParried = (bool)stream.ReceiveNext();
+            if (isParrying)
+            {
+                isParrying = (bool)stream.ReceiveNext();
+                isParried = (bool)stream.ReceiveNext();
+            }
        }
     }
 
