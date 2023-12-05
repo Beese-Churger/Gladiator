@@ -108,7 +108,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     Collider currentCollider;
 
-    int playerIDParried = -1;
+    public int playerIDParried = -1;
 
     //Values that will be synced over network
     IEnumerator lightAttack;
