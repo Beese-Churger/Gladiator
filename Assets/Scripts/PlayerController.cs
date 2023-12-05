@@ -343,6 +343,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         if (CheckIfParried())
         {
             isParried = false;
+            Debug.Log("hi");
             InterruptPlayer();
             //Debug.Log("hi");
             //if(PV.IsMine)
@@ -879,30 +880,28 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     [PunRPC]
     public void RPC_DeReferenceParry()
     {
+        Debug.Log("called");
         playerIDParried = -1;
     }
 
     public bool CheckIfParried()
     {
 
-        if (!cameraController.currentLock)
-            return false;
-        PlayerController pc = cameraController.currentLock.GetComponent<PlayerController>();
-        if (!pc)
-            return false;
-
-        if (pc.playerIDParried == -1)
+        if (cameraController.currentLock)
         {
-            Debug.Log("hi");
-            return false;
-        }
+            PlayerController pc = cameraController.currentLock.GetComponent<PlayerController>();
 
-
-
-        if(pc.playerIDParried == PV.ViewID && !isParried)
-        {
-            isParried = true;
-            return true;
+            if (!pc)
+            {
+                if (pc.playerIDParried != -1)
+                {
+                    if (pc.playerIDParried == PV.ViewID && !isParried)
+                    {
+                        isParried = true;
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }
