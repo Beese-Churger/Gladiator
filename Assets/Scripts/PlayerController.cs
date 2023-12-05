@@ -125,8 +125,131 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     IEnumerator heavyAttack;
     IEnumerator dodging;
 
+    // syncing variables and shit
+    private const byte POSITION_FLAG = 1 << 0;
+    private const byte ROTATION_FLAG = 1 << 1;
+    private const byte HEALTH_FLAG = 1 << 2;
+    private const byte STAMINA_FLAG = 1 << 3;
+    private const byte PARRYING_FLAG = 1 << 4;
+    private const byte PARRIED_FLAG = 1 << 5;
+
+    Vector3 lastSyncedPosition;
+    Quaternion lastSyncedRotation;
+    float lastSyncedHealth;
+    float lastSyncedStamina;
+    bool lastSyncedParrying;
+    bool lastSyncedParried;
+
+    private byte dataFlags;
+
     PhotonView PV;
     public Animator animator;
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            dataFlags = 0;
+
+            if(transform.position != lastSyncedPosition)
+            {
+                dataFlags |= POSITION_FLAG;
+            }
+
+            if(model.rotation != lastSyncedRotation)
+            {
+                dataFlags |= ROTATION_FLAG;
+            }
+
+            if(currentHealth != lastSyncedHealth)
+            {
+                dataFlags |= HEALTH_FLAG;
+            }
+
+            if (currentStamina != lastSyncedStamina)
+            {
+                dataFlags |= STAMINA_FLAG;
+            }
+
+            if (isParrying != lastSyncedParrying)
+            {
+                dataFlags |= PARRYING_FLAG;
+            }
+
+            if (isParried != lastSyncedParried)
+            {
+                dataFlags |= PARRIED_FLAG;
+            }
+
+            stream.SendNext(dataFlags);
+
+            if((dataFlags & POSITION_FLAG) != 0)
+            {
+                stream.SendNext(transform.position);
+            }
+
+            if ((dataFlags & ROTATION_FLAG) != 0)
+            {
+                stream.SendNext(model.rotation);
+            }
+
+            if ((dataFlags & HEALTH_FLAG) != 0)
+            {
+                stream.SendNext(currentHealth);
+            }
+
+            if ((dataFlags & STAMINA_FLAG) != 0)
+            {
+                stream.SendNext(currentStamina);
+            }
+
+            if ((dataFlags & PARRYING_FLAG) != 0)
+            {
+                stream.SendNext(isParrying);
+            }
+
+            if ((dataFlags & PARRIED_FLAG) != 0)
+            {
+                stream.SendNext(isParried);
+            }
+
+        }
+        else
+        {
+            dataFlags = (byte)stream.ReceiveNext();
+
+            if ((dataFlags & POSITION_FLAG) != 0)
+            {
+                transform.position = (Vector3)stream.ReceiveNext();
+            }
+
+            if ((dataFlags & ROTATION_FLAG) != 0)
+            {
+                model.rotation = (Quaternion)stream.ReceiveNext();
+            }
+
+            if ((dataFlags & HEALTH_FLAG) != 0)
+            {
+                currentHealth = (float)stream.ReceiveNext();
+            }
+
+            if ((dataFlags & STAMINA_FLAG) != 0)
+            {
+                currentStamina = (float)stream.ReceiveNext();
+            }
+
+            if ((dataFlags & PARRYING_FLAG) != 0)
+            {
+                isParrying = (bool)stream.ReceiveNext();
+            }
+
+            if ((dataFlags & PARRIED_FLAG) != 0)
+            {
+                isParried = (bool)stream.ReceiveNext();
+            }
+
+        }
+    }
     private void Start()
     {
         if(!PV.IsMine)
@@ -159,34 +282,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         lastHitTime = Time.time;
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-       if(stream.IsWriting)
-       {
-            if(isParrying)
-            {
-                stream.SendNext(isParrying);
-                stream.SendNext(isParried);
-            }
-            if(tookHit)
-            {
-                stream.SendNext(tookHit);
-            }
-
-       }
-       else
-       {
-            if (isParrying)
-            {
-                isParrying = (bool)stream.ReceiveNext();
-                isParried = (bool)stream.ReceiveNext();
-            }
-            if(tookHit)
-            {
-                tookHit = (bool)stream.ReceiveNext();
-            }
-       }
-    }
+    
 
 
     private void Update()
@@ -224,6 +320,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         {
             isParried = false;
             InterruptPlayer();
+            Debug.Log("hi");
             if(PV.IsMine)
             {
                 PV.RPC(nameof(RPC_DeReferenceParry), RpcTarget.All);
