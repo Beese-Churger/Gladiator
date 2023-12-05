@@ -341,17 +341,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
             InterruptPlayer();
         }
 
-        if (CheckIfParried())
-        {
-            isParried = false;
-            Debug.Log("hi");
-            InterruptPlayer();
-            //Debug.Log("hi");
-            //if(PV.IsMine)
-            //{
-            //    PV.RPC(nameof(RPC_DeReferenceParry), RpcTarget.All);
-            //}
-        }
+      
 
         // ground check
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
@@ -365,6 +355,11 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         if (!PV.IsMine)
             return;
 
+        if (CheckIfParried())
+        {
+
+            
+        }
         CheckWhoCanLock();
         UpdateUI();
         MyInput();
@@ -880,12 +875,19 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         isParrying = false;
     }
     [PunRPC]
-    public void RPC_DeReferenceParry()
+    public void RPC_Parried()
     {
-        Debug.Log("called");
-        playerIDParried = -1;
+        StartCoroutine(Parried());
     }
 
+    IEnumerator Parried()
+    {
+        isParried = true;
+        InterruptPlayer();
+        yield return new WaitForSeconds(0.7f);
+
+        isParried = false;
+    }
     public bool CheckIfParried()
     {
 
@@ -897,9 +899,8 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
             {
                 if (pc.playerIDParried != -1)
                 {
-                    if (pc.playerIDParried == PV.ViewID && !isParried)
+                    if (pc.playerIDParried == PV.ViewID)
                     {
-                        isParried = true;
                         return true;
                     }
                 }
