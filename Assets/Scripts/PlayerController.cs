@@ -110,10 +110,11 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     public int playerIDParried = -1;
 
-    //Values that will be synced over network
+    // to stop coroutines
     IEnumerator lightAttack;
     IEnumerator heavyAttack;
     IEnumerator dodging;
+    IEnumerator parriedStun;
 
     // syncing variables and shit
     private const byte POSITION_FLAG = 1 << 0;
@@ -838,10 +839,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         else
             return false;
     }
-    //public void AttackParried()
-    //{
-    //    PV.RPC(nameof(RPC_AttackParried),RpcTarget.All)
-    //}
+
     public void ParryAttack(bool _isHeavy)
     {
         PV.RPC(nameof(RPC_ParryAttack), RpcTarget.All, _isHeavy);
@@ -873,8 +871,12 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     IEnumerator Parrying()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return null;
+
         playerIDParried = -1;
+
+        yield return new WaitForSeconds(0.5f);
+
         isParrying = false;
     }
     [PunRPC]
@@ -890,8 +892,8 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         if (cameraController.currentLock)
         {
             PlayerController pc = cameraController.currentLock.GetComponent<PlayerController>();
-
-            if (!pc)
+            //Debug.Log(pc.playerIDParried + " "+ PV.ViewID);
+            if (pc)
             {
                 if (pc.playerIDParried != -1)
                 {
