@@ -5557,6 +5557,8 @@ MonoBehaviour:
   isParrying: 0
   isParried: 0
   lockOnPlayerID: -1
+  isBlocking: 0
+  playerIDParried: -1
   animator: {fileID: 5635569067390719461}
 --- !u!114 &7167737441030003614
 MonoBehaviour:

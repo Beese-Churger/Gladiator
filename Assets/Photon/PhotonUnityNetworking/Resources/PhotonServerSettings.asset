@@ -53,6 +53,8 @@ MonoBehaviour:
   - RPC_UpdateTarget
   - RPC_GetParried
   - RPC_DeReferenceParry
+  - RPC_AttackParried
+  - RPC_Parried
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     public bool isParried = false;
     public int lockOnPlayerID = -1;
     public bool isBlocking = false;
-
+    bool attackReceivedIsHeavy = false;
     Collider currentCollider;
 
     public int playerIDParried = -1;
@@ -339,6 +339,20 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
             tookHit = false;
             isDodging = false;
             InterruptPlayer();
+        }
+
+        if(isBlocking)
+        {
+            lastHitTime = Time.time;
+            if (attackReceivedIsHeavy)
+            {
+                // take reduced damage if isHeavy
+                //currentHealth -= damage;
+                //UpdateHealthBar();
+            }
+            animator.SetTrigger("BLOCK");
+            isBlocking = false;
+            //StartCoroutine(Blocking());
         }
 
       
@@ -754,7 +768,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     private bool AbleToMove()
     {
-        if (isAttacking || isDodging)
+        if (isAttacking || isDodging || isBlocking)
             return false;
 
         if (lastHitTime + timeToMove > Time.time)
@@ -884,7 +898,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     {
         isParried = true;
         InterruptPlayer();
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(0.5f);
 
         isParried = false;
     }
@@ -938,7 +952,8 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         }
         if (currDir == incomingDir)
         {
-            isBlocking = true;
+            //if(!isParrying)
+            Debug.Log("Blocked" + isAttacking);
             BlockAttack(damage, _isHeavy);
         }
         else
@@ -952,15 +967,8 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     [PunRPC]
     void RPC_BlockAttack(float damage, bool _isHeavy, PhotonMessageInfo info)
     {
-        lastHitTime = Time.time;
-        if(_isHeavy)
-        {
-            // take reduced damage if isHeavy
-            //currentHealth -= damage;
-            //UpdateHealthBar();
-        }
-        animator.SetTrigger("BLOCK");
-        StartCoroutine(Blocking());
+        isBlocking = true;
+        attackReceivedIsHeavy = _isHeavy;
     }
     IEnumerator Blocking()
     {
@@ -1024,6 +1032,4 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     {
         playerManager.Die();
     }
-
-
 }
