@@ -137,7 +137,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     private byte dataFlags;
 
-    public PhotonView PV;
+    PhotonView PV;
     public Animator animator;
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -922,13 +922,13 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         }
         return false;
     }
-    public bool CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
+    public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
     {
-        //if (isAttacking)
-        //{
-        //    TakeDamage(damage);
-        //    return false;
-        //}
+        if (isAttacking)
+        {
+            TakeDamage(damage);
+            return;
+        }
 
 
         //check if player is facing enemy
@@ -953,13 +953,11 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         if (currDir == incomingDir)
         {
             //if(!isParrying)
-            //Debug.Log("Blocked" + isAttacking);
-            //BlockAttack(damage, _isHeavy);
-            return true;
+            Debug.Log("Blocked" + isAttacking);
+            BlockAttack(damage, _isHeavy);
         }
         else
-            //TakeDamage(damage);
-            return false;
+            TakeDamage(damage);
     }
 
     public void BlockAttack(float damage, bool _isHeavy)
@@ -967,7 +965,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         PV.RPC(nameof(RPC_BlockAttack), RpcTarget.All, damage, _isHeavy);
     }
     [PunRPC]
-    public void RPC_BlockAttack(float damage, bool _isHeavy, PhotonMessageInfo info)
+    void RPC_BlockAttack(float damage, bool _isHeavy, PhotonMessageInfo info)
     {
         isBlocking = true;
         attackReceivedIsHeavy = _isHeavy;
