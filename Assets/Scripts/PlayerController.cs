@@ -671,8 +671,14 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     {
         isDodging = true;
         dodgeLeft = _dodgeLeft;
-        PV.RPC(nameof(RPC_Dodge), RpcTarget.All, _dodgeLeft);
+        PV.RPC(nameof(RPC_DodgeCall), RpcTarget.MasterClient, _dodgeLeft);
     }
+    [PunRPC]
+    public void RPC_DodgeCall(bool dodgeLeft)
+    {
+        PV.RPC(nameof(RPC_Dodge), RpcTarget.All, dodgeLeft);
+    }
+
     [PunRPC]
     public void RPC_Dodge(bool dodgeLeft)
     {
