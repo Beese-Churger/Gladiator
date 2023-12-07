@@ -119,12 +119,12 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     // syncing variables and shit
     private const byte POSITION_FLAG = 1 << 0;
     private const byte ROTATION_FLAG = 1 << 1;
-    //private const byte HEALTH_FLAG = 1 << 2;
-    //private const byte STAMINA_FLAG = 1 << 3;
-    private const byte PARRYING_FLAG = 1 << 2;
-    private const byte PARRIED_FLAG = 1 << 3;
-    private const byte BLOCKING_FLAG = 1 << 4;
-    private const byte TOOKHIT_FLAG = 1 << 5;
+    private const byte HEALTH_FLAG = 1 << 2;
+    private const byte STAMINA_FLAG = 1 << 3;
+    private const byte PARRYING_FLAG = 1 << 4;
+    private const byte PARRIED_FLAG = 1 << 5;
+    private const byte BLOCKING_FLAG = 1 << 6;
+    private const byte TOOKHIT_FLAG = 1 << 7;
 
     Vector3 lastSyncedPosition;
     Quaternion lastSyncedRotation;
@@ -156,15 +156,15 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
                 dataFlags |= ROTATION_FLAG;
             }
 
-            //if(currentHealth != lastSyncedHealth)
-            //{
-            //    dataFlags |= HEALTH_FLAG;
-            //}
+            if(currentHealth != lastSyncedHealth)
+            {
+                dataFlags |= HEALTH_FLAG;
+            }
 
-            //if (currentStamina != lastSyncedStamina)
-            //{
-            //    dataFlags |= STAMINA_FLAG;
-            //}
+            if (currentStamina != lastSyncedStamina)
+            {
+                dataFlags |= STAMINA_FLAG;
+            }
 
             if (isParrying != lastSyncedParrying)
             {
@@ -198,15 +198,15 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
                 stream.SendNext(model.rotation);
             }
 
-            //if ((dataFlags & HEALTH_FLAG) != 0)
-            //{
-            //    stream.SendNext(currentHealth);
-            //}
+            if ((dataFlags & HEALTH_FLAG) != 0)
+            {
+                stream.SendNext(currentHealth);
+            }
 
-            //if ((dataFlags & STAMINA_FLAG) != 0)
-            //{
-            //    stream.SendNext(currentStamina);
-            //}
+            if ((dataFlags & STAMINA_FLAG) != 0)
+            {
+                stream.SendNext(currentStamina);
+            }
 
             if ((dataFlags & PARRYING_FLAG) != 0)
             {
@@ -243,15 +243,15 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
                 model.rotation = (Quaternion)stream.ReceiveNext();
             }
 
-            //if ((dataFlags & HEALTH_FLAG) != 0)
-            //{
-            //    currentHealth = (float)stream.ReceiveNext();
-            //}
+            if ((dataFlags & HEALTH_FLAG) != 0)
+            {
+                currentHealth = (float)stream.ReceiveNext();
+            }
 
-            //if ((dataFlags & STAMINA_FLAG) != 0)
-            //{
-            //    currentStamina = (float)stream.ReceiveNext();
-            //}
+            if ((dataFlags & STAMINA_FLAG) != 0)
+            {
+                currentStamina = (float)stream.ReceiveNext();
+            }
 
             if ((dataFlags & PARRYING_FLAG) != 0)
             {
