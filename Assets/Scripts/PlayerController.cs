@@ -371,8 +371,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
         if (CheckIfParried())
         {
-            PV.RPC(nameof(RPC_Parried), RpcTarget.All);
-            
+            Parried();            
         }
         CheckWhoCanLock();
         UpdateUI();
@@ -502,8 +501,12 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     public void LightAttack()
     {
-        isAttacking = true;
-        PV.RPC(nameof(RPC_LightAttack), RpcTarget.All, mouseController.GetInputDirection());
+        PV.RPC(nameof(RPC_LightAttackCall), RpcTarget.MasterClient, mouseController.GetInputDirection());
+    }
+    [PunRPC]
+    public void RPC_LightAttackCall(MouseController.DirectionalInput direction)
+    {
+        PV.RPC(nameof(RPC_LightAttack), RpcTarget.All, direction);
     }
     [PunRPC]
     public void RPC_LightAttack(MouseController.DirectionalInput direction)
@@ -564,8 +567,12 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     public void HeavyAttack()
     {
-        isAttacking = true;
-        PV.RPC(nameof(RPC_HeavyAttack), RpcTarget.All, mouseController.GetInputDirection());
+        PV.RPC(nameof(RPC_HeavyAttackCall), RpcTarget.MasterClient, mouseController.GetInputDirection());
+    }
+    [PunRPC]
+    public void RPC_HeavyAttackCall(MouseController.DirectionalInput direction)
+    {
+        PV.RPC(nameof(RPC_HeavyAttack), RpcTarget.All, direction);
     }
     [PunRPC]
     public void RPC_HeavyAttack(MouseController.DirectionalInput direction)
@@ -658,6 +665,11 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     void Feint(bool isFeint)
     {
+        PV.RPC(nameof(RPC_FeintCall), RpcTarget.MasterClient, isFeint);
+    }
+    [PunRPC]
+    public void RPC_FeintCall(bool isFeint)
+    {
         PV.RPC(nameof(RPC_Feint), RpcTarget.All, isFeint);
     }
 
@@ -669,7 +681,6 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     public void Dodge(bool _dodgeLeft)
     {
-        isDodging = true;
         dodgeLeft = _dodgeLeft;
         PV.RPC(nameof(RPC_DodgeCall), RpcTarget.MasterClient, _dodgeLeft);
     }
@@ -857,10 +868,18 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     public void ParryAttack(bool _isHeavy)
     {
-        PV.RPC(nameof(RPC_ParryAttack), RpcTarget.All, _isHeavy);
-        PV.RPC(nameof(RPC_AttackParried), RpcTarget.All, playerIDParried);
+        PV.RPC(nameof(RPC_ParryAttackCall), RpcTarget.MasterClient, _isHeavy, playerIDParried);
+        //PV.RPC(nameof(RPC_AttackParried), RpcTarget.MasterClient, playerIDParried);
         //PV.RPC(nameof(RPC_GetParried), PhotonView.Find(playerIDParried).Owner); // parry reaction for the one who got parried
     }
+
+    [PunRPC]
+    public void RPC_ParryAttackCall(bool _isHeavy, int _playerIDParried)
+    {
+        PV.RPC(nameof(RPC_ParryAttack), RpcTarget.All, _isHeavy);
+        PV.RPC(nameof(RPC_AttackParried), RpcTarget.All, _playerIDParried);
+    }
+
     [PunRPC]
     public void RPC_ParryAttack(bool _isHeavy) 
     {
@@ -894,13 +913,22 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
         isParrying = false;
     }
-    [PunRPC]
-    public void RPC_Parried()
+    public void Parried()
     {
-        StartCoroutine(Parried());
+        PV.RPC(nameof(RPC_ParriedCall), RpcTarget.MasterClient);
+    }
+    [PunRPC]
+    void RPC_ParriedCall()
+    {
+        PV.RPC(nameof(RPC_Parried), RpcTarget.All);
+    }
+    [PunRPC]
+    void RPC_Parried()
+    {
+        StartCoroutine(GetParried());
     }
 
-    IEnumerator Parried()
+    IEnumerator GetParried()
     {
         isParried = true;
         InterruptPlayer();
@@ -968,8 +996,14 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     public void BlockAttack(float damage, bool _isHeavy)
     {
+        PV.RPC(nameof(RPC_BlockAttackCall), RpcTarget.MasterClient, damage, _isHeavy);
+    }
+    [PunRPC]
+    void RPC_BlockAttackCall(float damage, bool _isHeavy, PhotonMessageInfo info)
+    {
         PV.RPC(nameof(RPC_BlockAttack), RpcTarget.All, damage, _isHeavy);
     }
+
     [PunRPC]
     void RPC_BlockAttack(float damage, bool _isHeavy, PhotonMessageInfo info)
     {
@@ -983,6 +1017,12 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         isBlocking = false;
     }
     public void TakeDamage(float damage)
+    {
+        PV.RPC(nameof(RPC_TakeDamageCall), RpcTarget.MasterClient, damage);
+    }
+
+    [PunRPC]
+    void RPC_TakeDamageCall(float damage, PhotonMessageInfo info)
     {
         PV.RPC(nameof(RPC_TakeDamage), RpcTarget.All, damage);
     }
