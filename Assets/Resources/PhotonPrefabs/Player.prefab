@@ -5516,6 +5516,7 @@ MonoBehaviour:
   staminaBarFill: {fileID: 6477239341178899517}
   maxHealth: 100
   maxStamina: 100
+  arenaCollider: {fileID: 0}
   moveSpeed: 5
   combatSpeed: 2
   freeSpeed: 5
