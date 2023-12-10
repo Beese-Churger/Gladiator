@@ -55,6 +55,14 @@ MonoBehaviour:
   - RPC_DeReferenceParry
   - RPC_AttackParried
   - RPC_Parried
+  - RPC_DodgeCall
+  - RPC_BlockAttackCall
+  - RPC_FeintCall
+  - RPC_HeavyAttackCall
+  - RPC_LightAttackCall
+  - RPC_ParriedCall
+  - RPC_ParryAttackCall
+  - RPC_TakeDamageCall
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
