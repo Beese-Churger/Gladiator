@@ -31,6 +31,8 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     bool isDead = false;
 
     [Header("Movement")]
+    [SerializeField] Collider arenaCollider;
+    Vector3 lastValidPosition;
     public float moveSpeed;
     public float combatSpeed;
     public float freeSpeed;
@@ -294,7 +296,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         mouseController = GetComponent<MouseController>();
         cameraController = cameraHolder.GetComponent<CameraController>();
         playerManager = FindObjectOfType<PlayerManager>();
-
+        arenaCollider = GameObject.FindGameObjectWithTag("ArenaBounds").GetComponent<Collider>();
         rb.freezeRotation = true;
         readyToJump = true;
         moveSpeed = freeSpeed;
@@ -377,8 +379,8 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         UpdateUI();
         MyInput();
         SpeedControl();
-
-        if(cameraController.CombatMode)
+        ClampPositionToArenaBounds();
+        if (cameraController.CombatMode)
         {
             if (Input.GetMouseButtonDown(0) && AbleToMove())
             {
@@ -465,8 +467,6 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
             return;
 
         MovePlayer();
-
-
     }
 
     private void MoveTowards(bool left)
@@ -491,12 +491,12 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     {
         // calculate movement direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-
+        rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
         // on ground
-        if (grounded)
-        {
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
-        }
+        //if (grounded)
+        //{
+        //    rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+        //}
     }
 
     public void LightAttack()
@@ -613,7 +613,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     IEnumerator PerformHeavyAttack(Collider collider)
     {
         yield return null; // yield 1 frame to ensure animation starts;
-
+        canRegenStamina = false;
         canFeint = true;
 
         yield return new WaitForSeconds(0.4f); // feint 400ms before attack would land
@@ -649,7 +649,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
         isAttacking = false;
         lastAttack = Time.time;
-
+        canRegenStamina = true;
         heavyAttack = null;
     }
 
@@ -1077,5 +1077,23 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     void Die()
     {
         playerManager.Die();
+    }
+
+    void ClampPositionToArenaBounds()
+    {
+        Vector3 currentPosition = transform.position;
+
+        // Calculate the closest point on the capsule collider to the player's position
+        Vector3 closestPoint = arenaCollider.ClosestPoint(currentPosition);
+
+        if (Vector3.Distance(currentPosition, closestPoint) > 0)
+        {
+            // Calculate the reflection vector based on the normal of the collider at the point of contact
+            Vector3 normal = (currentPosition - closestPoint).normalized;
+            Vector3 reflection = Vector3.Reflect(currentPosition - closestPoint, normal).normalized;
+
+            // Update the player's position using the reflection vector
+            transform.position = closestPoint + reflection * 0.05f;
+        }
     }
 }
