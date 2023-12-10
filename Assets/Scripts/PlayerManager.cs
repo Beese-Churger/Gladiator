@@ -40,7 +40,7 @@ public class PlayerManager : MonoBehaviour
 
     void CreateController()
     {
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"), spawnPoints[PV.Owner.ActorNumber].position, Quaternion.identity);
+        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"), spawnPoints[PV.Owner.ActorNumber - 1].position, Quaternion.identity);
     }
 
 
