@@ -17,16 +17,10 @@ public class PlayerManager : MonoBehaviour
     int kills;
     int deaths;
 
-    List<Transform> spawnPoints = new();
 
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
-        Transform arenaSpawns = GameObject.Find("Spawns").transform;
-        foreach(Transform spawnPoint in arenaSpawns)
-        {
-            spawnPoints.Add(spawnPoint);
-        }
     }
 
     private void Start()
@@ -40,7 +34,8 @@ public class PlayerManager : MonoBehaviour
 
     void CreateController()
     {
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"), spawnPoints[PV.Owner.ActorNumber - 1].position, Quaternion.identity);
+        Transform spawnPoint = SpawnManager.Instance.GetSpawnPoint(PV.Owner.ActorNumber);
+        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"), spawnPoint.position, spawnPoint.rotation);
     }
 
 

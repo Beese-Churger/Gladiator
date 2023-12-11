@@ -146,8 +146,8 @@ public class CameraController : MonoBehaviour
 
                 playerObj.forward = dirToCombatLookAt.normalized;
 
-                combatLookAt.position = player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(currentLock.position, player.position), 2);
-                combatLookAt.rotation = playerObj.rotation;
+                combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(currentLock.position, player.position) * 0.5f, 1), playerObj.rotation);
+                //combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * (Vector3.Distance(player.transform.position, currentLock.position) / 2), playerObj.rotation);
 
                 playerDirectional.transform.position = Vector2.Lerp(playerDirectional.transform.position,Camera.main.WorldToScreenPoint(player.position), 10 * Time.deltaTime);
                 break;
