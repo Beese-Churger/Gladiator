@@ -35,7 +35,7 @@ public class Detect : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        for(int i = cameraController.indicators.Count; i >= 0; --i)
+        for(int i = cameraController.indicators.Count - 1; i >= 0; --i)
         {
             if (!opponentsInRange.Contains(cameraController.indicators[i].GetComponent<Indicator>().GetTarget()))
             {

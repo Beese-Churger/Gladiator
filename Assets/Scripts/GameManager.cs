@@ -142,7 +142,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void RoundOver(int team)
     {
-        Debug.Log("check");
         PV.RPC(nameof(RPC_RoundOver), RpcTarget.All, team);
     }
 
