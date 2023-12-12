@@ -702,6 +702,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     {
         PV.RPC(nameof(RPC_FeintCall), RpcTarget.MasterClient, isFeint);
     }
+
     [PunRPC]
     public void RPC_FeintCall(bool isFeint)
     {
@@ -719,6 +720,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         dodgeLeft = _dodgeLeft;
         PV.RPC(nameof(RPC_DodgeCall), RpcTarget.MasterClient, _dodgeLeft);
     }
+
     [PunRPC]
     public void RPC_DodgeCall(bool dodgeLeft)
     {
@@ -784,6 +786,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
 
                 continue;
             }
+
             if (!detectionRadius.opponentsInRange[i])
             {
                 detectionRadius.opponentsInRange.Remove(detectionRadius.opponentsInRange[i]);
@@ -795,12 +798,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
                 if(!opponentsInFOV.Contains(detectionRadius.opponentsInRange[i]) && !detectionRadius.opponentsInRange[i].GetComponent<PlayerController>().isDead)
                     opponentsInFOV.Add(detectionRadius.opponentsInRange[i]);
             }
-
             else
             {
                 opponentsInFOV.Remove(detectionRadius.opponentsInRange[i]);
             }
-
         }
     }
     private bool IsInCameraFrustum(int index)
@@ -860,6 +861,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     {
         return currDir;
     }
+
     public void UpdateUI()
     {
 
@@ -884,6 +886,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     {
         staminaBarFill.value = currentStamina / maxStamina;
     }
+
     public bool CheckIfCanParry(PlayerController enemy, MouseController.DirectionalInput enemyDir, bool _isHeavy)
     {
         //check if player is facing enemy
@@ -917,15 +920,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     public void ParryAttack(bool _isHeavy)
     {
         PV.RPC(nameof(RPC_ParryAttackCall), RpcTarget.MasterClient, _isHeavy, playerIDParried);
-        //PV.RPC(nameof(RPC_AttackParried), RpcTarget.MasterClient, playerIDParried);
-        //PV.RPC(nameof(RPC_GetParried), PhotonView.Find(playerIDParried).Owner); // parry reaction for the one who got parried
     }
     
     [PunRPC]
     public void RPC_ParryAttackCall(bool _isHeavy, int _playerIDParried)
     {
         PV.RPC(nameof(RPC_ParryAttack), RpcTarget.All, _isHeavy);
-        PV.RPC(nameof(RPC_AttackParried), RpcTarget.All, _playerIDParried);
+        PV.RPC(nameof(RPC_AttackParried), RpcTarget.All, _playerIDParried); // parry reaction for the one who got parried
     }
 
     [PunRPC]
@@ -961,15 +962,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
 
         isParrying = false;
     }
+
     public void Parried()
     {
         PV.RPC(nameof(RPC_ParriedCall), RpcTarget.MasterClient);
     }
+
     [PunRPC]
     void RPC_ParriedCall()
     {
         PV.RPC(nameof(RPC_Parried), RpcTarget.All);
     }
+
     [PunRPC]
     void RPC_Parried()
     {
@@ -984,6 +988,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
 
         isParried = false;
     }
+
     public bool CheckIfParried()
     {
 
@@ -1004,6 +1009,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         }
         return false;
     }
+
     public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
     {
         if (isAttacking)
@@ -1046,6 +1052,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     {
         PV.RPC(nameof(RPC_BlockAttackCall), RpcTarget.MasterClient, damage, _isHeavy);
     }
+
     [PunRPC]
     void RPC_BlockAttackCall(float damage, bool _isHeavy, PhotonMessageInfo info)
     {
@@ -1058,21 +1065,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         isBlocking = true;
         attackReceivedIsHeavy = _isHeavy;
     }
+
     IEnumerator Blocking()
     {
         yield return new WaitForSeconds(0.05f);
 
         isBlocking = false;
     }
+
     public void TakeDamage(float damage)
     {
         PV.RPC(nameof(RPC_TakeDamageCall), RpcTarget.MasterClient, damage);
     }
-    //public void TakeDamage(float damage)
-    //{
-    //    PV.RPC(nameof(RPC_TakeDamage), PV.Owner, damage);
-    //}
-
 
     [PunRPC]
     void RPC_TakeDamageCall(float damage, PhotonMessageInfo info)
@@ -1112,6 +1116,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     {
         PV.RPC(nameof(RPC_UseStamina), RpcTarget.All, amount);
     }
+
     [PunRPC]
     void RPC_UseStamina(float amount)
     {

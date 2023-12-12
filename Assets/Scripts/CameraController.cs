@@ -5,8 +5,6 @@ using Cinemachine;
 using Photon.Pun;
 public class CameraController : MonoBehaviour
 {
-    //public static CameraController instance;
-
     [Header("References")]
     MouseController mouseController;
     public Transform orientation;
@@ -46,12 +44,7 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
-        //if (!instance)
-        //    instance = this;
-        //else
-        //    Destroy(this);
 
-        //playerDirectional = MouseController.instance.GetPlayerDirectional();
     }
 
     private void Awake()
@@ -129,18 +122,6 @@ public class CameraController : MonoBehaviour
                         currentLock = combatLookAt;
                     }
 
-                    //if ((currentLock != combatLookAt) && currentLock.gameObject.GetComponent<PlayerController>().isDead)
-                    //{
-                    //    if (playerController.opponentsInFOV.Count > 0)
-                    //    {
-                    //        SwapTarget();
-                    //    }
-                    //    //combatLookAt.SetPositionAndRotation(orientation.forward * 4, orientation.rotation);
-                    //    //currentLock = combatLookAt;
-                    //}
-
-
-
                     if (playerController.opponentsInFOV.Count <= 0)
                     {
                         combatLookAt.position = playerObj.position + (orientationInitialFwd * 4);
@@ -166,7 +147,6 @@ public class CameraController : MonoBehaviour
                     playerDirectional.transform.position = Vector2.Lerp(playerDirectional.transform.position, Camera.main.WorldToScreenPoint(player.position), 10 * Time.deltaTime);
                     break;
                 }
-            
         }
     }
 
@@ -183,7 +163,6 @@ public class CameraController : MonoBehaviour
 
     public void SwapTarget()
     {
-
         int currIndex = playerController.opponentsInFOV.IndexOf(currentLock.gameObject);
 
         if (currIndex == playerController.opponentsInFOV.Count - 1)
@@ -191,10 +170,8 @@ public class CameraController : MonoBehaviour
         else
             currIndex++;
 
-        //return playerController.opponentsInFOV[currIndex].GetComponent<PlayerController>().isDead;
         currentLock = playerController.opponentsInFOV[currIndex].transform;
         UpdateTarget(currentLock.GetComponent<PhotonView>().ViewID);
-
     }
 
     public void UpdateTarget(int id)
@@ -207,6 +184,7 @@ public class CameraController : MonoBehaviour
     {
         playerController.lockOnPlayerID = id;
     }
+
     private void TurnOnIndicators()
     {
         if (indicators.Count <= 0)

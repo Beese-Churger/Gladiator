@@ -34,14 +34,8 @@ public class MouseController : MonoBehaviourPunCallbacks
 
     PhotonView PV;
 
-    // Start is called before the first frame update
     void Start()
     {
-        //if (!instance)
-        //    instance = this;
-        //else
-        //    Destroy(this);
-
         Cursor.lockState = CursorLockMode.Locked;
         int x = (Screen.width / 2);
         int y = (Screen.height / 2);
@@ -57,7 +51,7 @@ public class MouseController : MonoBehaviourPunCallbacks
         PV = GetComponent<PhotonView>();
         inputDirection = DirectionalInput.TOP;
     }
-    // Update is called once per frame
+
     void Update()
     {
         if (!PV.IsMine)
