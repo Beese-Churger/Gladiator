@@ -41,6 +41,10 @@ public class PlayerManager : MonoBehaviour
         PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
     }
 
+    public Transform RespawnPoint()
+    {
+        return SpawnManager.Instance.GetSpawnPoint(PV.Owner.ActorNumber);
+    }
 
     public void Die()
     {

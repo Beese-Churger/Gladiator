@@ -1164,4 +1164,28 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     {
         scoreboard.updateScores(team1, team2, round);
     }
+
+    public void Respawn()
+    {
+        PV.RPC(nameof(RPC_Respawn), RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void RPC_Respawn()
+    {
+        isDead = false;
+        playerCollider.enabled = true;
+        deathCollider.enabled = false;
+
+        currentHealth = maxHealth;
+        currentStamina = maxStamina;
+        currDir = MouseController.DirectionalInput.TOP;
+        lastAttack = Time.time;
+        lastDodgeTime = Time.time;
+        lastHitTime = Time.time;
+        animator.SetTrigger("REVIVE");
+        Transform point = playerManager.RespawnPoint();
+
+        transform.SetPositionAndRotation(point.position, point.rotation);
+    }
 }

@@ -157,5 +157,12 @@ public class GameManager : MonoBehaviourPunCallbacks
         round++;
 
         masterClient.UpdateScoreboard(team1Points, team2Points, round);
+        StartCoroutine(StartNextRound());
+    }
+
+    IEnumerator StartNextRound()
+    {
+        yield return new WaitForSeconds(5f);
+        masterClient.Respawn();
     }
 }
