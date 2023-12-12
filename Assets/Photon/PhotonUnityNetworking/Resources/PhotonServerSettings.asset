@@ -63,6 +63,8 @@ MonoBehaviour:
   - RPC_ParriedCall
   - RPC_ParryAttackCall
   - RPC_TakeDamageCall
+  - RPC_GameStart
+  - RPC_RoundOver
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     //public static PlayerController instance;
     [SerializeField] PlayerManager playerManager;
     [Header("Stats")]
+    [SerializeField] Transform canvasHolder;
+    public Scoreboard scoreboard;
     public GameObject healthbar;
     public Slider healthBarFill;
     public Slider staminaBarFill;
@@ -287,6 +289,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             {
                 Destroy(child.gameObject);
             }
+            foreach(Transform child in canvasHolder)
+            {
+                Destroy(child.gameObject);
+            }
         }
     }
 
@@ -320,7 +326,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         {
             if (targetPlayer.CustomProperties.TryGetValue("team", out object team))
             {
-                Debug.Log(team.ToString());
                 this.team = int.Parse(team.ToString());
             }
         }
@@ -1124,6 +1129,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             playerManager.DeathCount();
         }
         isDead = true;
+        if (PhotonNetwork.IsMasterClient)
+        {
+            GameManager.Instance.CheckIfRoundEnd();
+        }
         //playerManager.Die();
     }
 
@@ -1143,5 +1152,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             // Update the player's position using the reflection vector
             transform.position = closestPoint + reflection * 0.05f;
         }
+    }
+
+    public void UpdateScoreboard(int team1, int team2, int round)
+    {
+        scoreboard.updateScores(team1, team2, round);
     }
 }

@@ -980,7 +980,7 @@ GameObject:
   - component: {fileID: 627773836636462296}
   - component: {fileID: 6615745830953193625}
   m_Layer: 5
-  m_Name: ScoreboardItem
+  m_Name: ScoreboardItemHeader
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1731,8 +1731,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -20.640015, y: 4.436719}
-  m_SizeDelta: {x: 150, y: 50}
+  m_AnchoredPosition: {x: -20.640015, y: 15.601}
+  m_SizeDelta: {x: 150, y: 31.203}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4906037779988246012
 CanvasRenderer:
@@ -1762,7 +1762,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c3e53db91a8b40d43b3cf19076e81449, type: 2}
   m_sharedMaterial: {fileID: 5403025159156186832, guid: c3e53db91a8b40d43b3cf19076e81449, type: 2}
@@ -1771,8 +1771,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1789,15 +1789,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
-  m_fontSizeBase: 50
+  m_fontSize: 70
+  m_fontSizeBase: 70
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 1024
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -2196,10 +2196,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e36ed87b53a53fe48bc90b8c266ba10a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  round: {fileID: 0}
-  timer: {fileID: 0}
-  player1: {fileID: 0}
-  player2: {fileID: 0}
+  round: {fileID: 7443830517643253233}
+  timer: {fileID: 3868054673178161865}
+  team1: {fileID: 280734121862836739}
+  team2: {fileID: 2511518473518834802}
   team1Container: {fileID: 3123722415037379876}
   team2Container: {fileID: 656326587078252192}
   scoreboardItemPrefab: {fileID: 2447815289746826659, guid: ab2675f299d600146a8e3ed90f3c3b5d, type: 3}
@@ -5231,8 +5231,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -34.25714, y: 4.436719}
-  m_SizeDelta: {x: 150, y: 50}
+  m_AnchoredPosition: {x: -34.103, y: 15.601}
+  m_SizeDelta: {x: 150, y: 31.203}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9200372761684519072
 CanvasRenderer:
@@ -5262,7 +5262,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c3e53db91a8b40d43b3cf19076e81449, type: 2}
   m_sharedMaterial: {fileID: 5403025159156186832, guid: c3e53db91a8b40d43b3cf19076e81449, type: 2}
@@ -5271,8 +5271,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -5289,15 +5289,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
-  m_fontSizeBase: 50
+  m_fontSize: 70
+  m_fontSizeBase: 70
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 1024
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -5913,7 +5913,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 0.26079005, z: -3.4310038}
+  m_FollowOffset: {x: 0, y: 0.9579041, z: -3.9368565}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -5933,7 +5933,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 125.64903
+    Value: 81.277534
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -6091,8 +6091,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569066303058731}
-  m_LocalRotation: {x: 0.01732004, y: 0.888972, z: -0.033736657, w: 0.45638883}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.09034368, y: 0.6466555, z: -0.07753999, w: 0.75343364}
+  m_LocalPosition: {x: -0.0000019073486, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6310,8 +6310,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569066544543228}
-  m_LocalRotation: {x: -0.00084826286, y: 0.88961035, z: 0.0016522771, w: 0.45671657}
-  m_LocalPosition: {x: -2.9175935, y: -3.346875, z: 1.9883257}
+  m_LocalRotation: {x: 0.0669932, y: 0.6487447, z: -0.057498787, w: 0.75586784}
+  m_LocalPosition: {x: -4.0208764, y: -2.649761, z: -0.60834527}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6463,7 +6463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 0.26079005, z: -3.4310038}
+  m_FollowOffset: {x: 0, y: 0.9579041, z: -3.9368565}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -6483,7 +6483,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 125.64903
+    Value: 81.277534
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -6855,7 +6855,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 0.26079005, z: -3.4310038}
+  m_FollowOffset: {x: 0, y: 0.9579041, z: -3.9368565}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -6875,7 +6875,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 125.64903
+    Value: 81.277534
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -7117,6 +7117,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerManager: {fileID: 0}
+  canvasHolder: {fileID: 5635569067236700030}
+  scoreboard: {fileID: 2119158375449909316}
   healthbar: {fileID: 5505417254408989603}
   healthBarFill: {fileID: 5883366469602725929}
   staminaBarFill: {fileID: 6477239341178899517}
@@ -7360,8 +7362,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569067606744101}
-  m_LocalRotation: {x: -0.0039114216, y: 0.8895793, z: 0.00761882, w: 0.4567006}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.055226777, y: 0.64956063, z: -0.04739992, w: 0.7568186}
+  m_LocalPosition: {x: -0.00000047683716, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7473,7 +7475,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569067871618058}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.9175935, y: -3.346875, z: 1.9883257}
+  m_LocalPosition: {x: -4.0208764, y: -2.649761, z: -0.60834527}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7522,13 +7524,13 @@ MonoBehaviour:
         m_Calls: []
   m_LegacyBlendHint: 0
   m_YAxis:
-    Value: 0.14456119
+    Value: 0.33530492
     m_SpeedMode: 0
     m_MaxSpeed: 2
     m_AccelTime: 0.2
     m_DecelTime: 0.1
     m_InputAxisName: Mouse Y
-    m_InputAxisValue: 0
+    m_InputAxisValue: -0.6
     m_InvertInput: 1
     m_MinValue: 0
     m_MaxValue: 1
@@ -7546,7 +7548,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 125.64903
+    Value: 81.277534
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -7773,8 +7775,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569068080064178}
-  m_LocalRotation: {x: 0.006683117, y: 0.88951665, z: -0.013017637, w: 0.45666844}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.07276687, y: 0.6482864, z: -0.062454183, w: 0.75533384}
+  m_LocalPosition: {x: -0.00000047683716, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
