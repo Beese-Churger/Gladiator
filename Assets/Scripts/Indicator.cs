@@ -21,6 +21,12 @@ public class Indicator: MonoBehaviour
     {
         if (targetFollow != null)
         {
+            if (targetPlayerController.isDead)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
             transform.position = Camera.main.WorldToScreenPoint(targetFollow.transform.position);
             // check if enemy is facing player
             Vector3 directionToPlayer = targetFollow.transform.position - host.transform.position;

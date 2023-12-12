@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
+public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObservable
 {
     //public enum PlayerState
     //{
@@ -28,8 +28,8 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     public float maxStamina = 100f;
     private float currentStamina;
 
-    bool isDead = false;
-
+    public bool isDead = false;
+    public int team = 0;
     [Header("Movement")]
     [SerializeField] Collider arenaCollider;
     Vector3 lastValidPosition;
@@ -70,6 +70,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     [Header("CombatStuff")]
     [SerializeField] Collider playerCollider;
+    [SerializeField] Collider deathCollider;
     [SerializeField] Detect detectionRadius;
     public List<GameObject> opponentsInFOV = new();
     public List<PlayerController> opponentsInAttackRange = new();
@@ -140,6 +141,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     private byte dataFlags;
 
     PhotonView PV;
+    Player player;
     public Animator animator;
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -301,6 +303,9 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         readyToJump = true;
         moveSpeed = freeSpeed;
 
+        playerCollider.enabled = true;
+        deathCollider.enabled = false;
+
         currentHealth = maxHealth;
         currentStamina = maxStamina;
         currDir = MouseController.DirectionalInput.TOP;
@@ -309,11 +314,27 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         lastHitTime = Time.time;
     }
 
-    
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    {
+        if(changedProps.ContainsKey("team") && targetPlayer == PV.Owner)
+        {
+            if (targetPlayer.CustomProperties.TryGetValue("team", out object team))
+            {
+                Debug.Log(team.ToString());
+                this.team = int.Parse(team.ToString());
+            }
+        }
+    }
 
 
     private void Update()
     {
+        if (isDead)
+        {
+            playerCollider.enabled = false;
+            deathCollider.enabled = true;
+            return;
+        }
 
         // animate player movement
         if (animator != null && animator.isActiveAndEnabled)
@@ -449,6 +470,9 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     }
     private void FixedUpdate()
     {
+        if (isDead)
+            return;
+
         if(canRegenStamina && lastAttack + regenDelay < Time.time)
         {
             RegenStamina(staminaRegenAmount);
@@ -740,8 +764,15 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     }
     public void CheckWhoCanLock()
     {
-        for(int i = 0; i < detectionRadius.opponentsInRange.Count; ++i)
+        for(int i = detectionRadius.opponentsInRange.Count - 1; i >= 0; --i)
         {
+            if(detectionRadius.opponentsInRange[i].GetComponent<PlayerController>().isDead)
+            {
+                opponentsInFOV.Remove(detectionRadius.opponentsInRange[i]);
+                detectionRadius.opponentsInRange.Remove(detectionRadius.opponentsInRange[i]);
+
+                continue;
+            }
             if (!detectionRadius.opponentsInRange[i])
             {
                 detectionRadius.opponentsInRange.Remove(detectionRadius.opponentsInRange[i]);
@@ -750,7 +781,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
             if (IsInCameraFrustum(i))
             {
-                if(!opponentsInFOV.Contains(detectionRadius.opponentsInRange[i]))
+                if(!opponentsInFOV.Contains(detectionRadius.opponentsInRange[i]) && !detectionRadius.opponentsInRange[i].GetComponent<PlayerController>().isDead)
                     opponentsInFOV.Add(detectionRadius.opponentsInRange[i]);
             }
 
@@ -766,8 +797,14 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         Plane[] planes = GeometryUtility.CalculateFrustumPlanes(Camera.main);
 
         if (GeometryUtility.TestPlanesAABB(planes, detectionRadius.opponentsInRange[index].GetComponent<Collider>().bounds))
-            return true; // Object is within the camera's frustum
+        {
+            //check if player is facing enemy
+            Vector3 directionToPlayer = transform.position - detectionRadius.opponentsInRange[index].transform.position;
+            float dotProduct = Vector3.Dot(orientation.forward, directionToPlayer.normalized);
 
+            if (dotProduct < 0)
+                return true; // object within camera frustrum and infront of player
+        }
         return false; // Object is not within the camera's frustum
     }
 
@@ -872,7 +909,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         //PV.RPC(nameof(RPC_AttackParried), RpcTarget.MasterClient, playerIDParried);
         //PV.RPC(nameof(RPC_GetParried), PhotonView.Find(playerIDParried).Owner); // parry reaction for the one who got parried
     }
-
+    
     [PunRPC]
     public void RPC_ParryAttackCall(bool _isHeavy, int _playerIDParried)
     {
@@ -1020,15 +1057,20 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
     {
         PV.RPC(nameof(RPC_TakeDamageCall), RpcTarget.MasterClient, damage);
     }
+    //public void TakeDamage(float damage)
+    //{
+    //    PV.RPC(nameof(RPC_TakeDamage), PV.Owner, damage);
+    //}
+
 
     [PunRPC]
     void RPC_TakeDamageCall(float damage, PhotonMessageInfo info)
     {
-        PV.RPC(nameof(RPC_TakeDamage), RpcTarget.All, damage);
+        PV.RPC(nameof(RPC_TakeDamage), RpcTarget.All, damage, info.Sender);
     }
 
     [PunRPC]
-    void RPC_TakeDamage(float damage, PhotonMessageInfo info)
+    void RPC_TakeDamage(float damage, Photon.Realtime.Player sender)
     {
         tookHit = true;
         lastHitTime = Time.time;
@@ -1036,13 +1078,14 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
         currentHealth -= damage;
         UpdateHealthBar();
 
-        //Debug.Log($"Hit by {info.Sender}");
+        //Debug.Log($"Hit by {sender}");
 
         if (currentHealth <= 0)
         {
             Die();
             animator.SetTrigger("DEATH");
-            PlayerManager.Find(info.Sender).GetKill();
+            if(PV.IsMine)
+                PlayerManager.Find(sender).GetKill();
         }
     }
 
@@ -1076,7 +1119,12 @@ public class PlayerController : MonoBehaviour, IDamageable, IPunObservable
 
     void Die()
     {
-        playerManager.Die();
+        if (PV.IsMine)
+        {
+            playerManager.DeathCount();
+        }
+        isDead = true;
+        //playerManager.Die();
     }
 
     void ClampPositionToArenaBounds()

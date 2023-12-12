@@ -70,6 +70,8 @@ public class CameraController : MonoBehaviour
         if (!PV.IsMine)
             return;
 
+        if (playerController.isDead)
+            return;
         
         // switch styles
         if (Input.GetKeyDown(KeyCode.LeftControl))
@@ -107,51 +109,64 @@ public class CameraController : MonoBehaviour
         orientation.forward = viewDir.normalized;
 
         // rotate player object
-        switch(currentStyle)
+        switch (currentStyle)
         {
             case CameraStyle.Basic:
-            {
-                float horizontalInput = Input.GetAxis("Horizontal");
-                float verticalInput = Input.GetAxis("Vertical");
-                Vector3 inputDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
+                {
+                    float horizontalInput = Input.GetAxis("Horizontal");
+                    float verticalInput = Input.GetAxis("Vertical");
+                    Vector3 inputDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-                if (inputDir != Vector3.zero)
-                    playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, Time.deltaTime * rotationSpeed);
-                break;
-            }
+                    if (inputDir != Vector3.zero)
+                        playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, Time.deltaTime * rotationSpeed);
+                    break;
+                }
             case CameraStyle.Combat:
-            {
-                    
-                if (!currentLock)
                 {
-                    currentLock = combatLookAt;
+
+                    if (!currentLock)
+                    {
+                        currentLock = combatLookAt;
+                    }
+
+                    //if ((currentLock != combatLookAt) && currentLock.gameObject.GetComponent<PlayerController>().isDead)
+                    //{
+                    //    if (playerController.opponentsInFOV.Count > 0)
+                    //    {
+                    //        SwapTarget();
+                    //    }
+                    //    //combatLookAt.SetPositionAndRotation(orientation.forward * 4, orientation.rotation);
+                    //    //currentLock = combatLookAt;
+                    //}
+
+
+
+                    if (playerController.opponentsInFOV.Count <= 0)
+                    {
+                        combatLookAt.position = playerObj.position + (orientationInitialFwd * 4);
+                    }
+                    else if (playerController.opponentsInFOV.Count == 1 && currentLock != combatLookAt)
+                    {
+                        SwapTarget();
+                    }
+
+                    if (Input.GetMouseButtonDown(2) && playerController.opponentsInFOV.Count > 0)
+                    {
+                        SwapTarget();
+                    }
+
+                    Vector3 dirToCombatLookAt = currentLock.position - new Vector3(player.position.x, currentLock.position.y, player.position.z);
+                    orientation.forward = dirToCombatLookAt.normalized;
+
+                    playerObj.forward = dirToCombatLookAt.normalized;
+
+                    combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(currentLock.position, player.position) * 0.5f, 1), playerObj.rotation);
+                    //combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * (Vector3.Distance(player.transform.position, currentLock.position) / 2), playerObj.rotation);
+
+                    playerDirectional.transform.position = Vector2.Lerp(playerDirectional.transform.position, Camera.main.WorldToScreenPoint(player.position), 10 * Time.deltaTime);
+                    break;
                 }
-
-                if(playerController.opponentsInFOV.Count <= 0)
-                {
-                    combatLookAt.position = playerObj.position + (orientationInitialFwd * 4);
-                }
-                else if(playerController.opponentsInFOV.Count == 1 && currentLock != combatLookAt)
-                {
-                    SwapTarget();
-                }
-
-                if (Input.GetMouseButtonDown(2))
-                {
-                    SwapTarget();
-                }
-                
-                Vector3 dirToCombatLookAt = currentLock.position - new Vector3(player.position.x, currentLock.position.y, player.position.z);
-                orientation.forward = dirToCombatLookAt.normalized;
-
-                playerObj.forward = dirToCombatLookAt.normalized;
-
-                combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(currentLock.position, player.position) * 0.5f, 1), playerObj.rotation);
-                //combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * (Vector3.Distance(player.transform.position, currentLock.position) / 2), playerObj.rotation);
-
-                playerDirectional.transform.position = Vector2.Lerp(playerDirectional.transform.position,Camera.main.WorldToScreenPoint(player.position), 10 * Time.deltaTime);
-                break;
-            }
+            
         }
     }
 
@@ -168,17 +183,18 @@ public class CameraController : MonoBehaviour
 
     public void SwapTarget()
     {
-        if (playerController.opponentsInFOV.Count > 0)
-        {
-            int currIndex = playerController.opponentsInFOV.IndexOf(currentLock.gameObject);
-            if (currIndex == playerController.opponentsInFOV.Count - 1)
-                currIndex = 0;
-            else
-                currIndex++;
 
-            currentLock = playerController.opponentsInFOV[currIndex].transform;
-            UpdateTarget(currentLock.GetComponent<PhotonView>().ViewID);
-        }
+        int currIndex = playerController.opponentsInFOV.IndexOf(currentLock.gameObject);
+
+        if (currIndex == playerController.opponentsInFOV.Count - 1)
+            currIndex = 0;
+        else
+            currIndex++;
+
+        //return playerController.opponentsInFOV[currIndex].GetComponent<PlayerController>().isDead;
+        currentLock = playerController.opponentsInFOV[currIndex].transform;
+        UpdateTarget(currentLock.GetComponent<PhotonView>().ViewID);
+
     }
 
     public void UpdateTarget(int id)
@@ -196,17 +212,12 @@ public class CameraController : MonoBehaviour
         if (indicators.Count <= 0)
             return;
 
-        for(int i = 0; i < indicators.Count; ++i)
+        for (int i = indicators.Count - 1; i >= 0; --i)
         {
-            //if (!playerController.opponentsInFOV.Contains(indicators[i].GetComponent<Indicator>().GetTarget()))
-            //{
-            //    indicators[i].SetActive(false);
-            //}
-            //else
-            //{
-            //    indicators[i].SetActive(true);
-            //}
-            indicators[i].SetActive(true);
+            if (!indicators[i])
+                indicators.Remove(indicators[i]);
+            else
+                indicators[i].SetActive(true);
         }
     }
 
@@ -215,11 +226,13 @@ public class CameraController : MonoBehaviour
         if (indicators.Count <= 0)
             return;
 
-        for (int i = 0; i < indicators.Count; ++i)
+        for(int i = indicators.Count - 1; i >= 0; --i)
         {
-            indicators[i].SetActive(false);
+            if (!indicators[i])
+                indicators.Remove(indicators[i]);
+            else
+                indicators[i].SetActive(false);
         }
     }
-
 }
 

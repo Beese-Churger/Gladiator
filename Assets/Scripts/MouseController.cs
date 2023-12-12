@@ -63,6 +63,12 @@ public class MouseController : MonoBehaviourPunCallbacks
         if (!PV.IsMine)
             return;
 
+        if(playerController.isDead)
+        {
+            directional.SetActive(false);
+            return;
+        }
+
         if (!cameraController.CombatMode)
             return;
 

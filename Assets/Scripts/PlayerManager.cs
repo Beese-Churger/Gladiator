@@ -35,7 +35,10 @@ public class PlayerManager : MonoBehaviour
     void CreateController()
     {
         Transform spawnPoint = SpawnManager.Instance.GetSpawnPoint(PV.Owner.ActorNumber);
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"), spawnPoint.position, spawnPoint.rotation);
+        controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"), spawnPoint.position, spawnPoint.rotation);
+        Hashtable hash = new Hashtable();
+        hash.Add("team", PhotonNetwork.LocalPlayer.ActorNumber == 1 ? 1 : 2);
+        PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
     }
 
 
@@ -43,7 +46,10 @@ public class PlayerManager : MonoBehaviour
     {
         PhotonNetwork.Destroy(controller);
         //CreateController();
+    }
 
+    public void DeathCount()
+    {
         deaths++;
 
         Hashtable hash = new Hashtable();
