@@ -289,8 +289,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             {
                 Destroy(child.gameObject);
             }
+            bool i = true;
             foreach(Transform child in canvasHolder)
             {
+                if(i) // dont destroy scoreboard;
+                {
+                    i = false;
+                    continue;
+                }
                 Destroy(child.gameObject);
             }
         }
