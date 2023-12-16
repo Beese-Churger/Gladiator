@@ -660,6 +660,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             canFeint = false;
             feint = false;
             animator.SetTrigger("FEINT");
+            canRegenStamina = true;
             yield break;
         }
         canFeint = false;
@@ -987,6 +988,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         yield return new WaitForSeconds(0.5f);
 
         isParried = false;
+        canRegenStamina = true;
     }
 
     public bool CheckIfParried()
@@ -1184,6 +1186,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
 
         currentHealth = maxHealth;
         currentStamina = maxStamina;
+
+        UpdateHealthBar();
+        UpdateStaminaBar();
+
+        canRegenStamina = true;
         currDir = MouseController.DirectionalInput.TOP;
         lastAttack = Time.time;
         lastDodgeTime = Time.time;
