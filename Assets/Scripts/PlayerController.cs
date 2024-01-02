@@ -7,14 +7,6 @@ using Photon.Realtime;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObservable
 {
-    //public enum PlayerState
-    //{
-    //    COMBAT,
-    //    PARRIED,
-    //    EXHAUSTED,
-    //    HIT
-    //}
-
     //public static PlayerController instance;
     [SerializeField] PlayerManager playerManager;
     [Header("Stats")]
@@ -407,11 +399,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         {
             Parried();            
         }
+
         CheckWhoCanLock();
         UpdateUI();
         MyInput();
         SpeedControl();
         ClampPositionToArenaBounds();
+
         if (cameraController.CombatMode)
         {
             if (Input.GetMouseButtonDown(0) && AbleToMove())
@@ -442,8 +436,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
 
             if(canFeint && Input.GetKeyDown(KeyCode.E))
             {
-                Feint(true);
-                canFeint = false;
+                Feint();
             }
             if(lastDodgeTime + dodgeCD < Time.time && AbleToMove())
             {
@@ -594,6 +587,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         collider.enabled = false;
 
         yield return new WaitForSeconds(0.1f);
+
         isAttacking = false;
         lastAttack = Time.time;
 
@@ -653,16 +647,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
 
         yield return new WaitForSeconds(0.4f); // feint 400ms before attack would land
 
-        if(DoFeint())
-        {
-            isAttacking = false;
-            lastAttack = Time.time;
-            canFeint = false;
-            feint = false;
-            animator.SetTrigger("FEINT");
-            canRegenStamina = true;
-            yield break;
-        }
         canFeint = false;
 
         yield return new WaitForSeconds(0.1f); // parry starts 300ms before attack lands
@@ -694,26 +678,25 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         return tookHit && !hasHyperArmor && !isDodging;
     }
 
-    bool DoFeint()
+    void Feint()
     {
-        return feint;
-    }
-
-    void Feint(bool isFeint)
-    {
-        PV.RPC(nameof(RPC_FeintCall), RpcTarget.MasterClient, isFeint);
+        PV.RPC(nameof(RPC_FeintCall), RpcTarget.MasterClient);
     }
 
     [PunRPC]
-    public void RPC_FeintCall(bool isFeint)
+    public void RPC_FeintCall()
     {
-        PV.RPC(nameof(RPC_Feint), RpcTarget.All, isFeint);
+        PV.RPC(nameof(RPC_Feint), RpcTarget.All);
     }
 
     [PunRPC]
-    public void RPC_Feint(bool isFeint)
+    public void RPC_Feint()
     {
-        feint = isFeint;
+        isAttacking = false;
+        lastAttack = Time.time;
+        canFeint = false;
+        animator.SetTrigger("FEINT");
+        canRegenStamina = true;
     }
 
     public void Dodge(bool _dodgeLeft)
@@ -833,7 +816,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         }
     }
 
-    private bool AbleToMove()
+    public bool AbleToMove()
     {
         if (isAttacking || isDodging || isBlocking)
             return false;
@@ -1064,6 +1047,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     [PunRPC]
     void RPC_BlockAttack(float damage, bool _isHeavy, PhotonMessageInfo info)
     {
+        ResetTriggers();
         isBlocking = true;
         attackReceivedIsHeavy = _isHeavy;
     }
@@ -1089,6 +1073,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     [PunRPC]
     void RPC_TakeDamage(float damage, Photon.Realtime.Player sender)
     {
+        ResetTriggers();
         tookHit = true;
         lastHitTime = Time.time;
 
@@ -1180,6 +1165,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     [PunRPC]
     public void RPC_Respawn()
     {
+        ResetTriggers();
         isDead = false;
         playerCollider.enabled = true;
         deathCollider.enabled = false;
@@ -1198,6 +1184,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         animator.SetTrigger("REVIVE");
         Transform point = playerManager.RespawnPoint();
 
+        cameraController.FreeLookCam();
         transform.SetPositionAndRotation(point.position, point.rotation);
+        ChangeSpeed();
+    }
+
+    void ResetTriggers() //Reset All the Animation Triggers so we don't have overlapping animations
+    {
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (parameter.name == "Yaxis" || parameter.name == "Xaxis")
+                continue;
+            animator.ResetTrigger(parameter.name);
+        }
     }
 }

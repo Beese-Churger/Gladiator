@@ -95,7 +95,7 @@ public class MouseController : MonoBehaviourPunCallbacks
             directions[1].GetComponent<Image>().color = new Color(1, 1, 1, 100);
             directions[2].GetComponent<Image>().color = new Color(1, 1, 1, 100);
         }
-        if (!playerController.isAttacking)
+        if (playerController.AbleToMove())
         {
 
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;

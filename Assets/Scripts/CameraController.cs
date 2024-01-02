@@ -74,26 +74,11 @@ public class CameraController : MonoBehaviour
 
             if (!combatMode)
             {
-                currentLock = null;
-                SwitchCameraStyle(CameraStyle.Basic);
-                TurnOffIndicators();
-                var heading = Mathf.Atan2(orientation.right.z, orientation.right.x) * Mathf.Rad2Deg;
-                thirdPersonCam.GetComponent<CinemachineFreeLook>().m_XAxis.Value = -heading;
-                thirdPersonCam.GetComponent<CinemachineFreeLook>().m_YAxis.Value = 0.6f;
-                animator.SetFloat("Xaxis", 0, 0, Time.deltaTime);
-                animator.SetFloat("Yaxis", 0, 0, Time.deltaTime);
-                animator.SetBool("CombatStance", false);
-                mouseController.ShowDirectionals(false);
+                FreeLookCam();
             }
             else
             {
-                playerController.LockOntoOpponent();
-                TurnOnIndicators();
-                SwitchCameraStyle(CameraStyle.Combat);
-                mouseController.ShowDirectionals(true);
-                mouseController.ResetCursor();
-                animator.SetBool("CombatStance", true);
-                playerDirectional.transform.position = Camera.main.WorldToScreenPoint(player.position);
+                CombatLookCam();
             }
         }
 
@@ -211,6 +196,31 @@ public class CameraController : MonoBehaviour
             else
                 indicators[i].SetActive(false);
         }
+    }
+
+    public void FreeLookCam()
+    {
+        currentLock = null;
+        SwitchCameraStyle(CameraStyle.Basic);
+        TurnOffIndicators();
+        var heading = Mathf.Atan2(orientation.right.z, orientation.right.x) * Mathf.Rad2Deg;
+        thirdPersonCam.GetComponent<CinemachineFreeLook>().m_XAxis.Value = -heading;
+        thirdPersonCam.GetComponent<CinemachineFreeLook>().m_YAxis.Value = 0.6f;
+        animator.SetFloat("Xaxis", 0, 0, Time.deltaTime);
+        animator.SetFloat("Yaxis", 0, 0, Time.deltaTime);
+        animator.SetBool("CombatStance", false);
+        mouseController.ShowDirectionals(false);
+    }
+
+    public void CombatLookCam()
+    {
+        playerController.LockOntoOpponent();
+        TurnOnIndicators();
+        SwitchCameraStyle(CameraStyle.Combat);
+        mouseController.ShowDirectionals(true);
+        mouseController.ResetCursor();
+        animator.SetBool("CombatStance", true);
+        playerDirectional.transform.position = Camera.main.WorldToScreenPoint(player.position);
     }
 }
 
