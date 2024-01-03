@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - ArenaBounds
+  - Spectator
   layers:
   - Default
   - TransparentFX
