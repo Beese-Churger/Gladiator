@@ -8,11 +8,6 @@ using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class Scoreboard : MonoBehaviourPunCallbacks
 {
-    public TMP_Text round;
-    public TMP_Text timer;
-    public TMP_Text team1;
-    public TMP_Text team2;
-
 	[SerializeField] Transform team1Container;
 	[SerializeField] Transform team2Container;
 	[SerializeField] GameObject scoreboardItemPrefab;
@@ -39,12 +34,7 @@ public class Scoreboard : MonoBehaviourPunCallbacks
 		RemoveScoreboardItem(otherPlayer);
 	}
 
-	public void updateScores(int _team1, int _team2, int _round)
-    {
-		round.text = "Round " + _round;
-		team1.text = _team1.ToString();
-		team2.text = _team2.ToString();
-    }
+
 	void AddScoreboardItem(Player player)
 	{
 		if (player.CustomProperties.TryGetValue("team", out object team))
