@@ -38,6 +38,8 @@ public class PlayerManager : MonoBehaviour
         controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"), spawnPoint.position, spawnPoint.rotation);
         Hashtable hash = new Hashtable();
         hash.Add("team", PhotonNetwork.LocalPlayer.ActorNumber == 1 ? 1 : 2);
+        //hash.Add(GladiatorInfo.PLAYER_LOADED_LEVEL, true);
+        Debug.Log("create");
         PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
     }
 

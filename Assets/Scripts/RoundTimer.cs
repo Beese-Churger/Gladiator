@@ -11,7 +11,7 @@ public class RoundTimer : MonoBehaviourPunCallbacks
     public const string RoundStartTime = "RoundStartTime";
 
     [Header("Countdown time in seconds")]
-    public float Countdown = 180.0f;
+    public float Countdown = 181.0f;
 
     private bool isTimerRunning;
 
@@ -34,7 +34,7 @@ public class RoundTimer : MonoBehaviourPunCallbacks
 
     public override void OnEnable()
     {
-        Debug.Log("OnEnable CountdownTimer");
+        Debug.Log("OnEnable roundTimer");
         base.OnEnable();
 
         // the starttime may already be in the props. look it up.
@@ -44,7 +44,7 @@ public class RoundTimer : MonoBehaviourPunCallbacks
     public override void OnDisable()
     {
         base.OnDisable();
-        Debug.Log("OnDisable CountdownTimer");
+        Debug.Log("OnDisable roundTimer");
     }
 
 
@@ -63,21 +63,19 @@ public class RoundTimer : MonoBehaviourPunCallbacks
 
     private void OnTimerRuns()
     {
-        this.isTimerRunning = true;
         this.enabled = true;
+        this.isTimerRunning = true;
     }
 
-    private void OnTimerEnds()
+    public void OnTimerEnds()
     {
         this.isTimerRunning = false;
         this.enabled = false;
 
-        Debug.Log("Emptying info text.", this.Text);
+        Debug.Log("Emptying info round text.", this.Text);
         this.Text.text = "00:00";
 
-        if (OnRoundTimerHasExpired != null) OnRoundTimerHasExpired();
-
-
+        if (OnRoundTimerHasExpired != null && TimeRemaining() <= 0) OnRoundTimerHasExpired();
     }
 
 
@@ -88,7 +86,7 @@ public class RoundTimer : MonoBehaviourPunCallbacks
     }
 
 
-    private void Initialize()
+    public void Initialize()
     {
         int propStartTime;
         if (TryGetStartTime(out propStartTime))
@@ -100,7 +98,10 @@ public class RoundTimer : MonoBehaviourPunCallbacks
             this.isTimerRunning = TimeRemaining() > 0;
 
             if (this.isTimerRunning)
+            {
+                Debug.Log("roundtimer");
                 OnTimerRuns();
+            }
             else
                 OnTimerEnds();
         }
@@ -132,7 +133,7 @@ public class RoundTimer : MonoBehaviourPunCallbacks
     public static void SetStartTime()
     {
         int startTime = 0;
-        bool wasSet = TryGetStartTime(out startTime);
+        //bool wasSet = TryGetStartTime(out startTime);
 
         Hashtable props = new Hashtable
             {
@@ -141,7 +142,7 @@ public class RoundTimer : MonoBehaviourPunCallbacks
         PhotonNetwork.CurrentRoom.SetCustomProperties(props);
 
 
-        Debug.Log("Set Custom Props for Time: " + props.ToStringFull() + " wasSet: " + wasSet);
+        Debug.Log("Set Custom Props for Time: " + props.ToStringFull() + " wasSet: " /*+ wasSet*/);
     }
 
     public string formatTimer(float currentTime)

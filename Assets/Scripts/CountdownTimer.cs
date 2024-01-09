@@ -20,7 +20,6 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
     [Header("Reference to a Text component for visualizing the countdown")]
     public TMP_Text Text;
 
-
     /// <summary>
     ///     Called when the timer has expired.
     /// </summary>
@@ -67,7 +66,7 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
         this.enabled = true;
     }
 
-    private void OnTimerEnds()
+    public void OnTimerEnds()
     {
         this.isTimerRunning = false;
         this.enabled = false;
@@ -75,15 +74,14 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
         Debug.Log("Emptying info text.", this.Text);
         this.Text.text = string.Empty;
 
-        if (OnCountdownTimerHasExpired != null) OnCountdownTimerHasExpired();
-
-        RoundTimer.SetStartTime();
+        if (OnCountdownTimerHasExpired != null && TimeRemaining() <= 0)
+            OnCountdownTimerHasExpired();
     }
 
 
     public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
     {
-        Debug.Log("CountdownTimer.OnRoomPropertiesUpdate " + propertiesThatChanged.ToStringFull());
+        Debug.Log("RoundTimer.OnRoomPropertiesUpdate " + propertiesThatChanged.ToStringFull());
         Initialize();
     }
 
@@ -132,7 +130,7 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
     public static void SetStartTime()
     {
         int startTime = 0;
-        bool wasSet = TryGetStartTime(out startTime);
+        //bool wasSet = TryGetStartTime(out startTime);
 
         Hashtable props = new Hashtable
             {
@@ -140,6 +138,6 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
             };
         PhotonNetwork.CurrentRoom.SetCustomProperties(props);
 
-        Debug.Log("Set Custom Props for Time: " + props.ToStringFull() + " wasSet: " + wasSet);
+        Debug.Log("Set Custom Props for Time: " + props.ToStringFull() + " wasSet: " /*+ wasSet*/);
     }
 }

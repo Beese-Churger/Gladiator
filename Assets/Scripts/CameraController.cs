@@ -137,6 +137,9 @@ public class CameraController : MonoBehaviour
 
     private void SwitchCameraStyle(CameraStyle newStyle)
     {
+        if (!combatCam || !thirdPersonCam)
+            return;
+
         combatCam.SetActive(false);
         thirdPersonCam.SetActive(false);
 
@@ -204,8 +207,12 @@ public class CameraController : MonoBehaviour
         SwitchCameraStyle(CameraStyle.Basic);
         TurnOffIndicators();
         var heading = Mathf.Atan2(orientation.right.z, orientation.right.x) * Mathf.Rad2Deg;
-        thirdPersonCam.GetComponent<CinemachineFreeLook>().m_XAxis.Value = -heading;
-        thirdPersonCam.GetComponent<CinemachineFreeLook>().m_YAxis.Value = 0.6f;
+        if(thirdPersonCam)
+        {
+            thirdPersonCam.GetComponent<CinemachineFreeLook>().m_XAxis.Value = -heading;
+            thirdPersonCam.GetComponent<CinemachineFreeLook>().m_YAxis.Value = 0.6f;
+        }
+
         animator.SetFloat("Xaxis", 0, 0, Time.deltaTime);
         animator.SetFloat("Yaxis", 0, 0, Time.deltaTime);
         animator.SetBool("CombatStance", false);

@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField] Score scoreboard;
 
     CountdownTimer countdownTimer;
-    RoundTimer roundTimer;
+    [SerializeField] RoundTimer roundTimer;
 
     int round = 1;
     int MAXROUNDS = 5;
@@ -49,12 +49,13 @@ public class GameManager : MonoBehaviourPunCallbacks
             {GladiatorInfo.PLAYER_LOADED_LEVEL, true}
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(props);
-
+        //Debug.Log("set");
         //if (!PhotonNetwork.IsMasterClient)
         //    return;
 
         time = 180;
-
+        CountdownTimer.OnCountdownTimerHasExpired += OnCountdownTimerIsExpired;
+        //RoundTimer.OnRoundTimerHasExpired += OnRoundTimerIsExpired;
 
         StartCoroutine(WaitToGetPlayers());
     }
@@ -79,7 +80,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             return;
         }
-
+        //Debug.Log(targetPlayer);
 
         // if there was no countdown yet, the master client (this one) waits until everyone loaded the level and sets a timer start
         int startTimestamp;
@@ -91,8 +92,10 @@ public class GameManager : MonoBehaviourPunCallbacks
             {
                 if (!startTimeIsSet)
                 {
-                    //Debug.Log("loaded");
+                    Debug.Log("loaded");
                     CountdownTimer.SetStartTime();
+                    //RoundTimer.SetStartTime();
+                    PV.RPC(nameof(RPC_StartCountdown), RpcTarget.All);
                 }
             }
             else
@@ -116,7 +119,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                     continue;
                 }
             }
-
+            //Debug.Log(p.NickName + p.CustomProperties.TryGetValue(GladiatorInfo.PLAYER_LOADED_LEVEL, out playerLoadedLevel));
             return false;
         }
 
@@ -155,19 +158,31 @@ public class GameManager : MonoBehaviourPunCallbacks
         switch (gameState)
         {
             case GameStates.COUNTDOWN:
+                if(!countdownTimer.enabled)
+                {
+                    if(PhotonNetwork.IsMasterClient)
+                    {
+
+                    }
+                    //countdownTimer.Initialize();
+                }
                 break;
             case GameStates.ROUNDONGOING:
-                if(timer)
+                if(!roundTimer.enabled)
                 {
-                    if(time <= 0)
-                    {
-                        round++;
 
-                        scoreboard.UpdateScores(team1Points, team2Points, round);
-                        gameState = GameStates.ROUNDOVER;
-                        StartCoroutine(StartNextRound());
-                    }
                 }
+                //if(timer)
+                //{
+                //    if(time <= 0)
+                //    {
+                //        round++;
+
+                //        scoreboard.UpdateScores(team1Points, team2Points, round);
+                //        gameState = GameStates.ROUNDOVER;
+                //        StartCoroutine(StartNextRound());
+                //    }
+                //}
                 break;
             case GameStates.ROUNDOVER:
                 break;
@@ -234,12 +249,20 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void RoundOver(int team)
     {
+        PV.RPC(nameof(RPC_RoundOverCall), RpcTarget.MasterClient, team);
+    }
+    [PunRPC]
+    public void RPC_RoundOverCall(int team)
+    {
         PV.RPC(nameof(RPC_RoundOver), RpcTarget.All, team);
     }
 
     [PunRPC]
     public void RPC_RoundOver(int team)
     {
+        roundTimer.OnTimerEnds();
+
+        //countdownTimer.OnTimerEnds();
         if (team == 1)
             team1Points++;
         else
@@ -262,9 +285,56 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         yield return new WaitForSeconds(5f);
         masterClient.Respawn();
-        gameState = GameStates.ROUNDONGOING;
-        CountdownTimer.SetStartTime();
-        countdownTimer.Initialize();
+        gameState = GameStates.COUNTDOWN;
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+
+            CountdownTimer.SetStartTime();
+            //RoundTimer.SetStartTime();
+
+        }
+
+        yield return new WaitForSeconds(0.1f);
+        countdownTimer.enabled = true;
+        //if (PhotonNetwork.IsMasterClient)
+        //{
+
+        //    //CountdownTimer.SetStartTime();
+        //    RoundTimer.SetStartTime();
+
+        //}
     }
    
+
+    private void OnCountdownTimerIsExpired()
+    {
+        gameState = GameStates.ROUNDONGOING;
+        if (PhotonNetwork.IsMasterClient)
+            RoundTimer.SetStartTime();
+
+        roundTimer.enabled = true;
+    }
+
+    private void OnRoundTimerIsExpired()
+    {
+        round++;
+
+        scoreboard.UpdateScores(team1Points, team2Points, round);
+        gameState = GameStates.ROUNDOVER;
+
+        //if (team1Points >= 3)
+        //    winningTeam = 1;
+        //else if (team2Points >= 3)
+        //    winningTeam = 2;
+
+        Debug.Log("hi");
+        StartCoroutine(StartNextRound());
+    }
+
+    [PunRPC]
+    public void RPC_StartCountdown()
+    {
+        countdownTimer.enabled = true;
+    }
 }

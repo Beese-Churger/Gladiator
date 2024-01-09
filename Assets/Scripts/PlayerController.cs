@@ -1165,6 +1165,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     [PunRPC]
     public void RPC_Respawn()
     {
+
+
         ResetTriggers();
         isDead = false;
         playerCollider.enabled = true;
@@ -1184,8 +1186,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         animator.SetTrigger("REVIVE");
         Transform point = playerManager.RespawnPoint();
 
-        cameraController.FreeLookCam();
         transform.SetPositionAndRotation(point.position, point.rotation);
+        //cameraController.FreeLookCam();
         ChangeSpeed();
     }
 
