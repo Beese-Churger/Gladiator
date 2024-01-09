@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager Instance;
@@ -268,7 +269,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         else
             team2Points++;
 
-        round++;
+        //round++;
 
         scoreboard.UpdateScores(team1Points, team2Points, round);
         gameState = GameStates.ROUNDOVER;
@@ -286,7 +287,14 @@ public class GameManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(5f);
         masterClient.Respawn();
         gameState = GameStates.COUNTDOWN;
+        round++;
+        if(round > 5)
+        {
+            GameOver();
 
+            yield break;
+        }
+        scoreboard.UpdateScores(team1Points, team2Points, round);
         if (PhotonNetwork.IsMasterClient)
         {
             CountdownTimer.SetStartTime();
@@ -314,8 +322,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
     private void OnRoundTimerIsExpired()
     {
-        round++;
-
         scoreboard.UpdateScores(team1Points, team2Points, round);
         gameState = GameStates.ROUNDOVER;
 
@@ -331,5 +337,30 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void RPC_StartCountdown()
     {
         countdownTimer.enabled = true;
+    }
+
+    public void GameOver()
+    {
+        if (team1Points > team2Points)
+            winningTeam = 1;
+        else if (team2Points > team1Points)
+            winningTeam = 2;
+        else
+            winningTeam = 3;
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+
+        }
+    }
+
+    public void GetOutOfThisRoomNow()
+    {
+        PhotonNetwork.LeaveRoom();
+    }
+
+    public override void OnLeftRoom()
+    {
+        SceneManager.LoadScene(1);
     }
 }
