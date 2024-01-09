@@ -303,7 +303,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
             RoundTimer.SetStartTime();
 
-        StartCoroutine(StartTimer());
+        roundTimer.enabled = true;
+        //StartCoroutine(StartTimer());
     }
 
     IEnumerator StartTimer()
