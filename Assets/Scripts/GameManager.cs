@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         time = 180;
         CountdownTimer.OnCountdownTimerHasExpired += OnCountdownTimerIsExpired;
-        //RoundTimer.OnRoundTimerHasExpired += OnRoundTimerIsExpired;
+        RoundTimer.OnRoundTimerHasExpired += OnRoundTimerIsExpired;
 
         StartCoroutine(WaitToGetPlayers());
     }
@@ -69,9 +69,9 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         PV = GetComponent<PhotonView>();
         countdownTimer = GetComponent<CountdownTimer>();
-        roundTimer = GetComponent<RoundTimer>();
+        //roundTimer = GetComponent<RoundTimer>();
 
-        gameState = GameStates.PREGAME;
+        gameState = GameStates.COUNTDOWN;
     }
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
@@ -289,21 +289,11 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.IsMasterClient)
         {
-
             CountdownTimer.SetStartTime();
-            //RoundTimer.SetStartTime();
-
         }
 
         yield return new WaitForSeconds(0.1f);
         countdownTimer.enabled = true;
-        //if (PhotonNetwork.IsMasterClient)
-        //{
-
-        //    //CountdownTimer.SetStartTime();
-        //    RoundTimer.SetStartTime();
-
-        //}
     }
    
 
@@ -313,9 +303,14 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
             RoundTimer.SetStartTime();
 
-        roundTimer.enabled = true;
+        StartCoroutine(StartTimer());
     }
 
+    IEnumerator StartTimer()
+    {
+        yield return new WaitForSeconds(0.1f);
+        roundTimer.enabled = true;
+    }
     private void OnRoundTimerIsExpired()
     {
         round++;
@@ -328,7 +323,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         //else if (team2Points >= 3)
         //    winningTeam = 2;
 
-        Debug.Log("hi");
         StartCoroutine(StartNextRound());
     }
 

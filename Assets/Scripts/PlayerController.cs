@@ -400,10 +400,24 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             Parried();            
         }
 
+        if (GameManager.Instance.gameState != GameManager.GameStates.COUNTDOWN)
+        {
+            rb.isKinematic = false;
+            MyInput();
+        }
+        else
+        {
+            rb.velocity = Vector3.zero;
+            rb.isKinematic = true;
+        }
+
+
         CheckWhoCanLock();
+
         UpdateUI();
-        MyInput();
+
         SpeedControl();
+
         ClampPositionToArenaBounds();
 
         if (cameraController.CombatMode)
