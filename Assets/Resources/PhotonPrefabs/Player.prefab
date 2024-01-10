@@ -5584,7 +5584,6 @@ MonoBehaviour:
   isBlocking: 0
   playerIDParried: -1
   animator: {fileID: 5635569067390719461}
-  game: {fileID: 0}
 --- !u!114 &7167737441030003614
 MonoBehaviour:
   m_ObjectHideFlags: 0
