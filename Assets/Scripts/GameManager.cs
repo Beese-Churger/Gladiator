@@ -17,8 +17,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public PlayerController masterClient;
 
-    float time;
-    [SerializeField] TMP_Text timer;
     [SerializeField] Score scoreboard;
 
     CountdownTimer countdownTimer;
@@ -54,7 +52,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         //if (!PhotonNetwork.IsMasterClient)
         //    return;
 
-        time = 180;
         CountdownTimer.OnCountdownTimerHasExpired += OnCountdownTimerIsExpired;
         RoundTimer.OnRoundTimerHasExpired += OnRoundTimerIsExpired;
 
@@ -288,7 +285,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         masterClient.Respawn();
         gameState = GameStates.COUNTDOWN;
         round++;
-        if(round > 5)
+        if(round > 2)
         {
             GameOver();
 
@@ -311,8 +308,10 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
             RoundTimer.SetStartTime();
 
-        roundTimer.enabled = true;
-        //StartCoroutine(StartTimer());
+        if(Application.isEditor)
+            roundTimer.enabled = true;
+        else
+            StartCoroutine(StartTimer());
     }
 
     IEnumerator StartTimer()
@@ -341,6 +340,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void GameOver()
     {
+        gameState = GameStates.POSTGAME;
+
         if (team1Points > team2Points)
             winningTeam = 1;
         else if (team2Points > team1Points)
@@ -348,12 +349,18 @@ public class GameManager : MonoBehaviourPunCallbacks
         else
             winningTeam = 3;
 
+        Debug.Log("end");
         if (PhotonNetwork.IsMasterClient)
         {
-
+            PV.RPC(nameof(RPC_ShowResults), RpcTarget.All, winningTeam);
         }
     }
 
+    [PunRPC]
+    public void RPC_ShowResults(int teamWon)
+    {
+
+    }
     public void GetOutOfThisRoomNow()
     {
         PhotonNetwork.LeaveRoom();

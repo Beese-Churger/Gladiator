@@ -68,6 +68,7 @@ MonoBehaviour:
   - RPC_Respawn
   - RPC_StartCountdown
   - RPC_RoundOverCall
+  - RPC_ShowResults
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
