@@ -43,6 +43,11 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        if (!Instance)
+            Instance = this;
+        else
+            Destroy(Instance);
+
         ExitGames.Client.Photon.Hashtable props = new()
         {
             {GladiatorInfo.PLAYER_LOADED_LEVEL, true}
@@ -60,10 +65,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     
     private void Awake()
     {
-        if (!Instance)
-            Instance = this;
-        else
-            Destroy(Instance);
 
         PV = GetComponent<PhotonView>();
         countdownTimer = GetComponent<CountdownTimer>();
@@ -271,11 +272,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         scoreboard.UpdateScores(team1Points, team2Points, round);
         gameState = GameStates.ROUNDOVER;
 
-        if (team1Points >= 3)
-            winningTeam = 1;
-        else if (team2Points >= 3)
-            winningTeam = 2;
-
         StartCoroutine(StartNextRound());
     }
 
@@ -285,10 +281,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         masterClient.Respawn();
         gameState = GameStates.COUNTDOWN;
         round++;
-        if(round > 2)
+        if(round > MAXROUNDS || team1Points >= 3 || team2Points >= 3)
         {
             GameOver();
-
             yield break;
         }
         scoreboard.UpdateScores(team1Points, team2Points, round);
@@ -308,10 +303,13 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
             RoundTimer.SetStartTime();
 
-        if(Application.isEditor)
+        //if (!roundTimer)
+        //    roundTimer = GetComponent<RoundTimer>();
+
+        //if (Application.isEditor)
             roundTimer.enabled = true;
-        else
-            StartCoroutine(StartTimer());
+        //else
+        //    StartCoroutine(StartTimer());
     }
 
     IEnumerator StartTimer()
@@ -352,22 +350,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         Debug.Log("end");
         if (PhotonNetwork.IsMasterClient)
         {
-            PV.RPC(nameof(RPC_ShowResults), RpcTarget.All, winningTeam);
+            masterClient.ShowWinner(winningTeam);
         }
-    }
-
-    [PunRPC]
-    public void RPC_ShowResults(int teamWon)
-    {
-
-    }
-    public void GetOutOfThisRoomNow()
-    {
-        PhotonNetwork.LeaveRoom();
-    }
-
-    public override void OnLeftRoom()
-    {
-        SceneManager.LoadScene(1);
     }
 }

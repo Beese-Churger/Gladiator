@@ -20,6 +20,7 @@ public class ScoreboardItem : MonoBehaviourPunCallbacks
 
 		usernameText.text = player.NickName;
 		UpdateStats();
+		Debug.Log(usernameText + " " +  killsText + " " + deathsText);
 	}
 
 	void UpdateStats()

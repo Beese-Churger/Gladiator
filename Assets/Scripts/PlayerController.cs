@@ -5,10 +5,14 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObservable
+public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunObservable*/
 {
     //public static PlayerController instance;
     [SerializeField] PlayerManager playerManager;
+    [SerializeField] GameManager gameManager;
+    [SerializeField] PostGame postGame;
+
+    public bool lockCursor = true;
     [Header("Stats")]
     [SerializeField] Transform canvasHolder;
     public Scoreboard scoreboard;
@@ -138,141 +142,142 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     Player player;
     public Animator animator;
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            dataFlags = 0;
+    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    //{
+    //    if (stream.IsWriting)
+    //    {
+    //        dataFlags = 0;
 
-            //if(transform.position != lastSyncedPosition)
-            //{
-            //    dataFlags |= POSITION_FLAG;
-            //}
+    //        //if(transform.position != lastSyncedPosition)
+    //        //{
+    //        //    dataFlags |= POSITION_FLAG;
+    //        //}
 
-            //if(model.rotation != lastSyncedRotation)
-            //{
-            //    dataFlags |= ROTATION_FLAG;
-            //}
+    //        //if(model.rotation != lastSyncedRotation)
+    //        //{
+    //        //    dataFlags |= ROTATION_FLAG;
+    //        //}
 
-            if (currentHealth != lastSyncedHealth)
-            {
-                dataFlags |= HEALTH_FLAG;
-            }
+    //        if (currentHealth != lastSyncedHealth)
+    //        {
+    //            dataFlags |= HEALTH_FLAG;
+    //        }
 
-            if (currentStamina != lastSyncedStamina)
-            {
-                dataFlags |= STAMINA_FLAG;
-            }
+    //        if (currentStamina != lastSyncedStamina)
+    //        {
+    //            dataFlags |= STAMINA_FLAG;
+    //        }
 
-            if (isParrying != lastSyncedParrying)
-            {
-                dataFlags |= PARRYING_FLAG;
-            }
+    //        if (isParrying != lastSyncedParrying)
+    //        {
+    //            dataFlags |= PARRYING_FLAG;
+    //        }
 
-            if (isParried != lastSyncedParried)
-            {
-                dataFlags |= PARRIED_FLAG;
-            }
+    //        if (isParried != lastSyncedParried)
+    //        {
+    //            dataFlags |= PARRIED_FLAG;
+    //        }
 
-            if (isBlocking != lastSyncedBlock)
-            {
-                dataFlags |= BLOCKING_FLAG;
-            }
+    //        if (isBlocking != lastSyncedBlock)
+    //        {
+    //            dataFlags |= BLOCKING_FLAG;
+    //        }
 
-            if (tookHit != lastSyncedHit)
-            {
-                dataFlags |= TOOKHIT_FLAG;
-            }
+    //        if (tookHit != lastSyncedHit)
+    //        {
+    //            dataFlags |= TOOKHIT_FLAG;
+    //        }
 
-            stream.SendNext(dataFlags);
+    //        stream.SendNext(dataFlags);
 
-            //if((dataFlags & POSITION_FLAG) != 0)
-            //{
-            //    stream.SendNext(transform.position);
-            //}
+    //        //if((dataFlags & POSITION_FLAG) != 0)
+    //        //{
+    //        //    stream.SendNext(transform.position);
+    //        //}
 
-            //if ((dataFlags & ROTATION_FLAG) != 0)
-            //{
-            //    stream.SendNext(model.rotation);
-            //}
+    //        //if ((dataFlags & ROTATION_FLAG) != 0)
+    //        //{
+    //        //    stream.SendNext(model.rotation);
+    //        //}
 
-            if ((dataFlags & HEALTH_FLAG) != 0)
-            {
-                stream.SendNext(currentHealth);
-            }
+    //        if ((dataFlags & HEALTH_FLAG) != 0)
+    //        {
+    //            stream.SendNext(currentHealth);
+    //        }
 
-            if ((dataFlags & STAMINA_FLAG) != 0)
-            {
-                stream.SendNext(currentStamina);
-            }
+    //        if ((dataFlags & STAMINA_FLAG) != 0)
+    //        {
+    //            stream.SendNext(currentStamina);
+    //        }
 
-            if ((dataFlags & PARRYING_FLAG) != 0)
-            {
-                stream.SendNext(isParrying);
-            }
+    //        if ((dataFlags & PARRYING_FLAG) != 0)
+    //        {
+    //            stream.SendNext(isParrying);
+    //        }
 
-            if ((dataFlags & PARRIED_FLAG) != 0)
-            {
-                stream.SendNext(isParried);
-            }
+    //        if ((dataFlags & PARRIED_FLAG) != 0)
+    //        {
+    //            stream.SendNext(isParried);
+    //        }
 
-            if ((dataFlags & BLOCKING_FLAG) != 0)
-            {
-                stream.SendNext(isBlocking);
-            }
+    //        if ((dataFlags & BLOCKING_FLAG) != 0)
+    //        {
+    //            stream.SendNext(isBlocking);
+    //        }
 
-            if ((dataFlags & TOOKHIT_FLAG) != 0)
-            {
-                stream.SendNext(tookHit);
-            }
+    //        if ((dataFlags & TOOKHIT_FLAG) != 0)
+    //        {
+    //            stream.SendNext(tookHit);
+    //        }
 
-        }
-        else
-        {
-            dataFlags = (byte)stream.ReceiveNext();
+    //    }
+    //    else
+    //    {
+    //        dataFlags = (byte)stream.ReceiveNext();
 
-            //if ((dataFlags & POSITION_FLAG) != 0)
-            //{
-            //    transform.position = (Vector3)stream.ReceiveNext();
-            //}
+    //        //if ((dataFlags & POSITION_FLAG) != 0)
+    //        //{
+    //        //    transform.position = (Vector3)stream.ReceiveNext();
+    //        //}
 
-            //if ((dataFlags & ROTATION_FLAG) != 0)
-            //{
-            //    model.rotation = (Quaternion)stream.ReceiveNext();
-            //}
+    //        //if ((dataFlags & ROTATION_FLAG) != 0)
+    //        //{
+    //        //    model.rotation = (Quaternion)stream.ReceiveNext();
+    //        //}
 
-            if ((dataFlags & HEALTH_FLAG) != 0)
-            {
-                currentHealth = (float)stream.ReceiveNext();
-            }
+    //        if ((dataFlags & HEALTH_FLAG) != 0)
+    //        {
+    //            currentHealth = (float)stream.ReceiveNext();
+    //        }
 
-            if ((dataFlags & STAMINA_FLAG) != 0)
-            {
-                currentStamina = (float)stream.ReceiveNext();
-            }
+    //        if ((dataFlags & STAMINA_FLAG) != 0)
+    //        {
+    //            currentStamina = (float)stream.ReceiveNext();
+    //        }
 
-            if ((dataFlags & PARRYING_FLAG) != 0)
-            {
-                isParrying = (bool)stream.ReceiveNext();
-            }
+    //        if ((dataFlags & PARRYING_FLAG) != 0)
+    //        {
+    //            isParrying = (bool)stream.ReceiveNext();
+    //        }
 
-            if ((dataFlags & PARRIED_FLAG) != 0)
-            {
-                isParried = (bool)stream.ReceiveNext();
-            }
+    //        if ((dataFlags & PARRIED_FLAG) != 0)
+    //        {
+    //            isParried = (bool)stream.ReceiveNext();
+    //        }
 
-            if ((dataFlags & BLOCKING_FLAG) != 0)
-            {
-                isBlocking = (bool)stream.ReceiveNext();
-            }
+    //        if ((dataFlags & BLOCKING_FLAG) != 0)
+    //        {
+    //            isBlocking = (bool)stream.ReceiveNext();
+    //        }
 
-            if ((dataFlags & TOOKHIT_FLAG) != 0)
-            {
-                tookHit = (bool)stream.ReceiveNext();
-            }
+    //        if ((dataFlags & TOOKHIT_FLAG) != 0)
+    //        {
+    //            tookHit = (bool)stream.ReceiveNext();
+    //        }
 
-        }
-    }
+    //    }
+    //}
+
     private void Start()
     {
         if(!PV.IsMine)
@@ -281,14 +286,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             {
                 Destroy(child.gameObject);
             }
-            bool i = true;
+            int i = 0;
             foreach(Transform child in canvasHolder)
             {
-                if(i) // dont destroy scoreboard;
-                {
-                    i = false;
-                    continue;
-                }
+                //if (i < 2) // dont destroy scoreboard;
+                //{
+                //    i++;
+                //    continue;
+                //}
                 Destroy(child.gameObject);
             }
         }
@@ -302,6 +307,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         mouseController = GetComponent<MouseController>();
         cameraController = cameraHolder.GetComponent<CameraController>();
         playerManager = FindObjectOfType<PlayerManager>();
+        gameManager = FindObjectOfType<GameManager>();
+        postGame = FindObjectOfType<PostGame>();
+
         arenaCollider = GameObject.FindGameObjectWithTag("ArenaBounds").GetComponent<Collider>();
         rb.freezeRotation = true;
         readyToJump = true;
@@ -419,6 +427,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
         SpeedControl();
 
         ClampPositionToArenaBounds();
+
+
+        // pressing esc toggles between hide/show
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            lockCursor = !lockCursor;
+        }
+
+        Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !lockCursor;
 
         if (cameraController.CombatMode)
         {
@@ -1181,7 +1199,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
     {
 
 
-        ResetTriggers();
+        //ResetTriggers();
         isDead = false;
         playerCollider.enabled = true;
         deathCollider.enabled = false;
@@ -1214,4 +1232,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IPunObse
             animator.ResetTrigger(parameter.name);
         }
     }
+
+    public void ShowWinner(int team)
+    {
+        PV.RPC(nameof(RPC_ShowWinner), RpcTarget.All, team);
+    }
+
+    [PunRPC]
+    void RPC_ShowWinner(int team)
+    {
+        postGame.Show(team);
+    }
+
+
 }

@@ -1,18 +1,48 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class PostGame : MonoBehaviour
+using TMPro;
+using Photon.Pun;
+using UnityEngine.SceneManagement;
+public class PostGame : MonoBehaviourPunCallbacks
 {
-    // Start is called before the first frame update
+    [SerializeField] GameManager gameManager;
+    [SerializeField] TMP_Text teamWon;
+    [SerializeField] CanvasGroup canvasGroup;
+
+    string[] teams = new string[] { "BLUE", "ORANGE", "DRAW" };
     void Start()
     {
-        
+        canvasGroup.alpha = 0;
+        gameManager = FindObjectOfType<GameManager>();
+        //gameObject.SetActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void GetOutOfThisRoomNow()
     {
-        
+        Debug.Log(PhotonNetwork.CurrentRoom.Name);
+        PhotonNetwork.LeaveRoom();
+        SceneManager.LoadScene(0);
     }
+
+    public override void OnLeftRoom()
+    {
+        Debug.Log("left");
+        SceneManager.LoadScene(0);
+    }
+
+    public void Show(int team)
+    {
+        Debug.Log(team);
+        if (team != 3)
+            teamWon.text = string.Format("{0} TEAM WON", teams[team - 1]);
+        else
+            teamWon.text = teams[team - 1];
+        canvasGroup.alpha = 1;
+    }
+
+    //public void Disable()
+    //{
+    //    gameObject.SetActive(false);
+    //}
 }

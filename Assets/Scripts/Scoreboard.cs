@@ -15,15 +15,25 @@ public class Scoreboard : MonoBehaviourPunCallbacks
 
 	Dictionary<Player, ScoreboardItem> scoreboardItems = new Dictionary<Player, ScoreboardItem>();
 
+	PhotonView PV;
 	void Start()
 	{
 		canvasGroup.alpha = 0;
+		//foreach (Player player in PhotonNetwork.PlayerList)
+		//{
+		//	AddScoreboardItem(player);
+		//}
+		StartCoroutine(WaitToGetPlayers());
+	}
+	IEnumerator WaitToGetPlayers()
+	{
+		yield return new WaitForSeconds(1f);
+
 		foreach (Player player in PhotonNetwork.PlayerList)
 		{
 			AddScoreboardItem(player);
 		}
 	}
-
 	public override void OnPlayerEnteredRoom(Player newPlayer)
 	{
 		AddScoreboardItem(newPlayer);

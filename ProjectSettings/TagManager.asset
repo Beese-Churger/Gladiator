@@ -8,6 +8,7 @@ TagManager:
   - ArenaBounds
   - Spectator
   - Timer
+  - MainUI
   layers:
   - Default
   - TransparentFX
