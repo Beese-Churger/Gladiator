@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         ExitGames.Client.Photon.Hashtable props = new()
         {
-            {GladiatorInfo.PLAYER_LOADED_LEVEL, true}
+            { GladiatorInfo.PLAYER_LOADED_LEVEL, true }
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(props);
         //Debug.Log("set");
@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         StartCoroutine(WaitToGetPlayers());
     }
-    
+
     private void Awake()
     {
 
@@ -157,9 +157,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         switch (gameState)
         {
             case GameStates.COUNTDOWN:
-                if(!countdownTimer.enabled)
+                if (!countdownTimer.enabled)
                 {
-                    if(PhotonNetwork.IsMasterClient)
+                    if (PhotonNetwork.IsMasterClient)
                     {
 
                     }
@@ -167,7 +167,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 }
                 break;
             case GameStates.ROUNDONGOING:
-                if(!roundTimer.enabled)
+                if (!roundTimer.enabled)
                 {
 
                 }
@@ -184,6 +184,13 @@ public class GameManager : MonoBehaviourPunCallbacks
                 //}
                 break;
             case GameStates.ROUNDOVER:
+                break;
+            case GameStates.POSTGAME:
+                if (roundTimer.enabled)
+                    roundTimer.enabled = false;
+
+                if (countdownTimer.enabled)
+                    countdownTimer.enabled = false;
                 break;
             default:
                 break;
@@ -206,7 +213,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         bool team1alive = false;
         bool team2alive = false;
 
-        for(int i = team1Players.Count - 1; i >= 0; --i)
+        for (int i = team1Players.Count - 1; i >= 0; --i)
         {
             if (!team1Players[i])
             {
@@ -267,7 +274,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         else
             team2Points++;
 
-        //round++;
+        if (round + 1 > MAXROUNDS || team1Points >= 3 || team2Points >= 3)
+        {
+            GameOver();
+            return;
+        }
 
         scoreboard.UpdateScores(team1Points, team2Points, round);
         gameState = GameStates.ROUNDOVER;
@@ -280,12 +291,12 @@ public class GameManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(5f);
         masterClient.Respawn();
         gameState = GameStates.COUNTDOWN;
-        round++;
-        if(round > MAXROUNDS || team1Points >= 3 || team2Points >= 3)
-        {
-            GameOver();
-            yield break;
-        }
+        //round++;
+        //if(round > MAXROUNDS || team1Points >= 3 || team2Points >= 3)
+        //{
+        //    GameOver();
+        //    yield break;
+        //}
         scoreboard.UpdateScores(team1Points, team2Points, round);
         if (PhotonNetwork.IsMasterClient)
         {
@@ -295,7 +306,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(0.1f);
         countdownTimer.enabled = true;
     }
-   
+
 
     private void OnCountdownTimerIsExpired()
     {
@@ -307,7 +318,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         //    roundTimer = GetComponent<RoundTimer>();
 
         //if (Application.isEditor)
-            roundTimer.enabled = true;
+        roundTimer.enabled = true;
         //else
         //    StartCoroutine(StartTimer());
     }
@@ -348,6 +359,38 @@ public class GameManager : MonoBehaviourPunCallbacks
             winningTeam = 3;
 
         Debug.Log("end");
+        if (PhotonNetwork.IsMasterClient)
+        {
+            masterClient.ShowWinner(winningTeam);
+        }
+    }
+
+    public void Surrender()
+    {
+        if (gameState == GameStates.POSTGAME)
+            return;
+
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("team", out object team))
+        {
+            PV.RPC(nameof(RPC_Surrender), RpcTarget.All, int.Parse(team.ToString()));
+        }
+    }
+
+    [PunRPC]
+    void RPC_Surrender(int surrenderingTeam)
+    {
+        gameState = GameStates.POSTGAME;
+        if (surrenderingTeam == 1)
+        {
+            team1Points = -1;
+            winningTeam = 2; 
+        }
+        else
+        {
+            team2Points = -1;
+            winningTeam = 1;
+        }
+        scoreboard.UpdateScores(team1Points, team2Points, round);
         if (PhotonNetwork.IsMasterClient)
         {
             masterClient.ShowWinner(winningTeam);

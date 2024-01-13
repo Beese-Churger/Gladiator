@@ -20,7 +20,6 @@ public class PostGame : MonoBehaviourPunCallbacks
 
     public void GetOutOfThisRoomNow()
     {
-        Debug.Log(PhotonNetwork.CurrentRoom.Name);
         PhotonNetwork.LeaveRoom();
         SceneManager.LoadScene(0);
     }

@@ -340,6 +340,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     private void Update()
     {
+        if (GameManager.Instance.gameState != GameManager.GameStates.POSTGAME)
+            return;
+
         if (isDead)
         {
             playerCollider.enabled = false;
@@ -430,13 +433,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
 
         // pressing esc toggles between hide/show
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if(GameManager.Instance.gameState == GameManager.GameStates.POSTGAME)
+        {
+            lockCursor = false;
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape))
         {
             lockCursor = !lockCursor;
         }
 
         Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.None;
         Cursor.visible = !lockCursor;
+
+
 
         if (cameraController.CombatMode)
         {
@@ -572,6 +581,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public void RPC_LightAttack(MouseController.DirectionalInput direction)
     {
         isAttacking = true;
+        canParry = false;
         animator.SetTrigger("LIGHT");
         animator.SetTrigger(direction.ToString());
 
@@ -639,6 +649,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public void RPC_HeavyAttack(MouseController.DirectionalInput direction)
     {
         isAttacking = true;
+        canParry = false;
         animator.SetTrigger("HEAVY");
         animator.SetTrigger(direction.ToString());
 
@@ -795,19 +806,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     {
         for(int i = detectionRadius.opponentsInRange.Count - 1; i >= 0; --i)
         {
-            if(detectionRadius.opponentsInRange[i].GetComponent<PlayerController>().isDead)
-            {
-                opponentsInFOV.Remove(detectionRadius.opponentsInRange[i]);
-                detectionRadius.opponentsInRange.Remove(detectionRadius.opponentsInRange[i]);
-
-                continue;
-            }
-
             if (!detectionRadius.opponentsInRange[i])
             {
                 detectionRadius.opponentsInRange.Remove(detectionRadius.opponentsInRange[i]);
                 continue;
             }
+
+
+            if (detectionRadius.opponentsInRange[i].GetComponent<PlayerController>().isDead)
+            {
+                opponentsInFOV.Remove(detectionRadius.opponentsInRange[i]);
+                detectionRadius.opponentsInRange.Remove(detectionRadius.opponentsInRange[i]);
+                continue;
+            }
+
 
             if (IsInCameraFrustum(i))
             {
