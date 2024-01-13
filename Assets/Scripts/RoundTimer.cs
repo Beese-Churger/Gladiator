@@ -150,6 +150,6 @@ public class RoundTimer : MonoBehaviourPunCallbacks
         float minutes = Mathf.FloorToInt(currentTime / 60);
         float seconds = Mathf.FloorToInt(currentTime % 60);
 
-        return string.Format("{00:00} : {01:00}", minutes, seconds);
+        return string.Format("{00:00}:{01:00}", minutes, seconds);
     }
 }

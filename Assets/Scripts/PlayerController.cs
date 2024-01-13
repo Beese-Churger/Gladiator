@@ -340,9 +340,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     private void Update()
     {
-        if (GameManager.Instance.gameState != GameManager.GameStates.POSTGAME)
-            return;
-
         if (isDead)
         {
             playerCollider.enabled = false;
@@ -406,6 +403,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         if (!PV.IsMine)
             return;
 
+        // pressing esc toggles between hide/show
+        if (GameManager.Instance.gameState == GameManager.GameStates.POSTGAME)
+        {
+            lockCursor = false;
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            lockCursor = !lockCursor;
+        }
+
+        Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !lockCursor;
+
+        if (GameManager.Instance.gameState == GameManager.GameStates.POSTGAME)
+            return;
+
         if (CheckIfParried())
         {
             Parried();            
@@ -431,19 +444,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         ClampPositionToArenaBounds();
 
-
-        // pressing esc toggles between hide/show
-        if(GameManager.Instance.gameState == GameManager.GameStates.POSTGAME)
-        {
-            lockCursor = false;
-        }
-        else if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            lockCursor = !lockCursor;
-        }
-
-        Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.None;
-        Cursor.visible = !lockCursor;
 
 
 

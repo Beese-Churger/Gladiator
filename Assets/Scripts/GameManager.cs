@@ -380,6 +380,11 @@ public class GameManager : MonoBehaviourPunCallbacks
     void RPC_Surrender(int surrenderingTeam)
     {
         gameState = GameStates.POSTGAME;
+        if (roundTimer.enabled)
+            roundTimer.enabled = false;
+
+        if (countdownTimer.enabled)
+            countdownTimer.enabled = false;
         if (surrenderingTeam == 1)
         {
             team1Points = -1;
