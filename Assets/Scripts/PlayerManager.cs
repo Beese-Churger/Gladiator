@@ -34,11 +34,12 @@ public class PlayerManager : MonoBehaviour
 
     void CreateController()
     {
+        int team = PhotonNetwork.LocalPlayer.IsMasterClient ? 1 : 2;
         Hashtable hash = new Hashtable();
-        hash.Add("team", PhotonNetwork.LocalPlayer.ActorNumber == 1 ? 1 : 2);
+        hash.Add("team", team);
         PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
 
-        Transform spawnPoint = SpawnManager.Instance.GetSpawnPoint(PV.Owner.ActorNumber);
+        Transform spawnPoint = SpawnManager.Instance.GetSpawnPoint(team);
         controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"), spawnPoint.position, spawnPoint.rotation);
     }
 

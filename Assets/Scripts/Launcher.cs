@@ -24,12 +24,18 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     [Header("CreateRoom")]
     [SerializeField] Toggle isPrivate;
-
+    
 
     [Header("JoinRoom")]
     [SerializeField] TMP_InputField roomCodeInputField;
     List<RoomInfo> cachedRoomList = new();
 
+    [Header("JoinedRoom")]
+    //[SerializeField] TMP_Text player1;
+    //[SerializeField] TMP_Text player2;
+    [SerializeField] Transform player1pos;
+    [SerializeField] Transform player2pos;
+    [SerializeField] GameObject gladItemPrefab;
     //[SerializeField] Transform p1, p2;
     
     private void Awake()
@@ -131,7 +137,17 @@ public class Launcher : MonoBehaviourPunCallbacks
         }
         for (int i = 0; i < players.Length; ++i)
         {
-            Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
+            if(players[i].IsMasterClient)
+            {
+                //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
+                Instantiate(gladItemPrefab, player1pos.position, player1pos.rotation).GetComponent<PlayerListItem>().SetUp(players[i]);
+            }
+            else
+            { 
+                //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
+                Instantiate(gladItemPrefab, player2pos.position, player2pos.rotation).GetComponent<PlayerListItem>().SetUp(players[i]);
+            }
+            
         }
 
     }
@@ -148,6 +164,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     }
     public void LeaveRoom()
     {
+        startGameButton.SetActive(false);
         PhotonNetwork.LeaveRoom();
         MenuManager.instance.OpenMenu("loading");
     }
@@ -177,7 +194,16 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(newPlayer);
+        if (newPlayer.IsMasterClient)
+        {
+            //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
+            Instantiate(gladItemPrefab, player1pos.position, player1pos.rotation).GetComponent<PlayerListItem>().SetUp(newPlayer);
+        }
+        else
+        {
+            //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
+            Instantiate(gladItemPrefab, player2pos.position, player2pos.rotation).GetComponent<PlayerListItem>().SetUp(newPlayer);
+        }
         Player[] players = PhotonNetwork.PlayerList;
         if (players.Length >= 2)
             startGameButton.SetActive(PhotonNetwork.IsMasterClient);

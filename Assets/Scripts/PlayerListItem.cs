@@ -8,11 +8,13 @@ using UnityEngine;
 public class PlayerListItem : MonoBehaviourPunCallbacks
 {
     [SerializeField] TMP_Text text;
+    [SerializeField] GameObject model;
     Player player;
 
     public void SetUp(Player _player)
     {
         player = _player;
+        text = GameObject.Find("Player" + (player.IsMasterClient ? "1" : "2")).GetComponent<TMP_Text>();
         text.text = player.NickName;
     }
 
@@ -20,7 +22,19 @@ public class PlayerListItem : MonoBehaviourPunCallbacks
     {
         if(player == otherPlayer)
         {
+            text.text = "Waiting...";
             Destroy(gameObject);
+            return;
+        }
+        else
+        {
+            if(player.IsMasterClient)
+            {
+                text.text = "Waiting...";
+                model.transform.position = GameObject.Find("player1pos").transform.position;
+                text = GameObject.Find("Player1").GetComponent<TMP_Text>();
+                text.text = player.NickName;
+            }
         }
     }
 
