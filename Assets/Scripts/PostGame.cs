@@ -34,7 +34,7 @@ public class PostGame : MonoBehaviourPunCallbacks
     {
         Debug.Log(team);
         if (team != 3)
-            teamWon.text = string.Format("{0} TEAM WON", teams[team - 1]);
+            teamWon.text = string.Format("{0} TEAM WINS", teams[team - 1]);
         else
             teamWon.text = teams[team - 1];
         canvasGroup.alpha = 1;

@@ -4500,7 +4500,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569066303058731}
-  m_LocalRotation: {x: 0.16311826, y: -0.42831695, z: 0.07892063, w: 0.88527316}
+  m_LocalRotation: {x: 0.16311826, y: -0.42831692, z: 0.078920625, w: 0.88527316}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5584,6 +5584,7 @@ MonoBehaviour:
   isBlocking: 0
   playerIDParried: -1
   animator: {fileID: 5635569067390719461}
+  anim: {fileID: 0}
 --- !u!114 &7167737441030003614
 MonoBehaviour:
   m_ObjectHideFlags: 0

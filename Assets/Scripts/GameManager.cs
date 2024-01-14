@@ -157,31 +157,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         switch (gameState)
         {
             case GameStates.COUNTDOWN:
-                if (!countdownTimer.enabled)
-                {
-                    if (PhotonNetwork.IsMasterClient)
-                    {
-
-                    }
-                    //countdownTimer.Initialize();
-                }
                 break;
             case GameStates.ROUNDONGOING:
-                if (!roundTimer.enabled)
-                {
-
-                }
-                //if(timer)
-                //{
-                //    if(time <= 0)
-                //    {
-                //        round++;
-
-                //        scoreboard.UpdateScores(team1Points, team2Points, round);
-                //        gameState = GameStates.ROUNDOVER;
-                //        StartCoroutine(StartNextRound());
-                //    }
-                //}
                 break;
             case GameStates.ROUNDOVER:
                 break;

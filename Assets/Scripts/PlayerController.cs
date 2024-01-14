@@ -7,6 +7,12 @@ using Photon.Realtime;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunObservable*/
 {
+    public enum PlayerStates
+    {
+        FREE,
+        STAGGER,
+        INVINCIBLE
+    }
     //public static PlayerController instance;
     [SerializeField] PlayerManager playerManager;
     [SerializeField] GameManager gameManager;
@@ -99,6 +105,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     bool hasHyperArmor = false;
     bool tookHit = false;
     bool isCombo = false;
+    bool isStaggered = false;
     public bool canParry = false;
     bool canFeint = false;
     bool feint = false;
@@ -115,7 +122,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     IEnumerator lightAttack;
     IEnumerator heavyAttack;
     IEnumerator dodging;
-    IEnumerator parriedStun;
+    IEnumerator currentStun;
 
     // syncing variables and shit
     //private const byte POSITION_FLAG = 1 << 0;
@@ -141,6 +148,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     PhotonView PV;
     Player player;
     public Animator animator;
+    public Animation anim;
 
     //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     //{
@@ -449,7 +457,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         if (cameraController.CombatMode)
         {
-            if (Input.GetMouseButtonDown(0) && AbleToMove())
+            if (Input.GetMouseButtonDown(0) && AbleToMove() && lightAttack == null)
             {
                 LightAttack();
             }
@@ -497,6 +505,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         }
     }
 
+    IEnumerator Stagger(float time) // for hit reactions
+    {
+        yield return null;
+
+        isStaggered = true;
+        //animator.SetTrigger("STUN")
+        yield return new WaitForSeconds(time);
+
+        animator.SetTrigger("ENDSTUN");
+        isStaggered = false;
+
+        currentStun = null;
+    }
     private void InterruptPlayer()
     {
         isAttacking = false;
@@ -512,9 +533,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         if(currentCollider != null)
             currentCollider.enabled = false;
 
+        if(currentStun != null)
+            StopCoroutine(currentStun);
+
+        currentStun = Stagger(0.4f);
+        StartCoroutine(currentStun);
     }
     private void FixedUpdate()
     {
+        if (GameManager.Instance.gameState == GameManager.GameStates.POSTGAME)
+            return;
+
         if (isDead)
             return;
 
@@ -561,11 +590,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         // calculate movement direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
         rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
-        // on ground
-        //if (grounded)
-        //{
-        //    rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
-        //}
     }
 
     public void LightAttack()
@@ -610,21 +634,31 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         UseStaminaAttack(staminaCost);
         // Schedule hitbox activation and deactivation using animation events
         currentCollider = collider;
+        if (lightAttack != null)
+            StopCoroutine(lightAttack);
         lightAttack = PerformLightAttack(collider);
         StartCoroutine(lightAttack);
     } 
 
     IEnumerator PerformLightAttack(Collider collider)
     {
-        yield return null; // yield 1 frame to ensure animation starts;
+        yield return null;
+        canParry = false;
+        canFeint = false;
 
-        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        yield return new WaitForSeconds(0.2f); // can parry 300ms before attack, light is 500ms;
 
-        yield return new WaitForSeconds(lightHitboxActivationTime);
+        canParry = true;
+
+        yield return new WaitForSeconds(0.2f); // parry window ends 100ms before attack;
+
+        canParry = false;
+
+        yield return new WaitForSeconds(0.1f);
 
         collider.enabled = true;
 
-        yield return new WaitForSeconds(lightHitboxDeactivationTime - lightHitboxActivationTime);
+        yield return new WaitForSeconds(0.2f);
 
         collider.enabled = false;
 
@@ -713,6 +747,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         isAttacking = false;
         lastAttack = Time.time;
         canRegenStamina = true;
+
         heavyAttack = null;
     }
 
@@ -862,7 +897,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     public bool AbleToMove()
     {
-        if (isAttacking || isDodging || isBlocking)
+        if (isAttacking || isDodging || isBlocking || isStaggered)
             return false;
 
         if (lastHitTime + timeToMove > Time.time)
@@ -954,7 +989,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public void RPC_ParryAttackCall(bool _isHeavy, int _playerIDParried)
     {
         PV.RPC(nameof(RPC_ParryAttack), RpcTarget.All, _isHeavy);
-        PV.RPC(nameof(RPC_AttackParried), RpcTarget.All, _playerIDParried); // parry reaction for the one who got parried
+        PV.RPC(nameof(RPC_AttackParried), RpcTarget.All, _playerIDParried, _isHeavy); // parry reaction for the one who got parried
     }
 
     [PunRPC]
@@ -975,9 +1010,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     }
 
     [PunRPC]
-    public void RPC_AttackParried(int playerParried)
+    public void RPC_AttackParried(int playerParried, bool _isHeavy) // parry reaction for the one who got parried
     {
         playerIDParried = playerParried;
+        if (_isHeavy)
+        {
+            // longer stun time if is heavy
+            animator.SetTrigger("PARRIED");
+            currentStun = Stagger(0.9f);
+        }
+        else
+        {
+            animator.SetTrigger("PARRIED");
+            currentStun = Stagger(0.6f);
+        }
+        StartCoroutine(currentStun);
     }
 
     IEnumerator Parrying()
@@ -1128,8 +1175,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         if (currentHealth <= 0)
         {
+            ResetTriggers();
             Die();
             animator.SetTrigger("DEATH");
+            //animator.Play("Death");
             if(PV.IsMine)
                 PlayerManager.Find(sender).GetKill();
         }
@@ -1166,6 +1215,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     void Die()
     {
+        //animator.Play("Death");
         if (PV.IsMine)
         {
             playerManager.DeathCount();

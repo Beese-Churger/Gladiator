@@ -29,7 +29,7 @@ public class Hitbox : MonoBehaviour
             PlayerController target = other.GetComponent<PlayerController>();
 
             if(!target.isParrying)
-                target.CheckIfBlocked(playerController, playerController.GetDir(), 10, false);
+                target.CheckIfBlocked(playerController, playerController.GetDir(), 100, false);
             //target.TakeDamage(10);
         }
     }
