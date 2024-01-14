@@ -13,6 +13,8 @@ public class CrowdFavour : MonoBehaviour
     public int team1Favour = 0;
     public int team2Favour = 0;
 
+
+
     private void Start()
     {
         Instance = this;

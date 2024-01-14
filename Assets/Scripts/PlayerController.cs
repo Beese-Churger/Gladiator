@@ -389,8 +389,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             if (attackReceivedIsHeavy)
             {
                 // take reduced damage if isHeavy
-                //currentHealth -= damage;
-                //UpdateHealthBar();
+                currentHealth -= 3;
+                UpdateHealthBar();
             }
             animator.SetTrigger("BLOCK");
             isBlocking = false;
@@ -416,7 +416,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         {
             lockCursor = false;
         }
-        else if (Input.GetKeyDown(KeyCode.Escape))
+        else if (Input.GetKeyDown(KeyCode.Escape) && GameManager.Instance.gameState != GameManager.GameStates.POSTGAME)
         {
             lockCursor = !lockCursor;
         }
@@ -505,6 +505,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         }
     }
 
+    public void LightStagger()
+    {
+        animator.SetTrigger("PARRIED");
+        currentStun = Stagger(0.6f);
+        StartCoroutine(currentStun);
+    }
     IEnumerator Stagger(float time) // for hit reactions
     {
         yield return null;
@@ -721,6 +727,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         yield return null; // yield 1 frame to ensure animation starts;
         canRegenStamina = false;
         canFeint = true;
+        isHeavy = true;
 
         yield return new WaitForSeconds(0.4f); // feint 400ms before attack would land
 
@@ -747,6 +754,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         isAttacking = false;
         lastAttack = Time.time;
         canRegenStamina = true;
+        isHeavy = false;
 
         heavyAttack = null;
     }
@@ -1086,12 +1094,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         return false;
     }
 
-    public void CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
+    public bool CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
     {
         if (isAttacking)
         {
-            TakeDamage(damage);
-            return;
+            //TakeDamage(damage);
+            return false;
         }
 
 
@@ -1116,38 +1124,31 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         }
         if (currDir == incomingDir)
         {
-            //if(!isParrying)
-            Debug.Log("Blocked" + isAttacking);
-            BlockAttack(damage, _isHeavy);
+            //BlockAttack(damage, _isHeavy);
+            return true;
         }
         else
-            TakeDamage(damage);
+            return false;
+            //TakeDamage(damage);
     }
 
-    public void BlockAttack(float damage, bool _isHeavy)
+    public void BlockAttack(bool _isHeavy)
     {
-        PV.RPC(nameof(RPC_BlockAttackCall), RpcTarget.MasterClient, damage, _isHeavy);
+        PV.RPC(nameof(RPC_BlockAttackCall), RpcTarget.MasterClient, _isHeavy);
     }
 
     [PunRPC]
-    void RPC_BlockAttackCall(float damage, bool _isHeavy, PhotonMessageInfo info)
+    void RPC_BlockAttackCall(bool _isHeavy, PhotonMessageInfo info)
     {
-        PV.RPC(nameof(RPC_BlockAttack), RpcTarget.All, damage, _isHeavy);
+        PV.RPC(nameof(RPC_BlockAttack), RpcTarget.All, _isHeavy);
     }
 
     [PunRPC]
-    void RPC_BlockAttack(float damage, bool _isHeavy, PhotonMessageInfo info)
+    void RPC_BlockAttack(bool _isHeavy, PhotonMessageInfo info)
     {
         //ResetTriggers();
         isBlocking = true;
         attackReceivedIsHeavy = _isHeavy;
-    }
-
-    IEnumerator Blocking()
-    {
-        yield return new WaitForSeconds(0.05f);
-
-        isBlocking = false;
     }
 
     public void TakeDamage(float damage)
