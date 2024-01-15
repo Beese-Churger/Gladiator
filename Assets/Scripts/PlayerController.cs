@@ -596,10 +596,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                 rb.AddForce(orientation.right * 100f, ForceMode.Force);
                 break;
             case 3:
-                rb.AddForce(orientation.forward * 100f, ForceMode.Force);
+                rb.AddForce(orientation.forward * 150f, ForceMode.Force);
                 break;
             case 4:
-                rb.AddForce(-orientation.forward * 100f, ForceMode.Force);
+                rb.AddForce(-orientation.forward * 40f, ForceMode.Force);
                 break;
             default:
                 break;

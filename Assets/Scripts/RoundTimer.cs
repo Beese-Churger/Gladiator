@@ -61,9 +61,10 @@ public class RoundTimer : MonoBehaviourPunCallbacks
     }
 
 
-    private void OnTimerRuns()
+    public void OnTimerRuns()
     {
         this.enabled = true;
+        //ameObject.SetActive(true);
         this.isTimerRunning = true;
     }
 
@@ -76,6 +77,8 @@ public class RoundTimer : MonoBehaviourPunCallbacks
         this.Text.text = "00:00";
 
         if (OnRoundTimerHasExpired != null && TimeRemaining() <= 0) OnRoundTimerHasExpired();
+
+        gameObject.SetActive(false);
     }
 
 

@@ -417,6 +417,52 @@ RectTransform:
   m_AnchoredPosition: {x: -5, y: 0}
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &359819612
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 359819614}
+  - component: {fileID: 359819613}
+  m_Layer: 0
+  m_Name: CountdownTimer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &359819613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359819612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1678c314170c50f4dbb0b250f3ca678c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Countdown: 5
+  Text: {fileID: 1912715703}
+--- !u!4 &359819614
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359819612}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 991.40283, y: 917.95636, z: 9.031798}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 17
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &381249188
 GameObject:
   m_ObjectHideFlags: 0
@@ -2613,6 +2659,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 12
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1778980081
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1778980083}
+  - component: {fileID: 1778980082}
+  m_Layer: 0
+  m_Name: RoundTimer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1778980082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778980081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9a3ff66c97cebe41924c0b798baea15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Countdown: 181
+  Text: {fileID: 1526148104}
+--- !u!4 &1778980083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778980081}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 991.40283, y: 917.95636, z: 9.031798}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1787994986
 GameObject:
@@ -6102,9 +6194,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4329598139409662786, guid: 36f32d668926bad4d8b2aa1623c06847, type: 3}
+      propertyPath: roundTimer
+      value: 
+      objectReference: {fileID: 1778980081}
+    - target: {fileID: 4329598139409662786, guid: 36f32d668926bad4d8b2aa1623c06847, type: 3}
       propertyPath: scoreboard
       value: 
       objectReference: {fileID: 1526148105}
+    - target: {fileID: 4329598139409662786, guid: 36f32d668926bad4d8b2aa1623c06847, type: 3}
+      propertyPath: countdownTimer
+      value: 
+      objectReference: {fileID: 359819612}
     - target: {fileID: 4329598139409662787, guid: 36f32d668926bad4d8b2aa1623c06847, type: 3}
       propertyPath: m_Name
       value: GameManager
@@ -6169,7 +6269,9 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4329598139409662791, guid: 36f32d668926bad4d8b2aa1623c06847, type: 3}
+    - {fileID: 4329598139409662790, guid: 36f32d668926bad4d8b2aa1623c06847, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 36f32d668926bad4d8b2aa1623c06847, type: 3}
 --- !u!114 &4329598139781314162 stripped
 MonoBehaviour:

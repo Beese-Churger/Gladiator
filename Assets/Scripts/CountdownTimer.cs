@@ -60,7 +60,7 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
     }
 
 
-    private void OnTimerRuns()
+    public void OnTimerRuns()
     {
         this.isTimerRunning = true;
         this.enabled = true;
@@ -70,12 +70,15 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
     {
         this.isTimerRunning = false;
         this.enabled = false;
+       
 
         Debug.Log("Emptying info text.", this.Text);
         this.Text.text = string.Empty;
 
         if (OnCountdownTimerHasExpired != null && TimeRemaining() <= 0)
             OnCountdownTimerHasExpired();
+
+        gameObject.SetActive(false);
     }
 
 

@@ -19,8 +19,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     [SerializeField] Score scoreboard;
 
-    CountdownTimer countdownTimer;
-    [SerializeField] RoundTimer roundTimer;
+    [SerializeField] GameObject countdownTimer;
+    [SerializeField] GameObject roundTimer;
 
     int round = 1;
     int MAXROUNDS = 5;
@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
 
         PV = GetComponent<PhotonView>();
-        countdownTimer = GetComponent<CountdownTimer>();
+        //countdownTimer = GetComponent<CountdownTimer>();
         //roundTimer = GetComponent<RoundTimer>();
 
         gameState = GameStates.COUNTDOWN;
@@ -93,7 +93,6 @@ public class GameManager : MonoBehaviourPunCallbacks
                 {
                     Debug.Log("loaded");
                     CountdownTimer.SetStartTime();
-                    //RoundTimer.SetStartTime();
                     PV.RPC(nameof(RPC_StartCountdown), RpcTarget.All);
                 }
             }
@@ -163,11 +162,8 @@ public class GameManager : MonoBehaviourPunCallbacks
             case GameStates.ROUNDOVER:
                 break;
             case GameStates.POSTGAME:
-                if (roundTimer.enabled)
-                    roundTimer.enabled = false;
-
-                if (countdownTimer.enabled)
-                    countdownTimer.enabled = false;
+                roundTimer.SetActive(false);
+                countdownTimer.SetActive(false);
                 break;
             default:
                 break;
@@ -243,9 +239,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void RPC_RoundOver(int team)
     {
-        roundTimer.OnTimerEnds();
+        roundTimer.GetComponent<RoundTimer>().OnTimerEnds();
 
-        //countdownTimer.OnTimerEnds();
         if (team == 1)
             team1Points++;
         else
@@ -256,7 +251,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             GameOver();
             return;
         }
-
+        
         scoreboard.UpdateScores(team1Points, team2Points, round);
         gameState = GameStates.ROUNDOVER;
 
@@ -268,20 +263,16 @@ public class GameManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(5f);
         masterClient.Respawn();
         gameState = GameStates.COUNTDOWN;
-        //round++;
-        //if(round > MAXROUNDS || team1Points >= 3 || team2Points >= 3)
-        //{
-        //    GameOver();
-        //    yield break;
-        //}
+        round++;
+
         scoreboard.UpdateScores(team1Points, team2Points, round);
         if (PhotonNetwork.IsMasterClient)
         {
             CountdownTimer.SetStartTime();
         }
 
-        yield return new WaitForSeconds(0.1f);
-        countdownTimer.enabled = true;
+        countdownTimer.SetActive(true);
+        countdownTimer.GetComponent<CountdownTimer>().Initialize();
     }
 
 
@@ -291,29 +282,14 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
             RoundTimer.SetStartTime();
 
-        //if (!roundTimer)
-        //    roundTimer = GetComponent<RoundTimer>();
-
-        //if (Application.isEditor)
-        roundTimer.enabled = true;
-        //else
-        //    StartCoroutine(StartTimer());
+        roundTimer.SetActive(true);
+        roundTimer.GetComponent<RoundTimer>().Initialize();
     }
 
-    IEnumerator StartTimer()
-    {
-        yield return new WaitForSeconds(0.1f);
-        roundTimer.enabled = true;
-    }
     private void OnRoundTimerIsExpired()
     {
         scoreboard.UpdateScores(team1Points, team2Points, round);
         gameState = GameStates.ROUNDOVER;
-
-        //if (team1Points >= 3)
-        //    winningTeam = 1;
-        //else if (team2Points >= 3)
-        //    winningTeam = 2;
 
         StartCoroutine(StartNextRound());
     }
@@ -321,7 +297,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void RPC_StartCountdown()
     {
-        countdownTimer.enabled = true;
+        countdownTimer.gameObject.SetActive(true);
     }
 
     public void GameOver()
@@ -357,11 +333,11 @@ public class GameManager : MonoBehaviourPunCallbacks
     void RPC_Surrender(int surrenderingTeam)
     {
         gameState = GameStates.POSTGAME;
-        if (roundTimer.enabled)
-            roundTimer.enabled = false;
+        //if (roundTimer.enabled)
+            roundTimer.SetActive(false);
 
-        if (countdownTimer.enabled)
-            countdownTimer.enabled = false;
+        //if (countdownTimer.enabled)
+            countdownTimer.SetActive(false);
         if (surrenderingTeam == 1)
         {
             team1Points = -1;
