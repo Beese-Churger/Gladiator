@@ -87,7 +87,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     bool isInvincible = false;
     public float iFrameDuration = 0.2f;
     float lastDodgeTime;
-    float dodgeCD = 0.3f;
+    float dodgeCD = 1.0f;
     public float lightHitboxActivationTime = 0.5f;
     public float lightHitboxDeactivationTime = 0.6f;
 
@@ -457,7 +457,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         if (cameraController.CombatMode)
         {
-            if (Input.GetMouseButtonDown(0) && AbleToMove() && lightAttack == null)
+            if (Input.GetMouseButtonDown(0) && AbleToMove())
             {
                 LightAttack();
             }
