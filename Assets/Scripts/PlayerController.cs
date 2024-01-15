@@ -83,7 +83,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     float timeToMove = 0.1f;
 
     bool isDodging = false;
-    bool dodgeLeft = false;
+    int dodgeDir = 1;
     bool isInvincible = false;
     public float iFrameDuration = 0.2f;
     float lastDodgeTime;
@@ -492,11 +492,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             {
                 if (Input.GetKey(KeyCode.A) && Input.GetKeyDown(KeyCode.Space))
                 {
-                    Dodge(true);
+                    Dodge(1);
                 }
                 else if (Input.GetKey(KeyCode.D) && Input.GetKeyDown(KeyCode.Space))
                 {
-                    Dodge(false);
+                    Dodge(2);
+                }
+                else if (Input.GetKey(KeyCode.W) && Input.GetKeyDown(KeyCode.Space))
+                {
+                    Dodge(3);
+                }
+                else if (Input.GetKey(KeyCode.S) && Input.GetKeyDown(KeyCode.Space))
+                {
+                    Dodge(4);
                 }
             }
         }
@@ -568,7 +576,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         }
         if (isDodging)
         {
-            MoveTowards(dodgeLeft);
+            MoveTowards(dodgeDir);
         }
 
         if (!AbleToMove())
@@ -577,16 +585,33 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         MovePlayer();
     }
 
-    private void MoveTowards(bool left)
+    private void MoveTowards(int dir)
     {
-        if(left)
+        switch (dir)
         {
-            rb.AddForce(-orientation.right * 100f, ForceMode.Force);
+            case 1:
+                rb.AddForce(-orientation.right * 100f, ForceMode.Force);
+                break;
+            case 2:
+                rb.AddForce(orientation.right * 100f, ForceMode.Force);
+                break;
+            case 3:
+                rb.AddForce(orientation.forward * 100f, ForceMode.Force);
+                break;
+            case 4:
+                rb.AddForce(-orientation.forward * 100f, ForceMode.Force);
+                break;
+            default:
+                break;
         }
-        else
-        {
-            rb.AddForce(orientation.right * 100f, ForceMode.Force);
-        }
+        //if (left)
+        //{
+        //    rb.AddForce(-orientation.right * 100f, ForceMode.Force);
+        //}
+        //else
+        //{
+        //    rb.AddForce(orientation.right * 100f, ForceMode.Force);
+        //}
 
     }
     private void MyInput()
@@ -789,28 +814,46 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canRegenStamina = true;
     }
 
-    public void Dodge(bool _dodgeLeft)
+    public void Dodge(int _dodgeDir)
     {
-        dodgeLeft = _dodgeLeft;
-        PV.RPC(nameof(RPC_DodgeCall), RpcTarget.MasterClient, _dodgeLeft);
+        dodgeDir = _dodgeDir;
+        PV.RPC(nameof(RPC_DodgeCall), RpcTarget.MasterClient, _dodgeDir);
     }
 
     [PunRPC]
-    public void RPC_DodgeCall(bool dodgeLeft)
+    public void RPC_DodgeCall(int _dodgeDir)
     {
-        PV.RPC(nameof(RPC_Dodge), RpcTarget.All, dodgeLeft);
+        PV.RPC(nameof(RPC_Dodge), RpcTarget.All, _dodgeDir);
     }
 
     [PunRPC]
-    public void RPC_Dodge(bool dodgeLeft)
+    public void RPC_Dodge(int _dodgeDir)
     {
         isDodging = true;
         isInvincible = true;
 
-        if(dodgeLeft)
-            animator.SetTrigger("DODGELEFT");
-        else
-            animator.SetTrigger("DODGERIGHT");
+        switch (_dodgeDir)
+        {
+            case 1:
+                animator.SetTrigger("DODGELEFT");
+                break;
+            case 2:
+                animator.SetTrigger("DODGERIGHT");
+                break;
+            case 3:
+                animator.SetTrigger("DODGERIGHT");
+                break;
+            case 4:
+                animator.SetTrigger("DODGERIGHT");
+                break;
+            default:
+                break;
+        }
+
+        //if (dodgeLeft)
+        //    animator.SetTrigger("DODGELEFT");
+        //else
+        //    animator.SetTrigger("DODGERIGHT");
 
         dodging = PerformDodge();
         StartCoroutine(dodging);
@@ -1078,7 +1121,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         Debug.Log(stunTime + PhotonNetwork.LocalPlayer.NickName);
         InterruptPlayer(stunTime, true);
         isHeavy = false;
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
 
         isParried = false;
         canRegenStamina = true;
@@ -1108,7 +1151,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     {
         if (isAttacking)
         {
-            //TakeDamage(damage);
             return false;
         }
 
