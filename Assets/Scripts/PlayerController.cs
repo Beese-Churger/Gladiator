@@ -380,7 +380,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         {
             tookHit = false;
             isDodging = false;
-            InterruptPlayer();
+            InterruptPlayer(0.5f);
         }
 
         if(isBlocking)
@@ -524,11 +524,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         currentStun = null;
     }
-    private void InterruptPlayer()
+    private void InterruptPlayer(float stunTime)
     {
         isAttacking = false;
         lastAttack = Time.time;
-        animator.SetTrigger("HIT");
+        if(isParried)
+            animator.SetTrigger("PARRIED");
+        else
+            animator.SetTrigger("HIT");
 
         if (lightAttack != null)
             StopCoroutine(lightAttack);
@@ -542,7 +545,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         if(currentStun != null)
             StopCoroutine(currentStun);
 
-        currentStun = Stagger(0.4f);
+        currentStun = Stagger(stunTime);
         StartCoroutine(currentStun);
     }
     private void FixedUpdate()
@@ -1021,18 +1024,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public void RPC_AttackParried(int playerParried, bool _isHeavy) // parry reaction for the one who got parried
     {
         playerIDParried = playerParried;
-        if (_isHeavy)
-        {
-            // longer stun time if is heavy
-            animator.SetTrigger("PARRIED");
-            currentStun = Stagger(0.9f);
-        }
-        else
-        {
-            animator.SetTrigger("PARRIED");
-            currentStun = Stagger(0.6f);
-        }
-        StartCoroutine(currentStun);
+        //if (_isHeavy)
+        //{
+        //    // longer stun time if is heavy
+        //    animator.SetTrigger("PARRIED");
+        //    currentStun = Stagger(0.9f);
+        //}
+        //else
+        //{
+        //    animator.SetTrigger("PARRIED");
+        //    currentStun = Stagger(0.6f);
+        //}
+        //StartCoroutine(currentStun);
     }
 
     IEnumerator Parrying()
@@ -1066,7 +1069,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     IEnumerator GetParried()
     {
         isParried = true;
-        InterruptPlayer();
+        float stunTime = 0;
+        if (isHeavy)
+            stunTime = 0.9f;
+        else
+            stunTime = 0.6f;
+
+        InterruptPlayer(stunTime);
+        isHeavy = false;
         yield return new WaitForSeconds(0.5f);
 
         isParried = false;
