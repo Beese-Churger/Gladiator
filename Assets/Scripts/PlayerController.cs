@@ -1075,6 +1075,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         else
             stunTime = 0.6f;
 
+        Debug.Log(stunTime + PhotonNetwork.LocalPlayer.NickName);
         InterruptPlayer(stunTime);
         isHeavy = false;
         yield return new WaitForSeconds(0.5f);
@@ -1085,7 +1086,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     public bool CheckIfParried()
     {
-
+        if (isParried)
+            return false;
         if (cameraController.currentLock)
         {
             PlayerController pc = cameraController.currentLock.GetComponent<PlayerController>();
