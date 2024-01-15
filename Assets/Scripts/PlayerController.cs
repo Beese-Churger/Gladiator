@@ -1069,7 +1069,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     IEnumerator GetParried()
     {
         isParried = true;
-        float stunTime = 0;
+        float stunTime;
         if (isHeavy)
             stunTime = 0.9f;
         else
@@ -1086,7 +1086,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     public bool CheckIfParried()
     {
-        if (isParried)
+        if (!isParried)
             return false;
         if (cameraController.currentLock)
         {
