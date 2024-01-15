@@ -380,7 +380,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         {
             tookHit = false;
             isDodging = false;
-            InterruptPlayer(0.5f);
+            InterruptPlayer(0.5f, false);
         }
 
         if(isBlocking)
@@ -525,11 +525,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         currentStun = null;
     }
-    private void InterruptPlayer(float stunTime)
+    private void InterruptPlayer(float stunTime, bool stagger)
     {
         isAttacking = false;
         lastAttack = Time.time;
-        if(isParried)
+        if(stagger)
             animator.SetTrigger("PARRIED");
         else
             animator.SetTrigger("HIT");
@@ -1076,7 +1076,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             stunTime = 0.6f;
 
         Debug.Log(stunTime + PhotonNetwork.LocalPlayer.NickName);
-        InterruptPlayer(stunTime);
+        InterruptPlayer(stunTime, true);
         isHeavy = false;
         yield return new WaitForSeconds(0.5f);
 
