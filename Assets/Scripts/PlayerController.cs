@@ -429,7 +429,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         if (CheckIfParried() && !isParried)
         {
-            Parried();            
+            Parried();
+            isParried = true;
         }
 
         if (GameManager.Instance.gameState != GameManager.GameStates.COUNTDOWN)
@@ -1068,7 +1069,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     IEnumerator GetParried()
     {
-        isParried = true;
         float stunTime;
         if (isHeavy)
             stunTime = 0.9f;
