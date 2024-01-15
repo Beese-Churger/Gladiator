@@ -513,13 +513,25 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         }
     }
-
     public void LightStagger()
+    {
+        PV.RPC(nameof(LightStaggerCall), RpcTarget.MasterClient);
+    }
+
+    [PunRPC]
+    void LightStaggerCall()
+    {
+        PV.RPC(nameof(RPC_LightStagger), RpcTarget.All);
+    }
+
+    [PunRPC]
+    void RPC_LightStagger()
     {
         animator.SetTrigger("PARRIED");
         currentStun = Stagger(0.6f);
         StartCoroutine(currentStun);
     }
+
     IEnumerator Stagger(float time) // for hit reactions
     {
         yield return null;
@@ -604,15 +616,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             default:
                 break;
         }
-        //if (left)
-        //{
-        //    rb.AddForce(-orientation.right * 100f, ForceMode.Force);
-        //}
-        //else
-        //{
-        //    rb.AddForce(orientation.right * 100f, ForceMode.Force);
-        //}
-
     }
     private void MyInput()
     {
