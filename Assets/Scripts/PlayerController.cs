@@ -427,7 +427,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         if (GameManager.Instance.gameState == GameManager.GameStates.POSTGAME)
             return;
 
-        if (CheckIfParried())
+        if (CheckIfParried() && !isParried)
         {
             Parried();            
         }
@@ -1086,8 +1086,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     public bool CheckIfParried()
     {
-        if (!isParried)
-            return false;
         if (cameraController.currentLock)
         {
             PlayerController pc = cameraController.currentLock.GetComponent<PlayerController>();
