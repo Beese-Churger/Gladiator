@@ -1117,9 +1117,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     {
         float stunTime;
         if (isHeavy)
-            stunTime = 0.9f;
+            stunTime = 1.3f;
         else
-            stunTime = 0.6f;
+            stunTime = 1.0f;
 
         Debug.Log(stunTime + PhotonNetwork.LocalPlayer.NickName);
         InterruptPlayer(stunTime, true);
