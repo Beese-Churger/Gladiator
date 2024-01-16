@@ -71,14 +71,13 @@ public class RoundTimer : MonoBehaviourPunCallbacks
     public void OnTimerEnds()
     {
         this.isTimerRunning = false;
+        this.enabled = false;
 
         Debug.Log("Emptying info round text.", this.Text);
         this.Text.text = "00:00";
 
-        if (OnRoundTimerHasExpired != null && TimeRemaining() <= 0) 
-            OnRoundTimerHasExpired();
+        if (OnRoundTimerHasExpired != null && TimeRemaining() <= 0) OnRoundTimerHasExpired();
 
-        this.enabled = false;
         gameObject.SetActive(false);
     }
 
