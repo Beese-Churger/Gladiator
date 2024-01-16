@@ -108,6 +108,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public int lockOnPlayerID = -1;
     public bool isBlocking = false;
     bool attackReceivedIsHeavy = false;
+    bool isExhausted = false;
     Collider currentCollider;
 
     public int playerIDParried = -1;
@@ -388,6 +389,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             InterruptPlayer(0.5f, false);
         }
 
+        if(currentStamina <=0)
+        {
+            isExhausted = true;
+        }
+
+        if(isExhausted)
+        {
+            if (currentStamina >= maxStamina)
+                isExhausted = false;
+        }
         //if(isBlocking)
         //{
         //    ResetTriggers("BLOCK");
@@ -519,6 +530,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         {
 
         }
+        //if(Input.GetKeyDown(KeyCode.K))
+        //{
+        //    currentStamina = 0;
+        //    UpdateStaminaBar();
+        //}
     }
     public void LightStagger()
     {
@@ -554,6 +570,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     }
     private void InterruptPlayer(float stunTime, bool stagger)
     {
+        animator.speed = 1f;
         isAttacking = false;
         canParry = false;
 
@@ -666,7 +683,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         switch (direction)
         {
             case MouseController.DirectionalInput.TOP:
-                collider = rHand;
+                collider = lHand;
                 staminaCost = lightStaminaCost[0];
                 break;
             case MouseController.DirectionalInput.LEFT:
@@ -697,27 +714,35 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canRegenStamina = false;
         canParry = false;
         canFeint = false;
+        float m = 1;
+        if (isExhausted)
+        {
+            animator.speed = 0.5f;
+            m = 2f;
+        }
+
         //MoveTowards(5);
 
-        yield return new WaitForSeconds(0.2f); // can parry 300ms before attack, light is 500ms;
+        yield return new WaitForSeconds(0.2f * m); // can parry 300ms before attack, light is 500ms;
 
         canParry = true;
 
-        yield return new WaitForSeconds(0.2f); // parry window ends 100ms before attack;
+        yield return new WaitForSeconds(0.2f * m); // parry window ends 100ms before attack;
 
         canParry = false;
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.1f * m);
 
         collider.enabled = true;
 
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.2f * m);
 
         collider.enabled = false;
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.1f * m);
 
         isAttacking = false;
+        animator.speed = 1f;
         lastAttack = Time.time;
         canRegenStamina = true;
         lightAttack = null;
@@ -746,7 +771,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         switch (direction)
         {
             case MouseController.DirectionalInput.TOP:
-                collider = rHand;
+                collider = lHand;
                 staminaCost = lightStaminaCost[0];
                 break;
             case MouseController.DirectionalInput.LEFT:
@@ -776,24 +801,30 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canFeint = true;
         isHeavy = true;
         //MoveTowards(5);
+        float m = 1;
+        if (isExhausted)
+        {
+            animator.speed = 0.5f;
+            m = 2f;
+        }
 
-        yield return new WaitForSeconds(0.4f); // feint 400ms before attack would land
+        yield return new WaitForSeconds(0.4f * m); // feint 400ms before attack would land
 
         canFeint = false;
 
-        yield return new WaitForSeconds(0.1f); // parry starts 300ms before attack lands
+        yield return new WaitForSeconds(0.1f * m); // parry starts 300ms before attack lands
 
         canParry = true;
 
-        yield return new WaitForSeconds(0.2f); // parry ends 100ms before attack lands lasts 200ms
+        yield return new WaitForSeconds(0.2f * m); // parry ends 100ms before attack lands lasts 200ms
 
         canParry = false;
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.1f * m);
 
         collider.enabled = true;
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.1f * m);
 
         collider.enabled = false;
 
@@ -803,6 +834,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         lastAttack = Time.time;
         canRegenStamina = true;
         isHeavy = false;
+        animator.speed = 1f;
 
         heavyAttack = null;
     }
@@ -1130,6 +1162,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             stunTime = 1.0f;
 
         Debug.Log(stunTime + PhotonNetwork.LocalPlayer.NickName);
+        if(isExhausted)
+        {
+            stunTime += 0.5f;
+        }
         InterruptPlayer(stunTime, true);
         isHeavy = false;
         yield return new WaitForSeconds(0.1f);

@@ -5563,6 +5563,7 @@ MonoBehaviour:
   opponentsInAttackRange: []
   rHand: {fileID: 8427858061803160642}
   lHand: {fileID: 6610068262487649943}
+  isDodging: 0
   isInvincible: 0
   iFrameDuration: 0.2
   lightHitboxActivationTime: 0.3
