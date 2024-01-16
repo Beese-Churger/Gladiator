@@ -5579,6 +5579,7 @@ MonoBehaviour:
   - 12
   isAttacking: 0
   isHeavy: 0
+  isStaggered: 0
   canParry: 0
   isParrying: 0
   isParried: 0

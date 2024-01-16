@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     [SerializeField] Score scoreboard;
 
+    [SerializeField] GameObject objects;
     [SerializeField] GameObject countdownTimer;
     [SerializeField] GameObject roundTimer;
 
@@ -269,7 +270,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
 
         yield return new WaitForSeconds(0.1f);
-        countdownTimer.SetActive(true);
+       // countdownTimer.SetActive(true);
         countdownTimer.GetComponent<CountdownTimer>().Initialize();
     }
 
@@ -280,7 +281,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
             RoundTimer.SetStartTime();
 
-        roundTimer.SetActive(true);
+        Debug.Log(roundTimer);
+        roundTimer = GameObject.Find("RoundTimer");
+        //roundTimer.SetActive(true);
         roundTimer.GetComponent<RoundTimer>().Initialize();
     }
 

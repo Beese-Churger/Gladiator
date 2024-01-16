@@ -79,7 +79,7 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
             OnCountdownTimerHasExpired();
 
         Debug.Log("hit");
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
     }
 
 

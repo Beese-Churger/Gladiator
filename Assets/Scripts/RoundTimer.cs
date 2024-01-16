@@ -78,7 +78,7 @@ public class RoundTimer : MonoBehaviourPunCallbacks
 
         if (OnRoundTimerHasExpired != null && TimeRemaining() <= 0) OnRoundTimerHasExpired();
 
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
     }
 
 

@@ -6194,6 +6194,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4329598139409662786, guid: 36f32d668926bad4d8b2aa1623c06847, type: 3}
+      propertyPath: objects
+      value: 
+      objectReference: {fileID: 1778980081}
+    - target: {fileID: 4329598139409662786, guid: 36f32d668926bad4d8b2aa1623c06847, type: 3}
       propertyPath: roundTimer
       value: 
       objectReference: {fileID: 1778980081}
