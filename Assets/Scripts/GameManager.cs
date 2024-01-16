@@ -53,9 +53,6 @@ public class GameManager : MonoBehaviourPunCallbacks
             { GladiatorInfo.PLAYER_LOADED_LEVEL, true }
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(props);
-        //Debug.Log("set");
-        //if (!PhotonNetwork.IsMasterClient)
-        //    return;
 
         CountdownTimer.OnCountdownTimerHasExpired += OnCountdownTimerIsExpired;
         RoundTimer.OnRoundTimerHasExpired += OnRoundTimerIsExpired;
@@ -311,7 +308,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         else
             winningTeam = 3;
 
-        Debug.Log("end");
+        Debug.Log("Game Ended");
         if (PhotonNetwork.IsMasterClient)
         {
             masterClient.ShowWinner(winningTeam);
@@ -333,11 +330,10 @@ public class GameManager : MonoBehaviourPunCallbacks
     void RPC_Surrender(int surrenderingTeam)
     {
         gameState = GameStates.POSTGAME;
-        //if (roundTimer.enabled)
-            roundTimer.SetActive(false);
 
-        //if (countdownTimer.enabled)
-            countdownTimer.SetActive(false);
+        roundTimer.SetActive(false);
+        countdownTimer.SetActive(false);
+
         if (surrenderingTeam == 1)
         {
             team1Points = -1;

@@ -10,8 +10,8 @@ public class CrowdFavour : MonoBehaviour
     public Text team1Text;
     public Text team2Text;
 
-    public int team1Favour = 0;
-    public int team2Favour = 0;
+    public int team1Favour = 50;
+    public int team2Favour = 50;
 
 
 
