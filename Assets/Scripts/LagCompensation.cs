@@ -7,6 +7,7 @@ public class LagCompensation : MonoBehaviourPun, IPunObservable
     private Quaternion networkedRotation;
 
     private float interpolationFactor = 15f;
+    private float extrapolationFactor = 1.5f;
 
     private Vector3 lastReceivedPosition;
     private Quaternion lastReceivedRotation;
@@ -16,11 +17,14 @@ public class LagCompensation : MonoBehaviourPun, IPunObservable
     {
         if (!photonView.IsMine)
         {
-            // Interpolate position and rotation for non-local players
+            // Extrapolate position and rotation for non-local players
             float timeSinceLastUpdate = Time.time - lastReceivedTime;
 
             Vector3 predictedPosition = lastReceivedPosition + (networkedPosition - lastReceivedPosition) * (timeSinceLastUpdate / interpolationFactor);
             Quaternion predictedRotation = Quaternion.Slerp(lastReceivedRotation, networkedRotation, timeSinceLastUpdate / interpolationFactor);
+
+            // Predict future position based on current velocity
+            predictedPosition += GetComponent<Rigidbody>().velocity * extrapolationFactor;
 
             transform.position = Vector3.Lerp(transform.position, predictedPosition, Time.deltaTime * interpolationFactor);
             transform.rotation = Quaternion.Slerp(transform.rotation, predictedRotation, Time.deltaTime * interpolationFactor);
