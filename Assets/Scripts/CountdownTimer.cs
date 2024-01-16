@@ -78,6 +78,7 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
         if (OnCountdownTimerHasExpired != null && TimeRemaining() <= 0)
             OnCountdownTimerHasExpired();
 
+        Debug.Log("hit");
         gameObject.SetActive(false);
     }
 
