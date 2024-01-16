@@ -30,7 +30,7 @@ public class Hitbox : MonoBehaviour
 
             if(!target.isParrying)
             {
-                if(target.CheckIfBlocked(playerController, playerController.GetDir(), 10, false))
+                if(target.CheckIfBlocked(playerController, playerController.GetDir()))
                 {
                     if(!playerController.isHeavy)
                     {
@@ -41,8 +41,9 @@ public class Hitbox : MonoBehaviour
                 }
                 else
                 {
+                    Debug.Log(playerController.currentAttack);
                     if(!target.isInvincible)
-                        target.TakeDamage(10);
+                        target.TakeDamage(playerController.attackDictionary[playerController.currentAttack]);
                 }
             }
                 

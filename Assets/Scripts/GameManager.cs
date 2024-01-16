@@ -244,13 +244,14 @@ public class GameManager : MonoBehaviourPunCallbacks
         else
             team2Points++;
 
+        scoreboard.UpdateScores(team1Points, team2Points, round);
+
         if (round + 1 > MAXROUNDS || team1Points >= 3 || team2Points >= 3)
         {
             GameOver();
             return;
         }
-        
-        scoreboard.UpdateScores(team1Points, team2Points, round);
+ 
         gameState = GameStates.ROUNDOVER;
 
         StartCoroutine(StartNextRound());

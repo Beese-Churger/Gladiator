@@ -7,12 +7,6 @@ using Photon.Realtime;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunObservable*/
 {
-    public enum PlayerStates
-    {
-        FREE,
-        STAGGER,
-        INVINCIBLE
-    }
     //public static PlayerController instance;
     [SerializeField] PlayerManager playerManager;
     [SerializeField] GameManager gameManager;
@@ -150,6 +144,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public Animator animator;
     public Animation anim;
 
+    public Dictionary<string, int> attackDictionary = new Dictionary<string, int>
+    {
+        { "LIGHTLEFT", 13 },
+        { "LIGHTRIGHT", 13 },
+        { "LIGHTTOP", 15 },
+        { "HEAVYLEFT", 23 },
+        { "HEAVYRIGHT", 23 },
+        { "HEAVYTOP", 30 }
+    };
+
+    public string currentAttack;
     //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     //{
     //    if (stream.IsWriting)
@@ -654,7 +659,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canParry = false;
         animator.SetTrigger("LIGHT");
         animator.SetTrigger(direction.ToString());
-
+        currentAttack = "LIGHT" + direction.ToString();
         // choose collider to activate
         Collider collider;
         float staminaCost = 0f;
@@ -734,7 +739,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canParry = false;
         animator.SetTrigger("HEAVY");
         animator.SetTrigger(direction.ToString());
-
+        currentAttack = "HEAVY" + direction.ToString();
         // choose collider to activate
         Collider collider;
         float staminaCost = 0f;
@@ -1153,7 +1158,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         return false;
     }
 
-    public bool CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
+    public bool CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir)
     {
         if (isAttacking || isStaggered)
         {
