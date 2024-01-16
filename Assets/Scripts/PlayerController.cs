@@ -652,8 +652,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         animator.SetTrigger("LIGHT");
         animator.SetTrigger(direction.ToString());
 
-        ResetTriggers("LIGHT");
-
         // choose collider to activate
         Collider collider;
         float staminaCost = 0f;
