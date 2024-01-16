@@ -268,6 +268,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             CountdownTimer.SetStartTime();
         }
 
+        yield return new WaitForSeconds(0.1f);
         countdownTimer.SetActive(true);
         countdownTimer.GetComponent<CountdownTimer>().Initialize();
     }
