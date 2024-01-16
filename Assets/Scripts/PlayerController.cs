@@ -385,7 +385,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         if(isBlocking)
         {
+            ResetTriggers("BLOCK");
             lastHitTime = Time.time;
+
             if (attackReceivedIsHeavy)
             {
                 // take reduced damage if isHeavy
@@ -613,6 +615,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             case 4:
                 rb.AddForce(-orientation.forward * 40f, ForceMode.Force);
                 break;
+            case 5:
+                rb.AddForce(-orientation.forward * 40f, ForceMode.Force);
+                break;
             default:
                 break;
         }
@@ -646,6 +651,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canParry = false;
         animator.SetTrigger("LIGHT");
         animator.SetTrigger(direction.ToString());
+
+        ResetTriggers("LIGHT");
 
         // choose collider to activate
         Collider collider;
@@ -681,8 +688,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     IEnumerator PerformLightAttack(Collider collider)
     {
         yield return null;
+        canRegenStamina = false;
         canParry = false;
         canFeint = false;
+        MoveTowards(5);
 
         yield return new WaitForSeconds(0.2f); // can parry 300ms before attack, light is 500ms;
 
@@ -704,7 +713,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         isAttacking = false;
         lastAttack = Time.time;
-
+        canRegenStamina = true;
         lightAttack = null;
     }
 
@@ -760,6 +769,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canRegenStamina = false;
         canFeint = true;
         isHeavy = true;
+        MoveTowards(5);
 
         yield return new WaitForSeconds(0.4f); // feint 400ms before attack would land
 
@@ -1071,18 +1081,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public void RPC_AttackParried(int playerParried, bool _isHeavy) // parry reaction for the one who got parried
     {
         playerIDParried = playerParried;
-        //if (_isHeavy)
-        //{
-        //    // longer stun time if is heavy
-        //    animator.SetTrigger("PARRIED");
-        //    currentStun = Stagger(0.9f);
-        //}
-        //else
-        //{
-        //    animator.SetTrigger("PARRIED");
-        //    currentStun = Stagger(0.6f);
-        //}
-        //StartCoroutine(currentStun);
     }
 
     IEnumerator Parrying()
@@ -1157,7 +1155,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             return false;
         }
 
-
         //check if player is facing enemy
         Vector3 directionToPlayer = transform.position - enemy.transform.position;
         float dotProduct = Vector3.Dot(orientation.forward, directionToPlayer.normalized);
@@ -1179,12 +1176,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         }
         if (currDir == incomingDir)
         {
-            //BlockAttack(damage, _isHeavy);
             return true;
         }
         else
             return false;
-            //TakeDamage(damage);
     }
 
     public void BlockAttack(bool _isHeavy)
@@ -1201,7 +1196,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     [PunRPC]
     void RPC_BlockAttack(bool _isHeavy, PhotonMessageInfo info)
     {
-        //ResetTriggers();
         isBlocking = true;
         attackReceivedIsHeavy = _isHeavy;
     }
@@ -1231,10 +1225,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         if (currentHealth <= 0)
         {
-            ResetTriggers();
+            ResetTriggers(null);
             Die();
             animator.SetTrigger("DEATH");
-            //animator.Play("Death");
             if(PV.IsMine)
                 PlayerManager.Find(sender).GetKill();
         }
@@ -1302,10 +1295,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         }
     }
 
-    public void UpdateScoreboard(int team1, int team2, int round)
-    {
-        //scoreboard.UpdateScores(team1, team2, round);
-    }
 
     public void Respawn()
     {
@@ -1315,8 +1304,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     [PunRPC]
     public void RPC_Respawn()
     {
-
-
         //ResetTriggers();
         isDead = false;
         playerCollider.enabled = true;
@@ -1341,10 +1328,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         ChangeSpeed();
     }
 
-    void ResetTriggers() //Reset All the Animation Triggers so we don't have overlapping animations
+    void ResetTriggers(string exclude) //Reset All the Animation Triggers so we don't have overlapping animations
     {
         foreach (AnimatorControllerParameter parameter in animator.parameters)
         {
+            if (parameter.name == exclude)
+                continue;
             if (parameter.name == "Yaxis" || parameter.name == "Xaxis")
                 continue;
             animator.ResetTrigger(parameter.name);

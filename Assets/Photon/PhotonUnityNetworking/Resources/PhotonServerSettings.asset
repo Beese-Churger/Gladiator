@@ -73,6 +73,8 @@ MonoBehaviour:
   - RPC_AddScoreboardItem
   - RPC_RemoveScoreboardItem
   - RPC_Surrender
+  - LightStaggerCall
+  - RPC_LightStagger
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
