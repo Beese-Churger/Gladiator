@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     bool hasHyperArmor = false;
     bool tookHit = false;
     bool isCombo = false;
-    bool isStaggered = false;
+    public bool isStaggered = false;
     public bool canParry = false;
     bool canFeint = false;
     bool feint = false;
@@ -288,14 +288,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     private void Start()
     {
-        if(!PV.IsMine)
+        if (!PV.IsMine)
         {
             foreach (Transform child in cameraHolder.transform)
             {
                 Destroy(child.gameObject);
             }
             int i = 0;
-            foreach(Transform child in canvasHolder)
+            foreach (Transform child in canvasHolder)
             {
                 //if (i < 2) // dont destroy scoreboard;
                 //{
@@ -336,7 +336,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
-        if(changedProps.ContainsKey("team") && targetPlayer == PV.Owner)
+        if (changedProps.ContainsKey("team") && targetPlayer == PV.Owner)
         {
             if (targetPlayer.CustomProperties.TryGetValue("team", out object team))
             {
@@ -399,7 +399,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         //    StartCoroutine(Blocking());
         //}
 
-      
+
 
         // ground check
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
@@ -467,14 +467,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             if (Input.GetMouseButtonDown(1) && AbleToMove())
             {
                 bool hasParry = false;
-                for(int i = 0; i < opponentsInAttackRange.Count; ++i)
+                for (int i = 0; i < opponentsInAttackRange.Count; ++i)
                 {
                     PlayerController enemyController = opponentsInAttackRange[i];
                     if (PV.ViewID == enemyController.lockOnPlayerID)
                     {
-                        if(enemyController.canParry)
+                        if (enemyController.canParry)
                         {
-                            if(CheckIfCanParry(enemyController, enemyController.GetDir(), enemyController.isHeavy))
+                            if (CheckIfCanParry(enemyController, enemyController.GetDir(), enemyController.isHeavy))
                             {
                                 ParryAttack(enemyController.isHeavy);
                                 hasParry = true;
@@ -482,15 +482,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                         }
                     }
                 }
-                if(!hasParry && !isParrying && !isBlocking)   
+                if (!hasParry && !isParrying && !isBlocking)
                     HeavyAttack();
             }
 
-            if(canFeint && Input.GetKeyDown(KeyCode.E))
+            if (canFeint && Input.GetKeyDown(KeyCode.E))
             {
                 Feint();
             }
-            if(lastDodgeTime + dodgeCD < Time.time && AbleToMove())
+            if (lastDodgeTime + dodgeCD < Time.time && AbleToMove())
             {
                 if (Input.GetKey(KeyCode.A) && Input.GetKeyDown(KeyCode.Space))
                 {
@@ -553,7 +553,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canParry = false;
 
         lastAttack = Time.time;
-        if(stagger)
+        if (stagger)
             animator.SetTrigger("PARRIED");
         else
             animator.SetTrigger("HIT");
@@ -564,10 +564,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             StopCoroutine(heavyAttack);
         if (dodging != null)
             StopCoroutine(dodging);
-        if(currentCollider != null)
+        if (currentCollider != null)
             currentCollider.enabled = false;
 
-        if(currentStun != null)
+        if (currentStun != null)
             StopCoroutine(currentStun);
 
 
@@ -582,7 +582,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         if (isDead)
             return;
 
-        if(canRegenStamina && lastAttack + regenDelay < Time.time)
+        if (canRegenStamina && lastAttack + regenDelay < Time.time)
         {
             RegenStamina(staminaRegenAmount);
         }
@@ -658,7 +658,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         // choose collider to activate
         Collider collider;
         float staminaCost = 0f;
-        switch(direction)
+        switch (direction)
         {
             case MouseController.DirectionalInput.TOP:
                 collider = rHand;
@@ -676,7 +676,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                 collider = rHand;
                 break;
         }
-        
+
         UseStaminaAttack(staminaCost);
         // Schedule hitbox activation and deactivation using animation events
         currentCollider = collider;
@@ -684,7 +684,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             StopCoroutine(lightAttack);
         lightAttack = PerformLightAttack(collider);
         StartCoroutine(lightAttack);
-    } 
+    }
 
     IEnumerator PerformLightAttack(Collider collider)
     {
@@ -897,22 +897,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     }
     public void LockOntoOpponent()
     {
-        if(detectionRadius.opponentsInRange.Count > 0)
+        if (detectionRadius.opponentsInRange.Count > 0)
         {
             CheckWhoCanLock();
         }
 
-        if(!cameraController.currentLock)
+        if (!cameraController.currentLock)
         {
             if (opponentsInFOV.Count > 0 && opponentsInFOV[0])
                 cameraController.currentLock = opponentsInFOV[0].transform;
             else
                 cameraController.orientationInitialFwd = orientation.forward;
-        }        
+        }
     }
     public void CheckWhoCanLock()
     {
-        for(int i = detectionRadius.opponentsInRange.Count - 1; i >= 0; --i)
+        for (int i = detectionRadius.opponentsInRange.Count - 1; i >= 0; --i)
         {
             if (!detectionRadius.opponentsInRange[i])
             {
@@ -931,7 +931,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
             if (IsInCameraFrustum(i))
             {
-                if(!opponentsInFOV.Contains(detectionRadius.opponentsInRange[i]) && !detectionRadius.opponentsInRange[i].GetComponent<PlayerController>().isDead)
+                if (!opponentsInFOV.Contains(detectionRadius.opponentsInRange[i]) && !detectionRadius.opponentsInRange[i].GetComponent<PlayerController>().isDead)
                     opponentsInFOV.Add(detectionRadius.opponentsInRange[i]);
             }
             else
@@ -1057,7 +1057,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     {
         PV.RPC(nameof(RPC_ParryAttackCall), RpcTarget.MasterClient, _isHeavy, playerIDParried);
     }
-    
+
     [PunRPC]
     public void RPC_ParryAttackCall(bool _isHeavy, int _playerIDParried)
     {
@@ -1066,7 +1066,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     }
 
     [PunRPC]
-    public void RPC_ParryAttack(bool _isHeavy) 
+    public void RPC_ParryAttack(bool _isHeavy)
     {
         isParrying = true;
         lastHitTime = Time.time;
@@ -1155,7 +1155,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     public bool CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir, int damage, bool _isHeavy)
     {
-        if (isAttacking)
+        if (isAttacking || isStaggered)
         {
             return false;
         }
