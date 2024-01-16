@@ -69,7 +69,7 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
     public void OnTimerEnds()
     {
         this.isTimerRunning = false;
-        this.enabled = false;
+
        
 
         Debug.Log("Emptying info text.", this.Text);
@@ -79,6 +79,7 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
             OnCountdownTimerHasExpired();
 
         Debug.Log("hit");
+        this.enabled = false;
         gameObject.SetActive(false);
     }
 

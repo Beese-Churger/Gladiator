@@ -277,8 +277,9 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         gameState = GameStates.ROUNDONGOING;
         if (PhotonNetwork.IsMasterClient)
+        {
             RoundTimer.SetStartTime();
-
+        }
         roundTimer.SetActive(true);
         roundTimer.GetComponent<RoundTimer>().Initialize();
     }
