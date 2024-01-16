@@ -32,6 +32,8 @@ public class CameraController : MonoBehaviour
     [SerializeField] GameObject directionalUIprefab;
     public List<GameObject> indicators = new();
 
+    [SerializeField] PhotonTransformView photonTransformView;
+
     bool combatMode = false;
     public bool CombatMode { get { return combatMode; } private set { CombatMode = value; } }
 
@@ -64,7 +66,9 @@ public class CameraController : MonoBehaviour
             return;
 
         if (playerController.isDead)
+        {
             return;
+        }
         
         // switch styles
         if (Input.GetKeyDown(KeyCode.LeftControl))

@@ -145,7 +145,7 @@ public class Launcher : MonoBehaviourPunCallbacks
             else
             { 
                 //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
-                Instantiate(gladItemPrefab, player2pos.position, player2pos.rotation, player1pos.transform).GetComponent<PlayerListItem>().SetUp(players[i]);
+                Instantiate(gladItemPrefab, player2pos.position, player2pos.rotation, player2pos.transform).GetComponent<PlayerListItem>().SetUp(players[i]);
             }
             
         }
@@ -197,12 +197,12 @@ public class Launcher : MonoBehaviourPunCallbacks
         if (newPlayer.IsMasterClient)
         {
             //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
-            Instantiate(gladItemPrefab, player1pos.position, player1pos.rotation).GetComponent<PlayerListItem>().SetUp(newPlayer);
+            Instantiate(gladItemPrefab, player1pos.position, player1pos.rotation, player1pos.transform).GetComponent<PlayerListItem>().SetUp(newPlayer);
         }
         else
         {
             //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
-            Instantiate(gladItemPrefab, player2pos.position, player2pos.rotation).GetComponent<PlayerListItem>().SetUp(newPlayer);
+            Instantiate(gladItemPrefab, player2pos.position, player2pos.rotation, player2pos.transform).GetComponent<PlayerListItem>().SetUp(newPlayer);
         }
         Player[] players = PhotonNetwork.PlayerList;
         if (players.Length >= 2)

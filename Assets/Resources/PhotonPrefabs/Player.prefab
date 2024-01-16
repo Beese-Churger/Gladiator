@@ -4454,6 +4454,7 @@ MonoBehaviour:
   canvas: {fileID: 5635569067236700030}
   directionalUIprefab: {fileID: 2305417588619033860, guid: 7dfb718351f179749945e0eb3ef1186f, type: 3}
   indicators: []
+  photonTransformView: {fileID: 0}
 --- !u!114 &5780464441667626499
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5425,6 +5426,7 @@ GameObject:
   - component: {fileID: 5635569067390719461}
   - component: {fileID: 2705569731626397718}
   - component: {fileID: 6640842779554564579}
+  - component: {fileID: 2958780528100252702}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -5478,6 +5480,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 2705569731626397718}
   - {fileID: 6640842779554564579}
+  - {fileID: 2958780528100252702}
   - {fileID: 784722857282839114}
   sceneViewId: 0
   InstantiationId: 0
@@ -5562,6 +5565,7 @@ MonoBehaviour:
   opponentsInAttackRange: []
   rHand: {fileID: 8427858061803160642}
   lHand: {fileID: 6610068262487649943}
+  isInvincible: 0
   iFrameDuration: 0.2
   lightHitboxActivationTime: 0.3
   lightHitboxDeactivationTime: 0.7
@@ -5718,9 +5722,24 @@ MonoBehaviour:
   - Type: 9
     SynchronizeType: 0
     Name: REVIVE
+  - Type: 9
+    SynchronizeType: 0
+    Name: ENDATTACK
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
+--- !u!114 &2958780528100252702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5635569067390719471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ccbb754800b1f94d8823788e1265c41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5635569067445041444
 GameObject:
   m_ObjectHideFlags: 0
