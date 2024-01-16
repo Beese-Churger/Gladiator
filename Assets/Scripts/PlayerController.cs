@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     float lastHitTime;
     float timeToMove = 0.1f;
 
-    bool isDodging = false;
+    public bool isDodging = false;
     int dodgeDir = 1;
     public bool isInvincible = false;
     public float iFrameDuration = 0.2f;
@@ -697,7 +697,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canRegenStamina = false;
         canParry = false;
         canFeint = false;
-        MoveTowards(5);
+        //MoveTowards(5);
 
         yield return new WaitForSeconds(0.2f); // can parry 300ms before attack, light is 500ms;
 
@@ -775,7 +775,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canRegenStamina = false;
         canFeint = true;
         isHeavy = true;
-        MoveTowards(5);
+        //MoveTowards(5);
 
         yield return new WaitForSeconds(0.4f); // feint 400ms before attack would land
 

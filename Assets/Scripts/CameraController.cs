@@ -13,7 +13,7 @@ public class CameraController : MonoBehaviour
     public Rigidbody rb;
     PlayerController playerController;
     public float rotationSpeed;
-
+    PlayerController enemyController;
     public Transform combatLookAt;
     public Vector3 orientationInitialFwd;
 
@@ -135,7 +135,8 @@ public class CameraController : MonoBehaviour
                     }
                     playerObj.forward = dirToCombatLookAt.normalized;
 
-                    combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(currentLock.position, player.position) * 0.5f, 1), playerObj.rotation);
+                    if(!enemyController.isInvincible)
+                        combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(currentLock.position, player.position) * 0.5f, 1), playerObj.rotation);
                     //combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * (Vector3.Distance(player.transform.position, currentLock.position) / 2), playerObj.rotation);
 
                     playerDirectional.transform.position = Vector2.Lerp(playerDirectional.transform.position, Camera.main.WorldToScreenPoint(player.position), 10 * Time.deltaTime);
@@ -168,6 +169,7 @@ public class CameraController : MonoBehaviour
             currIndex++;
 
         currentLock = playerController.opponentsInFOV[currIndex].transform;
+        enemyController = currentLock.gameObject.GetComponent<PlayerController>();
         UpdateTarget(currentLock.GetComponent<PhotonView>().ViewID);
     }
 

@@ -5588,6 +5588,7 @@ MonoBehaviour:
   playerIDParried: -1
   animator: {fileID: 5635569067390719461}
   anim: {fileID: 0}
+  currentAttack: 
 --- !u!114 &7167737441030003614
 MonoBehaviour:
   m_ObjectHideFlags: 0
