@@ -84,7 +84,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     bool isDodging = false;
     int dodgeDir = 1;
-    bool isInvincible = false;
+    public bool isInvincible = false;
     public float iFrameDuration = 0.2f;
     float lastDodgeTime;
     float dodgeCD = 1.0f;
@@ -803,7 +803,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     bool ShouldInterruptAction()
     {
-        return tookHit && !hasHyperArmor && !isDodging;
+        return tookHit && !hasHyperArmor && !isInvincible;
     }
 
     void Feint()
@@ -843,7 +843,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public void RPC_Dodge(int _dodgeDir)
     {
         isDodging = true;
-        isInvincible = true;
+        isInvincible = false;
 
         switch (_dodgeDir)
         {
@@ -876,10 +876,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     {
         //UpdateAttackIndicator();
         yield return null; // yield 1 frame to ensure animation starts;
-
+        isInvincible = false;
         AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
 
-        yield return new WaitForSeconds(iFrameDuration);
+        yield return new WaitForSeconds(0.166f); // iframe starts at 166ms
+
+        isInvincible = true;
+
+        yield return new WaitForSeconds(0.134f); // iframe ends at 300ms
 
         isInvincible = false;
 

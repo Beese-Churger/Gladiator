@@ -41,7 +41,8 @@ public class Hitbox : MonoBehaviour
                 }
                 else
                 {
-                    target.TakeDamage(10);
+                    if(!target.isInvincible)
+                        target.TakeDamage(10);
                 }
             }
                 
