@@ -383,21 +383,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             InterruptPlayer(0.5f, false);
         }
 
-        if(isBlocking)
-        {
-            ResetTriggers("BLOCK");
-            lastHitTime = Time.time;
+        //if(isBlocking)
+        //{
+        //    ResetTriggers("BLOCK");
+        //    lastHitTime = Time.time;
 
-            if (attackReceivedIsHeavy)
-            {
-                // take reduced damage if isHeavy
-                currentHealth -= 3;
-                UpdateHealthBar();
-            }
-            animator.SetTrigger("BLOCK");
-            isBlocking = false;
-            //StartCoroutine(Blocking());
-        }
+        //    if (attackReceivedIsHeavy)
+        //    {
+        //        // take reduced damage if isHeavy
+        //        currentHealth -= 3;
+        //        UpdateHealthBar();
+        //    }
+        //    animator.SetTrigger("BLOCK");
+        //    isBlocking = false;
+        //    StartCoroutine(Blocking());
+        //}
 
       
 
@@ -604,10 +604,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         switch (dir)
         {
             case 1:
-                rb.AddForce(-orientation.right * 100f, ForceMode.Force);
+                rb.AddForce(-orientation.right * 70f, ForceMode.Force);
                 break;
             case 2:
-                rb.AddForce(orientation.right * 100f, ForceMode.Force);
+                rb.AddForce(orientation.right * 70f, ForceMode.Force);
                 break;
             case 3:
                 rb.AddForce(orientation.forward * 150f, ForceMode.Force);
@@ -1200,8 +1200,37 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     {
         isBlocking = true;
         attackReceivedIsHeavy = _isHeavy;
+
+        ResetTriggers("BLOCK");
+        lastHitTime = Time.time;
+
+        float stunTime;
+        if (attackReceivedIsHeavy)
+        {
+            // take reduced damage if isHeavy
+            currentHealth -= 3;
+            UpdateHealthBar();
+            stunTime = 0.6f;
+        }
+        else
+        {
+            isBlocking = false;
+            stunTime = 0.1f;
+        }
+        animator.SetTrigger("BLOCK");
+
+        StartCoroutine(Blocking(stunTime));
     }
 
+    IEnumerator Blocking(float stunTime)
+    {
+        yield return null;
+
+        yield return new WaitForSeconds(stunTime);
+
+        isBlocking = false;
+        animator.SetTrigger("BLOCKEND");
+    }
     public void TakeDamage(float damage)
     {
         PV.RPC(nameof(RPC_TakeDamageCall), RpcTarget.MasterClient, damage);
@@ -1334,7 +1363,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     {
         foreach (AnimatorControllerParameter parameter in animator.parameters)
         {
-            if (parameter.name == exclude)
+            if (parameter.name == exclude || parameter.name == "CombatStance")
                 continue;
             if (parameter.name == "Yaxis" || parameter.name == "Xaxis")
                 continue;

@@ -128,6 +128,11 @@ public class CameraController : MonoBehaviour
                     Vector3 dirToCombatLookAt = currentLock.position - new Vector3(player.position.x, currentLock.position.y, player.position.z);
                     orientation.forward = dirToCombatLookAt.normalized;
 
+                    if(dirToCombatLookAt.normalized == Vector3.zero)
+                    {
+                        //combatMode = false;
+                        currentLock = combatLookAt;
+                    }
                     playerObj.forward = dirToCombatLookAt.normalized;
 
                     combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(currentLock.position, player.position) * 0.5f, 1), playerObj.rotation);
