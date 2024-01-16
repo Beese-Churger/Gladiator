@@ -43,10 +43,10 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        if (!Instance)
+        //if (!Instance)
             Instance = this;
-        else
-            Destroy(Instance);
+        //else
+        //    Destroy(Instance);
 
         ExitGames.Client.Photon.Hashtable props = new()
         {

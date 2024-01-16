@@ -550,6 +550,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     private void InterruptPlayer(float stunTime, bool stagger)
     {
         isAttacking = false;
+        canParry = false;
+
         lastAttack = Time.time;
         if(stagger)
             animator.SetTrigger("PARRIED");
@@ -567,6 +569,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         if(currentStun != null)
             StopCoroutine(currentStun);
+
 
         currentStun = Stagger(stunTime);
         StartCoroutine(currentStun);
