@@ -680,22 +680,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         // choose collider to activate
         Collider collider;
         float staminaCost = 0f;
+        collider = rHand;
         switch (direction)
         {
             case MouseController.DirectionalInput.TOP:
-                collider = lHand;
                 staminaCost = lightStaminaCost[0];
                 break;
             case MouseController.DirectionalInput.LEFT:
-                collider = lHand;
                 staminaCost = lightStaminaCost[1];
                 break;
             case MouseController.DirectionalInput.RIGHT:
-                collider = rHand;
                 staminaCost = lightStaminaCost[2];
                 break;
             default:
-                collider = rHand;
                 break;
         }
 
@@ -731,11 +728,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         canParry = false;
 
-        yield return new WaitForSeconds(0.1f * m);
+        //yield return new WaitForSeconds(0.1f * m);
 
         collider.enabled = true;
 
-        yield return new WaitForSeconds(0.2f * m);
+        yield return new WaitForSeconds(0.3f * m);
 
         collider.enabled = false;
 
@@ -768,22 +765,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         // choose collider to activate
         Collider collider;
         float staminaCost = 0f;
+
+        collider = rHand;
         switch (direction)
         {
             case MouseController.DirectionalInput.TOP:
-                collider = lHand;
                 staminaCost = lightStaminaCost[0];
                 break;
             case MouseController.DirectionalInput.LEFT:
-                collider = lHand;
                 staminaCost = lightStaminaCost[1];
                 break;
             case MouseController.DirectionalInput.RIGHT:
-                collider = rHand;
                 staminaCost = lightStaminaCost[2];
                 break;
             default:
-                collider = rHand;
                 break;
         }
 
@@ -820,11 +815,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         canParry = false;
 
-        yield return new WaitForSeconds(0.1f * m);
+        //yield return new WaitForSeconds(0.1f * m);
 
         collider.enabled = true;
 
-        yield return new WaitForSeconds(0.1f * m);
+        yield return new WaitForSeconds(0.3f * m);
 
         collider.enabled = false;
 
