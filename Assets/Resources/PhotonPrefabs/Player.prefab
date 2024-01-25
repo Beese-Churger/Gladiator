@@ -5728,6 +5728,12 @@ MonoBehaviour:
   - Type: 9
     SynchronizeType: 0
     Name: BLOCKEND
+  - Type: 9
+    SynchronizeType: 0
+    Name: DODGEFWD
+  - Type: 9
+    SynchronizeType: 0
+    Name: DODGEBWD
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

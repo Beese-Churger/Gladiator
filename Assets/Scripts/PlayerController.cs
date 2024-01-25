@@ -303,11 +303,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             int i = 0;
             foreach (Transform child in canvasHolder)
             {
-                //if (i < 2) // dont destroy scoreboard;
-                //{
-                //    i++;
-                //    continue;
-                //}
                 Destroy(child.gameObject);
             }
         }
@@ -530,11 +525,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         {
 
         }
-        //if(Input.GetKeyDown(KeyCode.K))
-        //{
-        //    currentStamina = 0;
-        //    UpdateStaminaBar();
-        //}
     }
     public void LightStagger()
     {
@@ -887,19 +877,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                 animator.SetTrigger("DODGERIGHT");
                 break;
             case 3:
-                animator.SetTrigger("DODGERIGHT");
+                animator.SetTrigger("DODGEFWD");
                 break;
             case 4:
-                animator.SetTrigger("DODGERIGHT");
+                animator.SetTrigger("DODGEBWD");
                 break;
             default:
                 break;
         }
-
-        //if (dodgeLeft)
-        //    animator.SetTrigger("DODGELEFT");
-        //else
-        //    animator.SetTrigger("DODGERIGHT");
 
         dodging = PerformDodge();
         StartCoroutine(dodging);
