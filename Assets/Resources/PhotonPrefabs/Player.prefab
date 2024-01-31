@@ -4321,7 +4321,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 0.660739, z: -3.7928283}
+  m_FollowOffset: {x: 0, y: 0.1630874, z: -3.2959015}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -4341,7 +4341,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 114.84444
+    Value: -76.00692
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -4442,6 +4442,7 @@ MonoBehaviour:
   playerObj: {fileID: 6756295419733340701}
   rb: {fileID: 5635569067390719470}
   rotationSpeed: 7
+  enemyController: {fileID: 0}
   combatLookAt: {fileID: 5635569067113481856}
   orientationInitialFwd: {x: 0, y: 0, z: 0}
   thirdPersonCam: {fileID: 5635569067871618058}
@@ -4500,7 +4501,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569066303058731}
-  m_LocalRotation: {x: 0.046376944, y: 0.83952975, z: -0.07257961, w: 0.5364431}
+  m_LocalRotation: {x: 0.01947734, y: -0.615521, z: 0.015219264, w: 0.7877328}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4719,8 +4720,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569066544543228}
-  m_LocalRotation: {x: 0.02810344, y: 0.84151274, z: -0.04398169, w: 0.53771013}
-  m_LocalPosition: {x: -3.5713608, y: -2.946926, z: 1.5822523}
+  m_LocalRotation: {x: -0.0134469075, y: -0.6156195, z: -0.010507183, w: 0.7878588}
+  m_LocalPosition: {x: 3.068544, y: -3.4445777, z: -0.8082912}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4872,7 +4873,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 0.660739, z: -3.7928283}
+  m_FollowOffset: {x: 0, y: 0.1630874, z: -3.2959015}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -4892,7 +4893,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 114.84444
+    Value: -76.00692
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -5264,7 +5265,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 0.660739, z: -3.7928283}
+  m_FollowOffset: {x: 0, y: 0.1630874, z: -3.2959015}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -5284,7 +5285,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 114.84444
+    Value: -76.00692
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -5558,6 +5559,7 @@ MonoBehaviour:
   playerCollider: {fileID: 5635569067390719467}
   deathCollider: {fileID: 3108949410095968875}
   detectionRadius: {fileID: 6170855969775771635}
+  attackRadius: {fileID: 3823699320113524234}
   opponentsInFOV: []
   opponentsInAttackRange: []
   rHand: {fileID: 8678441093197246708}
@@ -5793,7 +5795,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569067606744101}
-  m_LocalRotation: {x: 0.0213932, y: 0.8419959, z: -0.03348022, w: 0.5380189}
+  m_LocalRotation: {x: -0.01715718, y: -0.61556315, z: -0.01340633, w: 0.7877867}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5906,7 +5908,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569067871618058}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.5713608, y: -2.946926, z: 1.5822523}
+  m_LocalPosition: {x: 3.068544, y: -3.4445777, z: -0.8082912}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5955,7 +5957,7 @@ MonoBehaviour:
         m_Calls: []
   m_LegacyBlendHint: 0
   m_YAxis:
-    Value: 0.26889488
+    Value: 0.10150809
     m_SpeedMode: 0
     m_MaxSpeed: 2
     m_AccelTime: 0.2
@@ -5979,7 +5981,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 114.84444
+    Value: -76.00692
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -6206,7 +6208,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569068080064178}
-  m_LocalRotation: {x: 0.033867177, y: 0.84099275, z: -0.053001896, w: 0.5373779}
+  m_LocalRotation: {x: 0.0011206953, y: -0.6157085, z: 0.0008756921, w: 0.78797275}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

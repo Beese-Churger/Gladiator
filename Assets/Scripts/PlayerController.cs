@@ -70,6 +70,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     [SerializeField] Collider playerCollider;
     [SerializeField] Collider deathCollider;
     [SerializeField] Detect detectionRadius;
+    [SerializeField] Collider attackRadius;
     public List<GameObject> opponentsInFOV = new();
     public List<PlayerController> opponentsInAttackRange = new();
     [SerializeField] Collider rHand, lHand;
@@ -110,7 +111,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     bool attackReceivedIsHeavy = false;
     bool isExhausted = false;
     Collider currentCollider;
-
+    bool move = false;
     public int playerIDParried = -1;
 
     // to stop coroutines
@@ -563,7 +564,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         animator.speed = 1f;
         isAttacking = false;
         canParry = false;
-
+        move = false;
         lastAttack = Time.time;
         if (stagger)
             animator.SetTrigger("PARRIED");
@@ -607,6 +608,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         {
             MoveTowards(dodgeDir);
         }
+        if(move)
+        {
+            MoveTowardsPoint();
+        }
 
         if (!AbleToMove())
             return;
@@ -636,6 +641,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             default:
                 break;
         }
+    }
+
+    private void MoveTowardsPoint()
+    {
+        Debug.Log(cameraController.enemyController.attackRadius.ClosestPoint(transform.position)  + " " + transform.position);
+        transform.position = Vector3.MoveTowards(transform.position, cameraController.enemyController.attackRadius.ClosestPoint(transform.position), 1f * Time.fixedDeltaTime);
     }
     private void MyInput()
     {
@@ -701,6 +712,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canRegenStamina = false;
         canParry = false;
         canFeint = false;
+        move = true;
+        //if(move)
+        //{
+        //    MoveTowardsPoint();
+        //}
         float m = 1;
         if (isExhausted)
         {
@@ -718,6 +734,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         canParry = false;
 
+        move = false;
         //yield return new WaitForSeconds(0.1f * m);
 
         collider.enabled = true;
@@ -785,7 +802,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canRegenStamina = false;
         canFeint = true;
         isHeavy = true;
-        //MoveTowards(5);
+        move = true;
+
         float m = 1;
         if (isExhausted)
         {
@@ -804,8 +822,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         yield return new WaitForSeconds(0.2f * m); // parry ends 100ms before attack lands lasts 200ms
 
         canParry = false;
-
-        //yield return new WaitForSeconds(0.1f * m);
+        move = false;
+        yield return new WaitForSeconds(0.1f * m);
 
         collider.enabled = true;
 

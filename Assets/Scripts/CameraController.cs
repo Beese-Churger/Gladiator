@@ -13,7 +13,7 @@ public class CameraController : MonoBehaviour
     public Rigidbody rb;
     PlayerController playerController;
     public float rotationSpeed;
-    PlayerController enemyController;
+    public PlayerController enemyController;
     public Transform combatLookAt;
     public Vector3 orientationInitialFwd;
 
