@@ -50,7 +50,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     CameraController cameraController;
     MouseController mouseController;
     public MouseController.DirectionalInput currDir;
-
+    [SerializeField] GameObject grayscale;
     [Header("Ground Check")]
     public float playerHeight;
     public LayerMask whatIsGround;
@@ -89,8 +89,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public float heavyHitboxActivationTime = 0.8f;
     public float heavyHitboxDeactivationTime = 0.9f;
 
-    public List<float> lightStaminaCost = new() { 8f, 6f, 6f };
-    public List<float> heavyStaminaCost = new() { 18f, 12f, 12f };
+    public List<float> lightStaminaCost = new() { 10f, 8f, 8f };
+    public List<float> heavyStaminaCost = new() { 22f, 16f, 16f };
     public bool isAttacking = false;
     public bool isHeavy = false;
     float lastAttack;
@@ -301,7 +301,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             {
                 Destroy(child.gameObject);
             }
-            int i = 0;
             foreach (Transform child in canvasHolder)
             {
                 Destroy(child.gameObject);
@@ -324,7 +323,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         rb.freezeRotation = true;
         readyToJump = true;
         moveSpeed = freeSpeed;
-
+        grayscale.SetActive(false);
         playerCollider.enabled = true;
         deathCollider.enabled = false;
 
@@ -392,8 +391,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         if(isExhausted)
         {
+            if (PV.IsMine && !grayscale.activeInHierarchy)
+                grayscale.SetActive(true);
             if (currentStamina >= maxStamina)
+            {
                 isExhausted = false;
+                if(PV.IsMine)
+                    grayscale.SetActive(false);
+            }
         }
         //if(isBlocking)
         //{
@@ -607,10 +612,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         if (isDodging)
         {
             MoveTowards(dodgeDir);
+            MoveTowardsPoint(1.5f);
         }
         if(move)
         {
-            MoveTowardsPoint();
+            float dir = 1.3f;
+            if (isHeavy)
+                dir = 1.5f;
+            MoveTowardsPoint(dir);
         }
 
         if (!AbleToMove())
@@ -630,23 +639,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                 rb.AddForce(orientation.right * 70f, ForceMode.Force);
                 break;
             case 3:
-                rb.AddForce(orientation.forward * 150f, ForceMode.Force);
+                rb.AddForce(orientation.forward * 70f, ForceMode.Force);
                 break;
             case 4:
-                rb.AddForce(-orientation.forward * 40f, ForceMode.Force);
-                break;
-            case 5:
-                rb.AddForce(orientation.forward * 80f, ForceMode.Force);
+                rb.AddForce(-orientation.forward * 50f, ForceMode.Force);
                 break;
             default:
                 break;
         }
     }
 
-    private void MoveTowardsPoint()
+    private void MoveTowardsPoint(float dist)
     {
-        Debug.Log(cameraController.enemyController.attackRadius.ClosestPoint(transform.position)  + " " + transform.position);
-        transform.position = Vector3.MoveTowards(transform.position, cameraController.enemyController.attackRadius.ClosestPoint(transform.position), 1f * Time.fixedDeltaTime);
+        //transform.position = Vector3.MoveTowards(transform.position, cameraController.enemyController.attackRadius.ClosestPoint(transform.position), 1f * Time.fixedDeltaTime);
+        Vector3 direction = transform.position - cameraController.enemyController.transform.position;
+        transform.position = Vector3.MoveTowards(transform.position, cameraController.enemyController.transform.position + (direction.normalized * dist), 1f * Time.fixedDeltaTime);
     }
     private void MyInput()
     {
@@ -713,18 +720,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canParry = false;
         canFeint = false;
         move = true;
-        //if(move)
-        //{
-        //    MoveTowardsPoint();
-        //}
+
         float m = 1;
         if (isExhausted)
         {
             animator.speed = 0.5f;
             m = 2f;
         }
-
-        //MoveTowards(5);
 
         yield return new WaitForSeconds(0.2f * m); // can parry 300ms before attack, light is 500ms;
 
@@ -777,13 +779,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         switch (direction)
         {
             case MouseController.DirectionalInput.TOP:
-                staminaCost = lightStaminaCost[0];
+                staminaCost = heavyStaminaCost[0];
                 break;
             case MouseController.DirectionalInput.LEFT:
-                staminaCost = lightStaminaCost[1];
+                staminaCost = heavyStaminaCost[1];
                 break;
             case MouseController.DirectionalInput.RIGHT:
-                staminaCost = lightStaminaCost[2];
+                staminaCost = heavyStaminaCost[2];
                 break;
             default:
                 break;
@@ -864,6 +866,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         isAttacking = false;
         lastAttack = Time.time;
         canFeint = false;
+        if (heavyAttack != null)
+            StopCoroutine(heavyAttack);
+        if (currentCollider != null)
+            currentCollider.enabled = false;
         animator.SetTrigger("FEINT");
         canRegenStamina = true;
     }
