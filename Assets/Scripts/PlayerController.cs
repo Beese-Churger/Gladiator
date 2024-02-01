@@ -76,6 +76,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     [SerializeField] Collider rHand, lHand;
     float lastHitTime;
     float timeToMove = 0.1f;
+    [SerializeField] GameObject attackTrail;
 
     public bool isDodging = false;
     int dodgeDir = 1;
@@ -324,6 +325,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         readyToJump = true;
         moveSpeed = freeSpeed;
         grayscale.SetActive(false);
+        attackTrail.SetActive(false);
         playerCollider.enabled = true;
         deathCollider.enabled = false;
 
@@ -587,7 +589,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         if (currentStun != null)
             StopCoroutine(currentStun);
-
+        attackTrail.SetActive(false);
 
         currentStun = Stagger(stunTime);
         StartCoroutine(currentStun);
@@ -720,6 +722,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canParry = false;
         canFeint = false;
         move = true;
+        attackTrail.SetActive(true);
 
         float m = 1;
         if (isExhausted)
@@ -744,7 +747,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         yield return new WaitForSeconds(0.3f * m);
 
         collider.enabled = false;
-
+        attackTrail.SetActive(false);
         yield return new WaitForSeconds(0.1f * m);
 
         isAttacking = false;
@@ -805,7 +808,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canFeint = true;
         isHeavy = true;
         move = true;
-
+        attackTrail.SetActive(true);
         float m = 1;
         if (isExhausted)
         {
@@ -832,6 +835,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         yield return new WaitForSeconds(0.3f * m);
 
         collider.enabled = false;
+        attackTrail.SetActive(false);
 
         yield return new WaitForSeconds(0.3f);
 
@@ -1304,6 +1308,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         if (currentHealth <= 0)
         {
+            if (PV.IsMine)
+                grayscale.SetActive(false);
             ResetTriggers(null);
             Die();
             animator.SetTrigger("DEATH");
@@ -1384,6 +1390,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public void RPC_Respawn()
     {
         //ResetTriggers();
+        if (PV.IsMine)
+            grayscale.SetActive(false);
+
         isDead = false;
         playerCollider.enabled = true;
         deathCollider.enabled = false;
@@ -1403,6 +1412,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         Transform point = playerManager.RespawnPoint();
 
         transform.SetPositionAndRotation(point.position, point.rotation);
+        attackTrail.SetActive(false);
         //cameraController.FreeLookCam();
         ChangeSpeed();
     }
