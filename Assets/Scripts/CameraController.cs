@@ -136,7 +136,7 @@ public class CameraController : MonoBehaviour
                     playerObj.forward = dirToCombatLookAt.normalized;
 
          
-                    if(enemyController && !enemyController.isInvincible)
+                    if(!playerController.isAttacking && enemyController && !enemyController.isInvincible)
                         combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(currentLock.position, player.position) * 0.5f, 1), playerObj.rotation);
                     //combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * (Vector3.Distance(player.transform.position, currentLock.position) / 2), playerObj.rotation);
 

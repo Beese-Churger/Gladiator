@@ -418,6 +418,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         //    StartCoroutine(Blocking());
         //}
 
+        // pressing esc toggles between hide/show
 
 
         // ground check
@@ -429,15 +430,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         else
             rb.drag = 0;
 
-        if (!PV.IsMine)
-            return;
-
-        // pressing esc toggles between hide/show
         if (GameManager.Instance.gameState == GameManager.GameStates.POSTGAME)
         {
             lockCursor = false;
+            Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !lockCursor;
         }
-        else if (Input.GetKeyDown(KeyCode.Escape) && GameManager.Instance.gameState != GameManager.GameStates.POSTGAME)
+
+        if (!PV.IsMine)
+            return;
+
+        if (GameManager.Instance.gameState != GameManager.GameStates.POSTGAME && Input.GetKeyDown(KeyCode.Escape))
         {
             lockCursor = !lockCursor;
         }
@@ -1421,8 +1424,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     {
         foreach (AnimatorControllerParameter parameter in animator.parameters)
         {
-            if (parameter.name == exclude || parameter.name == "CombatStance")
-                continue;
+            if(exclude != null)
+                if (parameter.name == exclude || parameter.name == "CombatStance")
+                    continue;
             if (parameter.name == "Yaxis" || parameter.name == "Xaxis")
                 continue;
             animator.ResetTrigger(parameter.name);
