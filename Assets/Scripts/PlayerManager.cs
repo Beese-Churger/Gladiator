@@ -40,7 +40,9 @@ public class PlayerManager : MonoBehaviour
         PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
 
         Transform spawnPoint = SpawnManager.Instance.GetSpawnPoint(team);
+
         controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"), spawnPoint.position, spawnPoint.rotation);
+       
     }
 
     public Transform RespawnPoint()

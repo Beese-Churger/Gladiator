@@ -197,7 +197,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Spear_Dodge_Fwd
-  m_Speed: 1
+  m_Speed: 1.3
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 5540821171308666407}
@@ -237,7 +237,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400040, guid: 963c602205c554940aa8cac531de90a5, type: 3}
+  m_Motion: {fileID: 1827226128182048838, guid: 172113928f75d4f4a8928581fcf29f33, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -405,7 +405,7 @@ AnimatorStateTransition:
   serializedVersion: 3
   m_TransitionDuration: 0.25
   m_TransitionOffset: 0
-  m_ExitTime: 0.5
+  m_ExitTime: 0.3
   m_HasExitTime: 1
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
@@ -906,7 +906,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Spear_Dodge_Back
-  m_Speed: 1
+  m_Speed: 1.3
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 58054058365029226}
@@ -931,7 +931,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: LowPolyHumanAnimator
+  m_Name: SwordAnimator
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: CombatStance
@@ -1095,7 +1095,7 @@ AnimatorStateTransition:
   serializedVersion: 3
   m_TransitionDuration: 0.25
   m_TransitionOffset: 0
-  m_ExitTime: 0.84042555
+  m_ExitTime: 0.3
   m_HasExitTime: 1
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
@@ -1142,7 +1142,7 @@ AnimatorStateTransition:
   serializedVersion: 3
   m_TransitionDuration: 0.25
   m_TransitionOffset: 0
-  m_ExitTime: 0.5
+  m_ExitTime: 0.3
   m_HasExitTime: 1
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
@@ -1169,7 +1169,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400042, guid: 963c602205c554940aa8cac531de90a5, type: 3}
+  m_Motion: {fileID: 1827226128182048838, guid: 6a317b388658f81408b11b9f07b421fd, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -1397,7 +1397,7 @@ BlendTree:
   m_Name: Movement
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: 7400018, guid: 011550b5296808442b9bb63523958e74, type: 3}
+    m_Motion: {fileID: 1827226128182048838, guid: 4f9c3d4d2b5e36548b86ba7c6427eaeb, type: 3}
     m_Threshold: 0
     m_Position: {x: 0, y: 1}
     m_TimeScale: 1
@@ -1405,7 +1405,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400042, guid: 011550b5296808442b9bb63523958e74, type: 3}
+    m_Motion: {fileID: 1827226128182048838, guid: e6e7d922e181d4748b50299c51a4b8a7, type: 3}
     m_Threshold: 0.128
     m_Position: {x: 1, y: 0}
     m_TimeScale: 1
@@ -1413,7 +1413,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400026, guid: 011550b5296808442b9bb63523958e74, type: 3}
+    m_Motion: {fileID: 1827226128182048838, guid: aec53cc373b1c6c43b2c02fa4d935a6b, type: 3}
     m_Threshold: 0.256
     m_Position: {x: 0, y: -1}
     m_TimeScale: 1
@@ -1421,7 +1421,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400034, guid: 011550b5296808442b9bb63523958e74, type: 3}
+    m_Motion: {fileID: 1827226128182048838, guid: 4fe82853024913d449dc5807d146fb30, type: 3}
     m_Threshold: 0.384
     m_Position: {x: -1, y: 0}
     m_TimeScale: 1
@@ -1429,7 +1429,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400002, guid: 011550b5296808442b9bb63523958e74, type: 3}
+    m_Motion: {fileID: 1827226128182048838, guid: afca1c0e136a6d740aeb76d0ee333fc4, type: 3}
     m_Threshold: 0.512
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
@@ -1465,7 +1465,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400060, guid: 963c602205c554940aa8cac531de90a5, type: 3}
+  m_Motion: {fileID: 1827226128182048838, guid: f4335f19d14ba48479cc081f9c36ae42, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -1560,7 +1560,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: DodgeLeft
-  m_Speed: 1
+  m_Speed: 1.3
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -4000964579767143240}
@@ -1595,7 +1595,7 @@ AnimatorStateTransition:
   serializedVersion: 3
   m_TransitionDuration: 0.25
   m_TransitionOffset: 0
-  m_ExitTime: 0.8333334
+  m_ExitTime: 0.3
   m_HasExitTime: 1
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
@@ -1760,7 +1760,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400074, guid: 963c602205c554940aa8cac531de90a5, type: 3}
+  m_Motion: {fileID: 1827226128182048838, guid: 7f6899f6134cd894682e4202098f7da2, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -1821,7 +1821,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: DodgeRight
-  m_Speed: 1
+  m_Speed: 1.3
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 251236395286193421}

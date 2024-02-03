@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         SHORTSWORD
     }
 
+    public Weapon weapon;
+
     //public static PlayerController instance;
     [SerializeField] PlayerManager playerManager;
     [SerializeField] GameManager gameManager;
@@ -151,7 +153,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     PhotonView PV;
     Player player;
     public Animator animator;
-    public Animation anim;
 
     public Dictionary<string, int> attackDictionary = new Dictionary<string, int>
     {
@@ -335,14 +336,48 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         playerCollider.enabled = true;
         deathCollider.enabled = false;
 
+        weapon = Weapon.TRIDENT;
         currentHealth = maxHealth;
         currentStamina = maxStamina;
         currDir = MouseController.DirectionalInput.TOP;
         lastAttack = Time.time;
         lastDodgeTime = Time.time;
         lastHitTime = Time.time;
+
+        SetWeapon();
     }
 
+    public void SetWeapon()
+    {
+        int weaponid = 0;
+        foreach (Player p in PhotonNetwork.PlayerList)
+        {
+            object playerWeapon;
+
+            if (p.CustomProperties.TryGetValue(GladiatorInfo.PLAYER_WEAPON, out playerWeapon))
+            {
+                if (p.ActorNumber == PV.ControllerActorNr)
+                {
+                    weaponid = int.Parse(playerWeapon.ToString());
+                }
+            }
+        }
+
+        ControllerHolder controllers = GetComponent<ControllerHolder>();
+        switch (weaponid)
+        {
+            case 0:
+                weapon = Weapon.TRIDENT;
+                break;
+            case 1:
+                weapon = Weapon.SHORTSWORD;
+                break;
+            default:
+                break;
+        }
+        animator.runtimeAnimatorController = controllers.animators[weaponid];
+
+    }
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
         if (changedProps.ContainsKey("team") && targetPlayer == PV.Owner)
