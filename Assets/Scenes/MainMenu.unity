@@ -3944,6 +3944,9 @@ MonoBehaviour:
   player1pos: {fileID: 1975722703}
   player2pos: {fileID: 1813448776}
   gladItemPrefab: {fileID: 4611293268207407746, guid: a7fb5bc0e4bfe8f4cad7eefa7b094c9b, type: 3}
+  team1: {fileID: 1875578517}
+  team2: {fileID: 1667129289}
+  weaponSelectPrefab: {fileID: 4066285103423822332, guid: 1ff294ee0104f1440bcb58e6425f0431, type: 3}
 --- !u!114 &995793082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4433,7 +4436,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000061035, y: -434}
+  m_AnchoredPosition: {x: 3.638e-12, y: -421.22}
   m_SizeDelta: {x: 400, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1132228403
@@ -4505,7 +4508,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6886792, g: 0.02516134, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

@@ -7,6 +7,12 @@ using Photon.Realtime;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunObservable*/
 {
+    public enum Weapon
+    {
+        TRIDENT,
+        SHORTSWORD
+    }
+
     //public static PlayerController instance;
     [SerializeField] PlayerManager playerManager;
     [SerializeField] GameManager gameManager;

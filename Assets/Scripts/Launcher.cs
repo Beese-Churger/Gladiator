@@ -36,8 +36,9 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] Transform player1pos;
     [SerializeField] Transform player2pos;
     [SerializeField] GameObject gladItemPrefab;
-    //[SerializeField] Transform p1, p2;
-    
+    [SerializeField] Transform team1, team2;
+    [SerializeField] GameObject weaponSelectPrefab;
+
     private void Awake()
     {
         if (!instance)
@@ -141,11 +142,13 @@ public class Launcher : MonoBehaviourPunCallbacks
             {
                 //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
                 Instantiate(gladItemPrefab, player1pos.position, player1pos.rotation, player1pos.transform).GetComponent<PlayerListItem>().SetUp(players[i]);
+                Instantiate(weaponSelectPrefab, team1).GetComponent<ItemCycle>().SetUp(players[i]);
             }
             else
             { 
                 //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
                 Instantiate(gladItemPrefab, player2pos.position, player2pos.rotation, player2pos.transform).GetComponent<PlayerListItem>().SetUp(players[i]);
+                Instantiate(weaponSelectPrefab, team2).GetComponent<ItemCycle>().SetUp(players[i]);
             }
             
         }
@@ -172,6 +175,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     public override void OnLeftRoom()
     {
         Debug.Log("left");
+
         MenuManager.instance.OpenMenu("title");
     }
 
@@ -198,11 +202,13 @@ public class Launcher : MonoBehaviourPunCallbacks
         {
             //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
             Instantiate(gladItemPrefab, player1pos.position, player1pos.rotation, player1pos.transform).GetComponent<PlayerListItem>().SetUp(newPlayer);
+            Instantiate(weaponSelectPrefab, team1).GetComponent<ItemCycle>().SetUp(newPlayer);
         }
         else
         {
             //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
             Instantiate(gladItemPrefab, player2pos.position, player2pos.rotation, player2pos.transform).GetComponent<PlayerListItem>().SetUp(newPlayer);
+            Instantiate(weaponSelectPrefab, team2).GetComponent<ItemCycle>().SetUp(newPlayer);
         }
         Player[] players = PhotonNetwork.PlayerList;
         if (players.Length >= 2)

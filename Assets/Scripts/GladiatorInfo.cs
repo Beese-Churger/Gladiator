@@ -6,7 +6,7 @@ public class GladiatorInfo : MonoBehaviour
 {
     //lobby
     public const string PLAYER_READY = "IsPlayerReady";
-    public const string PLAYER_CHARACTER = "PlayerCharacter";
+    public const string PLAYER_WEAPON = "PlayerWeapon";
     public const string PLAYER_TEAM = "PlayerTeam";
 
     //inGame
