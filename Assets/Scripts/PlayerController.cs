@@ -75,12 +75,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     Vector2 speedPercent;
 
     [Header("CombatStuff")]
+    public List<GameObject> Weapons = new();
     [SerializeField] Collider playerCollider;
     [SerializeField] Collider deathCollider;
     [SerializeField] Detect detectionRadius;
     [SerializeField] Collider attackRadius;
     public List<GameObject> opponentsInFOV = new();
     public List<PlayerController> opponentsInAttackRange = new();
+    
     [SerializeField] Collider rHand, lHand;
     float lastHitTime;
     float timeToMove = 0.1f;
@@ -122,6 +124,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     Collider currentCollider;
     bool move = false;
     public int playerIDParried = -1;
+    bool performFeint;
 
     // to stop coroutines
     IEnumerator lightAttack;
@@ -163,6 +166,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         { "HEAVYRIGHT", 23 },
         { "HEAVYTOP", 30 }
     };
+
 
     public string currentAttack;
     //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -335,6 +339,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         attackTrail.SetActive(false);
         playerCollider.enabled = true;
         deathCollider.enabled = false;
+        performFeint = false;
 
         weapon = Weapon.TRIDENT;
         currentHealth = maxHealth;
@@ -350,6 +355,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public void SetWeapon()
     {
         int weaponid = 0;
+        foreach(GameObject weapons in Weapons)
+        {
+            weapons.SetActive(false);
+        }
         foreach (Player p in PhotonNetwork.PlayerList)
         {
             object playerWeapon;
@@ -375,6 +384,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             default:
                 break;
         }
+        Weapons[weaponid].SetActive(true);
+        rHand = Weapons[weaponid].GetComponent<Collider>();
         animator.runtimeAnimatorController = controllers.animators[weaponid];
 
     }
@@ -549,7 +560,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                     HeavyAttack();
             }
 
-            if (canFeint && Input.GetKeyDown(KeyCode.E))
+            if (canFeint && Input.GetKeyDown(KeyCode.E) && !isExhausted)
             {
                 Feint();
             }
@@ -616,6 +627,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         isAttacking = false;
         canParry = false;
         move = false;
+        performFeint = false;
+
         lastAttack = Time.time;
         if (stagger)
             animator.SetTrigger("PARRIED");
@@ -658,13 +671,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         if (isDodging)
         {
             MoveTowards(dodgeDir);
-            MoveTowardsPoint(1.5f);
+            if(dodgeDir != 4)
+                MoveTowardsPoint(1.5f);
         }
         if(move)
         {
             float dir = 1.3f;
             if (isHeavy)
                 dir = 1.5f;
+
+            if (weapon == Weapon.SHORTSWORD)
+                dir = 1;
             MoveTowardsPoint(dir);
         }
 
@@ -679,16 +696,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         switch (dir)
         {
             case 1:
-                rb.AddForce(-orientation.right * 70f, ForceMode.Force);
+                rb.AddForce(-orientation.right * 150f, ForceMode.Force);
                 break;
             case 2:
-                rb.AddForce(orientation.right * 70f, ForceMode.Force);
+                rb.AddForce(orientation.right * 150f, ForceMode.Force);
                 break;
             case 3:
-                rb.AddForce(orientation.forward * 70f, ForceMode.Force);
+                rb.AddForce(orientation.forward * 150f, ForceMode.Force);
                 break;
             case 4:
-                rb.AddForce(-orientation.forward * 50f, ForceMode.Force);
+                rb.AddForce(-orientation.forward * 70f, ForceMode.Force);
                 break;
             default:
                 break;
@@ -765,6 +782,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canRegenStamina = false;
         canParry = false;
         canFeint = false;
+        performFeint = false;
         move = true;
         attackTrail.SetActive(true);
 
@@ -773,6 +791,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         {
             animator.speed = 0.5f;
             m = 2f;
+        }
+        else
+        {
+            animator.speed = 1;
         }
 
         yield return new WaitForSeconds(0.2f * m); // can parry 300ms before attack, light is 500ms;
@@ -853,16 +875,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         isHeavy = true;
         move = true;
         attackTrail.SetActive(true);
+        performFeint = false;
         float m = 1;
         if (isExhausted)
         {
             animator.speed = 0.5f;
             m = 2f;
         }
+        else
+        {
+            animator.speed = 1;
+        }
 
         yield return new WaitForSeconds(0.4f * m); // feint 400ms before attack would land
 
         canFeint = false;
+        if (performFeint)
+            PerformFeint();
 
         yield return new WaitForSeconds(0.1f * m); // parry starts 300ms before attack lands
 
@@ -911,15 +940,24 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     [PunRPC]
     public void RPC_Feint()
     {
+        performFeint = true;
+    }
+
+    public void PerformFeint()
+    {
         isAttacking = false;
         lastAttack = Time.time;
         canFeint = false;
+        performFeint = false;
+        isHeavy = false;
+        move = false;
         if (heavyAttack != null)
             StopCoroutine(heavyAttack);
         if (currentCollider != null)
             currentCollider.enabled = false;
         animator.SetTrigger("FEINT");
         canRegenStamina = true;
+        attackTrail.SetActive(false);
     }
 
     public void Dodge(int _dodgeDir)
@@ -977,7 +1015,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         isInvincible = false;
 
-        yield return new WaitForSeconds(stateInfo.length * 0.5f);
+        yield return new WaitForSeconds(0.2f);
 
         isDodging = false;
         lastDodgeTime = Time.time;

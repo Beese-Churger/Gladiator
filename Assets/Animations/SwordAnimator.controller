@@ -224,7 +224,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: LightLeft
-  m_Speed: 0.7
+  m_Speed: 0.9
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 9186299594862054900}
@@ -473,7 +473,7 @@ BlendTree:
   m_Name: Movement
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: 7400058, guid: 011550b5296808442b9bb63523958e74, type: 3}
+    m_Motion: {fileID: 1827226128182048838, guid: 860f67949dcfe1a4ea03c3c8ab073c16, type: 3}
     m_Threshold: 0
     m_Position: {x: 0, y: 1}
     m_TimeScale: 1
@@ -505,7 +505,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400002, guid: 011550b5296808442b9bb63523958e74, type: 3}
+    m_Motion: {fileID: 1827226128182048838, guid: afca1c0e136a6d740aeb76d0ee333fc4, type: 3}
     m_Threshold: 0.64000005
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
@@ -1156,7 +1156,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: LightRight
-  m_Speed: 0.7
+  m_Speed: 0.9
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -2952224142166383277}
@@ -1451,7 +1451,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: HeavyLeft
-  m_Speed: 0.65
+  m_Speed: 0.5
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -6241014217033987680}
@@ -1732,7 +1732,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400038, guid: 53b1914c23d3e11498ab4125bfaa431c, type: 3}
+  m_Motion: {fileID: 1827226128182048838, guid: dae89d1b62ca2874682f877f8a48504d, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -1746,7 +1746,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: HeavyRight
-  m_Speed: 0.5
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -185720095063770861}

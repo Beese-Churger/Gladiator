@@ -126,7 +126,9 @@ public class CameraController : MonoBehaviour
                     }
 
                     Vector3 dirToCombatLookAt = currentLock.position - new Vector3(player.position.x, currentLock.position.y, player.position.z);
-                    orientation.forward = dirToCombatLookAt.normalized;
+
+                    if (!playerController.isAttacking)
+                        orientation.forward = dirToCombatLookAt.normalized;
 
                     if(dirToCombatLookAt.normalized == Vector3.zero)
                     {
@@ -136,8 +138,8 @@ public class CameraController : MonoBehaviour
                     playerObj.forward = dirToCombatLookAt.normalized;
 
          
-                    if(!playerController.isAttacking && enemyController && !enemyController.isInvincible)
-                        combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(currentLock.position, player.position) * 0.5f, 1), playerObj.rotation);
+                    
+                    combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * Mathf.Min(Vector3.Distance(currentLock.position, player.position) * 0.5f, 1), playerObj.rotation);
                     //combatLookAt.SetPositionAndRotation(player.transform.position + dirToCombatLookAt.normalized * (Vector3.Distance(player.transform.position, currentLock.position) / 2), playerObj.rotation);
 
                     playerDirectional.transform.position = Vector2.Lerp(playerDirectional.transform.position, Camera.main.WorldToScreenPoint(player.position), 10 * Time.deltaTime);
