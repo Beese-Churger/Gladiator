@@ -75,6 +75,12 @@ MonoBehaviour:
   - RPC_Surrender
   - LightStaggerCall
   - RPC_LightStagger
+  - RPC_Mixup
+  - RPC_MixupCall
+  - RPC_Chase
+  - RPC_ChaseCall
+  - RPC_DodgeAttack
+  - RPC_DodgeAttackCall
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

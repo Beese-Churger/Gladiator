@@ -126,6 +126,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public int playerIDParried = -1;
     bool performFeint;
     bool mixup;
+    bool chase;
     // to stop coroutines
     IEnumerator lightAttack;
     IEnumerator heavyAttack;
@@ -341,6 +342,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         deathCollider.enabled = false;
         performFeint = false;
         mixup = false;
+        chase = false;
 
         weapon = Weapon.TRIDENT;
         currentHealth = maxHealth;
@@ -455,24 +457,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                     grayscale.SetActive(false);
             }
         }
-        //if(isBlocking)
-        //{
-        //    ResetTriggers("BLOCK");
-        //    lastHitTime = Time.time;
-
-        //    if (attackReceivedIsHeavy)
-        //    {
-        //        // take reduced damage if isHeavy
-        //        currentHealth -= 3;
-        //        UpdateHealthBar();
-        //    }
-        //    animator.SetTrigger("BLOCK");
-        //    isBlocking = false;
-        //    StartCoroutine(Blocking());
-        //}
-
-        // pressing esc toggles between hide/show
-
 
         // ground check
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
@@ -559,10 +543,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             {
                 if (Input.GetKeyDown(KeyCode.E))
                     Feint();
-                if (Input.GetMouseButtonDown(0))
+                if (weapon == Weapon.TRIDENT && currDir == MouseController.DirectionalInput.RIGHT && Input.GetMouseButtonDown(0))
                     Mixup();
             }
-            
+            if(isDodging)
+            {
+                if (Input.GetMouseButtonDown(0))
+                    Chase();
+            }
             if (lastDodgeTime + dodgeCD < Time.time && AbleToMove())
             {
                 if (Input.GetKey(KeyCode.A) && Input.GetKeyDown(KeyCode.Space))
@@ -628,6 +616,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         move = false;
         performFeint = false;
         mixup = false;
+        chase = false;
 
         lastAttack = Time.time;
         if (stagger)
@@ -990,6 +979,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         mixup = true;
     }
 
+    void Chase()
+    {
+        PV.RPC(nameof(RPC_ChaseCall), RpcTarget.MasterClient);
+    }
+
+    [PunRPC]
+    public void RPC_ChaseCall()
+    {
+        PV.RPC(nameof(RPC_Chase), RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void RPC_Chase()
+    {
+        chase = true;
+    }
+
     public void Dodge(int _dodgeDir)
     {
         dodgeDir = _dodgeDir;
@@ -1045,12 +1051,44 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         isInvincible = false;
 
+        if(chase && dodgeDir == 3)
+        {
+            PV.RPC(nameof(RPC_DodgeAttackCall), RpcTarget.MasterClient);
+        }
         yield return new WaitForSeconds(0.1f);
 
         isDodging = false;
         lastDodgeTime = Time.time;
 
         dodging = null;
+    }
+
+    [PunRPC]
+    public void RPC_DodgeAttackCall()
+    {
+        PV.RPC(nameof(RPC_DodgeAttack), RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void RPC_DodgeAttack()
+    {
+        isAttacking = true;
+        canParry = false;
+        animator.SetTrigger("CHASE");
+        mouseController.SetInputDirection(MouseController.DirectionalInput.TOP);
+        currentAttack = "LIGHTTOP";
+        currDir = MouseController.DirectionalInput.TOP;
+
+        float staminaCost = 10f;
+
+        UseStaminaAttack(staminaCost);
+
+        currentCollider = rHand;
+        if (lightAttack != null)
+            StopCoroutine(lightAttack);
+        lightAttack = PerformLightAttack(currentCollider);
+        StartCoroutine(lightAttack);
+        chase = false;
     }
     public void LockOntoOpponent()
     {
@@ -1499,6 +1537,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         isDead = false;
         playerCollider.enabled = true;
         deathCollider.enabled = false;
+        performFeint = false;
+        mixup = false;
+        chase = false;
 
         currentHealth = maxHealth;
         currentStamina = maxStamina;
