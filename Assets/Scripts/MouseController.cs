@@ -160,6 +160,20 @@ public class MouseController : MonoBehaviourPunCallbacks
         return inputDirection;
     }
 
+    public void SetInputDirection(DirectionalInput input)
+    {
+        inputDirection = input;
+        switch (input)
+        {
+            case DirectionalInput.TOP:
+                Top();
+                break;
+            default:
+                break;
+        }
+
+        //PV.RPC(nameof(RPC_UpdateIndicatorDirection), RpcTarget.All, inputDirection);
+    }
     public void UpdateDirection()
     {
 
@@ -172,5 +186,14 @@ public class MouseController : MonoBehaviourPunCallbacks
     {
          //Debug.Log($"Player {photonView.Owner.NickName} took {input}");
          playerController.SetDir(input);
+    }
+
+    void Top()
+    {
+        if (!PV.IsMine)
+            return;
+        directions[0].SetActive(true);
+        directions[1].SetActive(false);
+        directions[2].SetActive(false);
     }
 }

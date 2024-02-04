@@ -125,7 +125,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     bool move = false;
     public int playerIDParried = -1;
     bool performFeint;
-
+    bool mixup;
     // to stop coroutines
     IEnumerator lightAttack;
     IEnumerator heavyAttack;
@@ -340,6 +340,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         playerCollider.enabled = true;
         deathCollider.enabled = false;
         performFeint = false;
+        mixup = false;
 
         weapon = Weapon.TRIDENT;
         currentHealth = maxHealth;
@@ -520,17 +521,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             rb.isKinematic = true;
         }
 
-
         CheckWhoCanLock();
-
-        UpdateUI();
 
         SpeedControl();
 
         ClampPositionToArenaBounds();
-
-
-
 
         if (cameraController.CombatMode)
         {
@@ -560,10 +555,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                     HeavyAttack();
             }
 
-            if (canFeint && Input.GetKeyDown(KeyCode.E) && !isExhausted)
+            if (canFeint && !isExhausted)
             {
-                Feint();
+                if (Input.GetKeyDown(KeyCode.E))
+                    Feint();
+                if (Input.GetMouseButtonDown(0))
+                    Mixup();
             }
+            
             if (lastDodgeTime + dodgeCD < Time.time && AbleToMove())
             {
                 if (Input.GetKey(KeyCode.A) && Input.GetKeyDown(KeyCode.Space))
@@ -628,6 +627,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canParry = false;
         move = false;
         performFeint = false;
+        mixup = false;
 
         lastAttack = Time.time;
         if (stagger)
@@ -705,7 +705,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                 rb.AddForce(orientation.forward * 150f, ForceMode.Force);
                 break;
             case 4:
-                rb.AddForce(-orientation.forward * 70f, ForceMode.Force);
+                rb.AddForce(-orientation.forward * 100f, ForceMode.Force);
                 break;
             default:
                 break;
@@ -784,6 +784,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canFeint = false;
         performFeint = false;
         move = true;
+        mixup = false;
         attackTrail.SetActive(true);
 
         float m = 1;
@@ -876,6 +877,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         move = true;
         attackTrail.SetActive(true);
         performFeint = false;
+        mixup = false;
+
         float m = 1;
         if (isExhausted)
         {
@@ -892,6 +895,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         canFeint = false;
         if (performFeint)
             PerformFeint();
+        if (mixup)
+        {
+            animator.SetTrigger("MIXUP");
+            mouseController.SetInputDirection(MouseController.DirectionalInput.TOP);
+            currentAttack = "LIGHTTOP";
+            currDir = MouseController.DirectionalInput.TOP;
+            isHeavy = false;
+            mixup = false;
+        }
 
         yield return new WaitForSeconds(0.1f * m); // parry starts 300ms before attack lands
 
@@ -912,6 +924,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         yield return new WaitForSeconds(0.3f);
 
+        //currDir = MouseController.DirectionalInput.RIGHT;
         isAttacking = false;
         lastAttack = Time.time;
         canRegenStamina = true;
@@ -958,6 +971,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         animator.SetTrigger("FEINT");
         canRegenStamina = true;
         attackTrail.SetActive(false);
+    }
+
+    void Mixup()
+    {
+        PV.RPC(nameof(RPC_MixupCall), RpcTarget.MasterClient);
+    }
+
+    [PunRPC]
+    public void RPC_MixupCall()
+    {
+        PV.RPC(nameof(RPC_Mixup), RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void RPC_Mixup()
+    {
+        mixup = true;
     }
 
     public void Dodge(int _dodgeDir)
@@ -1011,11 +1041,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         isInvincible = true;
 
-        yield return new WaitForSeconds(0.134f); // iframe ends at 300ms
+        yield return new WaitForSeconds(0.2f); // iframe ends at 300ms
 
         isInvincible = false;
 
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.1f);
 
         isDodging = false;
         lastDodgeTime = Time.time;
@@ -1123,15 +1153,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public MouseController.DirectionalInput GetDir()
     {
         return currDir;
-    }
-
-    public void UpdateUI()
-    {
-
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            SetHealth(currentHealth - 10);
-        }
     }
 
     public void SetHealth(float health)

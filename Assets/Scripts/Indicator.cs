@@ -52,7 +52,7 @@ public class Indicator: MonoBehaviour
             {
                 ChangeIndicatorColor(new Color(1, 1, 1, 100));
             }
-            if (!targetPlayerController.isAttacking)
+            //if (!targetPlayerController.isAttacking)
             { 
                 if (dotProduct > 0f)
                 {
