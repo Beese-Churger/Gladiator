@@ -5,14 +5,6 @@ using UnityEngine;
 public class ControllerHolder : MonoBehaviour
 {
     public List<RuntimeAnimatorController> animators = new();
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public List<GameObject> helms = new();
+    public List<GameObject> weapons = new();
 }

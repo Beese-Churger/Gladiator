@@ -360,11 +360,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     public void SetWeapon()
     {
+
+        ControllerHolder controllers = GetComponent<ControllerHolder>();
+
         int weaponid = 0;
-        foreach(GameObject weapons in Weapons)
+        foreach(GameObject weapons in controllers.weapons)
         {
             weapons.SetActive(false);
         }
+        foreach (GameObject helms in controllers.helms)
+        {
+            helms.SetActive(false);
+        }
+
         foreach (Player p in PhotonNetwork.PlayerList)
         {
             object playerWeapon;
@@ -378,7 +386,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             }
         }
 
-        ControllerHolder controllers = GetComponent<ControllerHolder>();
         switch (weaponid)
         {
             case 0:
@@ -390,7 +397,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             default:
                 break;
         }
-        Weapons[weaponid].SetActive(true);
+
+        controllers.weapons[weaponid].SetActive(true);
+        controllers.helms[weaponid].SetActive(true);
+
         rHand = Weapons[weaponid].GetComponent<Collider>();
         animator.runtimeAnimatorController = controllers.animators[weaponid];
 

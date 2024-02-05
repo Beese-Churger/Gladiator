@@ -16,7 +16,7 @@ public class ItemCycle : MonoBehaviourPunCallbacks
     void init()
     {
         itemList.Add("Trident");
-        itemList.Add("Short Sword");
+        itemList.Add("Gladius");
         // Ensure there's at least one item in the list
         if (itemList.Count == 0)
         {
@@ -104,7 +104,6 @@ public class ItemCycle : MonoBehaviourPunCallbacks
             if (targetPlayer == player)
             {
                 itemDisplay.text = itemList[int.Parse(changedProps[GladiatorInfo.PLAYER_WEAPON].ToString())];
-                Debug.Log(changedProps[GladiatorInfo.PLAYER_WEAPON]);
             }
         }
     }
