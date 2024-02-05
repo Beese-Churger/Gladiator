@@ -44,7 +44,7 @@ public class Indicator: MonoBehaviour
                     ChangeIndicatorColor(new Color(1, 0, 0, 100));
                 }
             }
-            else if(targetPlayerController.isStaggered)
+            else if(targetPlayerController.isStaggered || targetPlayerController.isBash)
             {
                 ChangeIndicatorColor(new Color(0, 0, 0, 100));
             }

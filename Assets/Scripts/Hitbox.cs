@@ -28,7 +28,12 @@ public class Hitbox : MonoBehaviour
 
             PlayerController target = other.GetComponent<PlayerController>();
 
-            if(!target.isParrying)
+            if(playerController.isBash)
+            {
+                if (!target.isInvincible)
+                    target.GiveBash();
+            }
+            else if(!target.isParrying)
             {
                 if(target.CheckIfBlocked(playerController, playerController.GetDir()))
                 {

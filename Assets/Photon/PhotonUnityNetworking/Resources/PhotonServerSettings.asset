@@ -81,6 +81,10 @@ MonoBehaviour:
   - RPC_ChaseCall
   - RPC_DodgeAttack
   - RPC_DodgeAttackCall
+  - RPC_Bash
+  - RPC_BashCall
+  - RPC_ReceiveBash
+  - RPC_ReceiveBashCall
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

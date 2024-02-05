@@ -84,6 +84,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public List<PlayerController> opponentsInAttackRange = new();
     
     [SerializeField] Collider rHand, lHand;
+    [SerializeField] Collider rFoot, lFoot;
     float lastHitTime;
     float timeToMove = 0.1f;
     [SerializeField] GameObject attackTrail;
@@ -105,8 +106,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public bool isAttacking = false;
     public bool isHeavy = false;
     float lastAttack;
-    float regenDelay = 1f;
-    float staminaRegenAmount = 20f;
+    float regenDelay = 1.5f;
+    float staminaRegenAmount = 15f;
     bool canRegenStamina = true;
     bool hasHyperArmor = false;
     bool tookHit = false;
@@ -124,15 +125,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     Collider currentCollider;
     bool move = false;
     public int playerIDParried = -1;
+    public bool isBash = false;
     bool performFeint;
     bool mixup;
     bool chase;
+    public bool recievedBash = false;
     // to stop coroutines
     IEnumerator lightAttack;
     IEnumerator heavyAttack;
     IEnumerator dodging;
     IEnumerator currentStun;
-
+    IEnumerator bashing;
     // syncing variables and shit
     //private const byte POSITION_FLAG = 1 << 0;
     //private const byte ROTATION_FLAG = 1 << 1;
@@ -538,7 +541,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                 if (!hasParry && !isParrying && !isBlocking)
                     HeavyAttack();
             }
-
+            if(Input.GetKeyDown(KeyCode.F) && AbleToMove())
+            {
+                Bash();
+            }
             if (canFeint && !isExhausted)
             {
                 if (Input.GetKeyDown(KeyCode.E))
@@ -600,12 +606,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         yield return null;
 
         isStaggered = true;
+
+        yield return new WaitForSeconds(0.2f);
+        recievedBash = false;
         //animator.SetTrigger("STUN")
-        yield return new WaitForSeconds(time);
+        yield return new WaitForSeconds(time - 0.2f);
 
         animator.SetTrigger("ENDSTUN");
         isStaggered = false;
-
+        canRegenStamina = true;
         currentStun = null;
     }
     private void InterruptPlayer(float stunTime, bool stagger)
@@ -614,6 +623,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         isAttacking = false;
         canParry = false;
         move = false;
+        isBash = false;
         performFeint = false;
         mixup = false;
         chase = false;
@@ -630,6 +640,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             StopCoroutine(heavyAttack);
         if (dodging != null)
             StopCoroutine(dodging);
+        if (bashing != null)
+            StopCoroutine(bashing);
         if (currentCollider != null)
             currentCollider.enabled = false;
 
@@ -650,7 +662,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         if (canRegenStamina && lastAttack + regenDelay < Time.time)
         {
-            RegenStamina(staminaRegenAmount);
+            float toRegen = staminaRegenAmount;
+            if (isExhausted)
+                toRegen = staminaRegenAmount + 5;
+            RegenStamina(toRegen);
         }
         if (!PV.IsMine)
         {
@@ -671,7 +686,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
             if (weapon == Weapon.SHORTSWORD)
                 dir = 1;
+
+            if (isBash)
+                dir = 0.5f;
             MoveTowardsPoint(dir);
+        }
+        if(recievedBash)
+        {
+            MoveTowards(4);
         }
 
         if (!AbleToMove())
@@ -703,9 +725,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     private void MoveTowardsPoint(float dist)
     {
-        //transform.position = Vector3.MoveTowards(transform.position, cameraController.enemyController.attackRadius.ClosestPoint(transform.position), 1f * Time.fixedDeltaTime);
-        Vector3 direction = transform.position - cameraController.enemyController.transform.position;
-        transform.position = Vector3.MoveTowards(transform.position, cameraController.enemyController.transform.position + (direction.normalized * dist), 1f * Time.fixedDeltaTime);
+        Vector3 direction;
+        Vector3 moveto;
+
+        if (!cameraController.enemyController)
+        {
+            direction = transform.forward;
+            moveto = transform.position;
+        }
+        else
+        {
+            direction = transform.position - cameraController.enemyController.transform.position;
+            moveto = cameraController.enemyController.transform.position;
+        }
+        
+        transform.position = Vector3.MoveTowards(transform.position, moveto + (direction.normalized * dist), 1f * Time.fixedDeltaTime);
     }
     private void MyInput()
     {
@@ -996,6 +1030,104 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         chase = true;
     }
 
+    void Bash()
+    {
+        PV.RPC(nameof(RPC_BashCall), RpcTarget.MasterClient);
+    }
+
+    [PunRPC]
+    public void RPC_BashCall()
+    {
+        PV.RPC(nameof(RPC_Bash), RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void RPC_Bash()
+    {
+        //isAttacking = true;
+        isBash = true;
+        canParry = false;
+        animator.SetTrigger("BASH");
+
+        // choose collider to activate
+        Collider collider;
+        float staminaCost = 15f;
+        if (weapon == Weapon.SHORTSWORD)
+            collider = rFoot;
+        else
+            collider = rHand;
+
+        UseStaminaAttack(staminaCost);
+        // Schedule hitbox activation and deactivation using animation events
+        currentCollider = collider;
+        if (bashing != null)
+            StopCoroutine(bashing);
+        bashing = PerformBash(collider);
+        StartCoroutine(bashing);
+    }
+
+
+    IEnumerator PerformBash(Collider collider)
+    {
+        yield return null;
+        canRegenStamina = false;
+        canParry = false;
+        canFeint = false;
+        performFeint = false;
+        move = true;
+        mixup = false;
+        attackTrail.SetActive(true);
+
+        float m = 1;
+        if (isExhausted)
+        {
+            animator.speed = 0.5f;
+            m = 2f;
+        }
+        else
+        {
+            animator.speed = 1;
+        }
+
+        yield return new WaitForSeconds(0.3f * m); // can parry 300ms before attack, light is 500ms;
+
+        move = false;
+        //yield return new WaitForSeconds(0.1f * m);
+
+        collider.enabled = true;
+
+        yield return new WaitForSeconds(0.2f * m);
+
+        collider.enabled = false;
+        attackTrail.SetActive(false);
+        yield return new WaitForSeconds(0.1f * m);
+
+        isBash = false;
+        isAttacking = false;
+        animator.speed = 1f;
+        lastAttack = Time.time;
+        canRegenStamina = true;
+        bashing = null;
+    }
+
+    public void GiveBash()
+    {
+        PV.RPC(nameof(RPC_ReceiveBashCall), RpcTarget.MasterClient);
+    }
+
+    [PunRPC]
+    void RPC_ReceiveBashCall()
+    {
+        PV.RPC(nameof(RPC_ReceiveBash), RpcTarget.All);
+    }
+
+    [PunRPC]
+    void RPC_ReceiveBash()
+    {
+        recievedBash = true;
+        InterruptPlayer(0.8f, true);
+    }
+
     public void Dodge(int _dodgeDir)
     {
         dodgeDir = _dodgeDir;
@@ -1165,7 +1297,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     public bool AbleToMove()
     {
-        if (isAttacking || isDodging || isBlocking || isStaggered)
+        if (isAttacking || isDodging || isBlocking || isStaggered || isBash)
             return false;
 
         if (lastHitTime + timeToMove > Time.time)
@@ -1345,7 +1477,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     public bool CheckIfBlocked(PlayerController enemy, MouseController.DirectionalInput enemyDir)
     {
-        if (isAttacking || isStaggered)
+        if (isAttacking || isStaggered || isBash)
         {
             return false;
         }
@@ -1540,6 +1672,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         performFeint = false;
         mixup = false;
         chase = false;
+        isBash = false;
+        recievedBash = false;
 
         currentHealth = maxHealth;
         currentStamina = maxStamina;
