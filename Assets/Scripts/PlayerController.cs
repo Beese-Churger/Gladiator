@@ -480,6 +480,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         performFeint = false;
         mixup = false;
         chase = false;
+        isDodging = false;
+
         if(currentCollider != null)
             currentCollider.enabled = false;
 
