@@ -21,7 +21,8 @@ public class Hitbox : MonoBehaviour
     {
         if (!PV.IsMine)
             return;
-        if(other.CompareTag("Player") && other.gameObject != playerController.gameObject)
+        Vector3 Hitpos = other.ClosestPointOnBounds(transform.position);
+        if (other.CompareTag("Player") && other.gameObject != playerController.gameObject)
         {
             //Debug.Log($"Player {photonView.Owner.NickName} took {input}");
             //Debug.Log("hit");
@@ -35,20 +36,20 @@ public class Hitbox : MonoBehaviour
             }
             else if(!target.isParrying)
             {
-                if(target.CheckIfBlocked(playerController, playerController.GetDir()))
+                if(target.cameraController.CombatMode && target.CheckIfBlocked(playerController, playerController.GetDir()))
                 {
                     if(!playerController.isHeavy)
                     {
                         playerController.LightStagger();
                     }
-                    target.BlockAttack(playerController.isHeavy);
+                    target.BlockAttack(playerController.isHeavy, Hitpos);
                     
                 }
                 else
                 {
                     Debug.Log(playerController.currentAttack);
-                    if(!target.isInvincible)
-                        target.TakeDamage(playerController.attackDictionary[playerController.currentAttack]);
+                    if(!target.isInvincible || !target.cameraController.CombatMode)
+                        target.TakeDamage(playerController.attackDictionary[playerController.currentAttack], Hitpos);
                 }
             }
                 

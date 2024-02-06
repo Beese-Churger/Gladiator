@@ -73,7 +73,7 @@ public class CameraController : MonoBehaviour
         // switch styles
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
-            combatMode = !combatMode;
+            PV.RPC(nameof(RPC_UpdateCombat), RpcTarget.All);
             playerController.ChangeSpeed();
 
             if (!combatMode)
@@ -147,7 +147,11 @@ public class CameraController : MonoBehaviour
                 }
         }
     }
-
+    [PunRPC]
+    public void RPC_UpdateCombat()
+    {
+        combatMode = !combatMode;
+    }
     private void SwitchCameraStyle(CameraStyle newStyle)
     {
         if (!combatCam || !thirdPersonCam)

@@ -18,19 +18,19 @@ public class CrowdFavour : MonoBehaviour
     private void Start()
     {
         Instance = this;
-        UpdateSlider();
+        //UpdateSlider();
     }
 
     public void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            IncreaseTeam1Favour();
-        }
-        if(Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            IncreaseTeam2Favour();
-        }
+        //if(Input.GetKeyDown(KeyCode.Alpha1))
+        //{
+        //    IncreaseTeam1Favour();
+        //}
+        //if(Input.GetKeyDown(KeyCode.Alpha2))
+        //{
+        //    IncreaseTeam2Favour();
+        //}
     }
     public void IncreaseTeam1Favour()
     {
@@ -56,12 +56,16 @@ public class CrowdFavour : MonoBehaviour
         UpdateSlider();
     }
 
-    private void UpdateSlider()
+    public void UpdateSlider()
     {
-        advantageSlider.maxValue = Mathf.Max(team1Favour, team2Favour) + 1;
-        advantageSlider.minValue = Mathf.Min(team1Favour, team2Favour) - 1;
+        team1Favour = (int)GameManager.Instance.team1Players[0].currentHealth;
+        team2Favour = (int)GameManager.Instance.team2Players[0].currentHealth;
+        //advantageSlider.maxValue = Mathf.Max(team1Favour, team2Favour) + 1;
+        //advantageSlider.minValue = Mathf.Min(team1Favour, team2Favour) - 1;
+        advantageSlider.maxValue = 100;
+        advantageSlider.minValue = 0;
 
-        advantageSlider.value = team1Favour;
+        advantageSlider.value = (team1Favour + (100 - team2Favour)) * 0.5f;
 
         //team1Text.text = "Team 1: " + team1Favour;
         //team2Text.text = "Team 2: " + team2Favour;

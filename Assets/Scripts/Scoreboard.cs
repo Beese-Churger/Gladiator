@@ -47,7 +47,7 @@ public class Scoreboard : MonoBehaviourPunCallbacks
 
 	void AddScoreboardItem(Player player)
 	{
-		if (player.CustomProperties.TryGetValue("team", out object team))
+		if (player.CustomProperties.TryGetValue(GladiatorInfo.PLAYER_TEAM, out object team))
 		{
 			if(team.ToString() == "1")
             {

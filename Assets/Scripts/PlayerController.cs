@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     public bool lockCursor = true;
     [Header("Stats")]
+    [SerializeField] ControllerHolder controllers;
     [SerializeField] Transform canvasHolder;
     public Scoreboard scoreboard;
     public GameObject healthbar;
@@ -29,10 +30,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public Slider staminaBarFill;
 
     public float maxHealth = 100f;
-    private float currentHealth;
+    public float currentHealth;
 
     public float maxStamina = 100f;
-    private float currentStamina;
+    public float currentStamina;
 
     public bool isDead = false;
     public int team = 0;
@@ -55,7 +56,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
     [Header("Camera")]
     [SerializeField] GameObject cameraHolder;
-    CameraController cameraController;
+    public CameraController cameraController;
     MouseController mouseController;
     public MouseController.DirectionalInput currDir;
     [SerializeField] GameObject grayscale;
@@ -130,32 +131,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     bool mixup;
     bool chase;
     public bool recievedBash = false;
+    int weaponId = 0;
     // to stop coroutines
     IEnumerator lightAttack;
     IEnumerator heavyAttack;
     IEnumerator dodging;
     IEnumerator currentStun;
     IEnumerator bashing;
-    // syncing variables and shit
-    //private const byte POSITION_FLAG = 1 << 0;
-    //private const byte ROTATION_FLAG = 1 << 1;
-    private const byte HEALTH_FLAG = 1 << 0;
-    private const byte STAMINA_FLAG = 1 << 1;
-    private const byte PARRYING_FLAG = 1 << 2;
-    private const byte PARRIED_FLAG = 1 << 3;
-    private const byte BLOCKING_FLAG = 1 << 4;
-    private const byte TOOKHIT_FLAG = 1 << 5;
-
-    Vector3 lastSyncedPosition;
-    Quaternion lastSyncedRotation;
-    float lastSyncedHealth;
-    float lastSyncedStamina;
-    bool lastSyncedParrying;
-    bool lastSyncedParried;
-    bool lastSyncedBlock;
-    bool lastSyncedHit;
-
-    private byte dataFlags;
 
     PhotonView PV;
     Player player;
@@ -171,143 +153,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         { "HEAVYTOP", 30 }
     };
 
-
     public string currentAttack;
-    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    //{
-    //    if (stream.IsWriting)
-    //    {
-    //        dataFlags = 0;
-
-    //        //if(transform.position != lastSyncedPosition)
-    //        //{
-    //        //    dataFlags |= POSITION_FLAG;
-    //        //}
-
-    //        //if(model.rotation != lastSyncedRotation)
-    //        //{
-    //        //    dataFlags |= ROTATION_FLAG;
-    //        //}
-
-    //        if (currentHealth != lastSyncedHealth)
-    //        {
-    //            dataFlags |= HEALTH_FLAG;
-    //        }
-
-    //        if (currentStamina != lastSyncedStamina)
-    //        {
-    //            dataFlags |= STAMINA_FLAG;
-    //        }
-
-    //        if (isParrying != lastSyncedParrying)
-    //        {
-    //            dataFlags |= PARRYING_FLAG;
-    //        }
-
-    //        if (isParried != lastSyncedParried)
-    //        {
-    //            dataFlags |= PARRIED_FLAG;
-    //        }
-
-    //        if (isBlocking != lastSyncedBlock)
-    //        {
-    //            dataFlags |= BLOCKING_FLAG;
-    //        }
-
-    //        if (tookHit != lastSyncedHit)
-    //        {
-    //            dataFlags |= TOOKHIT_FLAG;
-    //        }
-
-    //        stream.SendNext(dataFlags);
-
-    //        //if((dataFlags & POSITION_FLAG) != 0)
-    //        //{
-    //        //    stream.SendNext(transform.position);
-    //        //}
-
-    //        //if ((dataFlags & ROTATION_FLAG) != 0)
-    //        //{
-    //        //    stream.SendNext(model.rotation);
-    //        //}
-
-    //        if ((dataFlags & HEALTH_FLAG) != 0)
-    //        {
-    //            stream.SendNext(currentHealth);
-    //        }
-
-    //        if ((dataFlags & STAMINA_FLAG) != 0)
-    //        {
-    //            stream.SendNext(currentStamina);
-    //        }
-
-    //        if ((dataFlags & PARRYING_FLAG) != 0)
-    //        {
-    //            stream.SendNext(isParrying);
-    //        }
-
-    //        if ((dataFlags & PARRIED_FLAG) != 0)
-    //        {
-    //            stream.SendNext(isParried);
-    //        }
-
-    //        if ((dataFlags & BLOCKING_FLAG) != 0)
-    //        {
-    //            stream.SendNext(isBlocking);
-    //        }
-
-    //        if ((dataFlags & TOOKHIT_FLAG) != 0)
-    //        {
-    //            stream.SendNext(tookHit);
-    //        }
-
-    //    }
-    //    else
-    //    {
-    //        dataFlags = (byte)stream.ReceiveNext();
-
-    //        //if ((dataFlags & POSITION_FLAG) != 0)
-    //        //{
-    //        //    transform.position = (Vector3)stream.ReceiveNext();
-    //        //}
-
-    //        //if ((dataFlags & ROTATION_FLAG) != 0)
-    //        //{
-    //        //    model.rotation = (Quaternion)stream.ReceiveNext();
-    //        //}
-
-    //        if ((dataFlags & HEALTH_FLAG) != 0)
-    //        {
-    //            currentHealth = (float)stream.ReceiveNext();
-    //        }
-
-    //        if ((dataFlags & STAMINA_FLAG) != 0)
-    //        {
-    //            currentStamina = (float)stream.ReceiveNext();
-    //        }
-
-    //        if ((dataFlags & PARRYING_FLAG) != 0)
-    //        {
-    //            isParrying = (bool)stream.ReceiveNext();
-    //        }
-
-    //        if ((dataFlags & PARRIED_FLAG) != 0)
-    //        {
-    //            isParried = (bool)stream.ReceiveNext();
-    //        }
-
-    //        if ((dataFlags & BLOCKING_FLAG) != 0)
-    //        {
-    //            isBlocking = (bool)stream.ReceiveNext();
-    //        }
-
-    //        if ((dataFlags & TOOKHIT_FLAG) != 0)
-    //        {
-    //            tookHit = (bool)stream.ReceiveNext();
-    //        }
-
-    //    }
-    //}
 
     private void Start()
     {
@@ -328,6 +174,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     {
         PV = GetComponent<PhotonView>();
         rb = GetComponent<Rigidbody>();
+
+        team = int.Parse(PV.Owner.CustomProperties[GladiatorInfo.PLAYER_TEAM].ToString());
 
         mouseController = GetComponent<MouseController>();
         cameraController = cameraHolder.GetComponent<CameraController>();
@@ -361,9 +209,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     public void SetWeapon()
     {
 
-        ControllerHolder controllers = GetComponent<ControllerHolder>();
+        //ControllerHolder controllers = GetComponent<ControllerHolder>();
 
-        int weaponid = 0;
+        //int weaponid = 0;
+        
         foreach(GameObject weapons in controllers.weapons)
         {
             weapons.SetActive(false);
@@ -381,12 +230,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             {
                 if (p.ActorNumber == PV.ControllerActorNr)
                 {
-                    weaponid = int.Parse(playerWeapon.ToString());
+                    weaponId = int.Parse(playerWeapon.ToString());
                 }
             }
         }
 
-        switch (weaponid)
+        switch (weaponId)
         {
             case 0:
                 weapon = Weapon.TRIDENT;
@@ -398,11 +247,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                 break;
         }
 
-        controllers.weapons[weaponid].SetActive(true);
-        controllers.helms[weaponid].SetActive(true);
+        controllers.weapons[weaponId].SetActive(true);
+        controllers.helms[weaponId].SetActive(true);
 
-        rHand = Weapons[weaponid].GetComponent<Collider>();
-        animator.runtimeAnimatorController = controllers.animators[weaponid];
+        rHand = Weapons[weaponId].GetComponent<Collider>();
+        animator.runtimeAnimatorController = controllers.animators[weaponId];
 
     }
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
@@ -1398,6 +1247,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     {
         isParrying = true;
         lastHitTime = Time.time;
+
         if (_isHeavy)
         {
             // longer stun time if is heavy
@@ -1407,6 +1257,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         {
             animator.SetTrigger("PARRY");
         }
+
+        GameObject effect = Instantiate(controllers.effects[4], rHand.transform.position, Quaternion.identity);
+        Destroy(effect, 1);
         StartCoroutine(Parrying());
     }
 
@@ -1519,19 +1372,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             return false;
     }
 
-    public void BlockAttack(bool _isHeavy)
+    public void BlockAttack(bool _isHeavy, Vector3 hitPos)
     {
-        PV.RPC(nameof(RPC_BlockAttackCall), RpcTarget.MasterClient, _isHeavy);
+        PV.RPC(nameof(RPC_BlockAttackCall), RpcTarget.MasterClient, _isHeavy, hitPos);
     }
 
     [PunRPC]
-    void RPC_BlockAttackCall(bool _isHeavy, PhotonMessageInfo info)
+    void RPC_BlockAttackCall(bool _isHeavy, Vector3 hitPos)
     {
-        PV.RPC(nameof(RPC_BlockAttack), RpcTarget.All, _isHeavy);
+        PV.RPC(nameof(RPC_BlockAttack), RpcTarget.All, _isHeavy, hitPos);
     }
 
     [PunRPC]
-    void RPC_BlockAttack(bool _isHeavy, PhotonMessageInfo info)
+    void RPC_BlockAttack(bool _isHeavy, Vector3 hitPos)
     {
         isBlocking = true;
         attackReceivedIsHeavy = _isHeavy;
@@ -1554,6 +1407,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         }
         animator.SetTrigger("BLOCK");
 
+        GameObject block = Instantiate(controllers.effects[2], hitPos, Quaternion.identity);
+        Destroy(block, 1);
+
         StartCoroutine(Blocking(stunTime));
     }
 
@@ -1566,27 +1422,32 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         isBlocking = false;
         animator.SetTrigger("BLOCKEND");
     }
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, Vector3 hitPos)
     {
-        PV.RPC(nameof(RPC_TakeDamageCall), RpcTarget.MasterClient, damage);
+        PV.RPC(nameof(RPC_TakeDamageCall), RpcTarget.MasterClient, damage, hitPos);
     }
 
     [PunRPC]
-    void RPC_TakeDamageCall(float damage, PhotonMessageInfo info)
+    void RPC_TakeDamageCall(float damage, Vector3 hitPos, PhotonMessageInfo info)
     {
-        PV.RPC(nameof(RPC_TakeDamage), RpcTarget.All, damage, info.Sender);
+        PV.RPC(nameof(RPC_TakeDamage), RpcTarget.All, damage, hitPos, info.Sender);
     }
 
     [PunRPC]
-    void RPC_TakeDamage(float damage, Photon.Realtime.Player sender)
+    void RPC_TakeDamage(float damage, Vector3 hitPos, Photon.Realtime.Player sender)
     {
         //ResetTriggers();
         tookHit = true;
+        GameObject block = Instantiate(controllers.effects[5], hitPos, Quaternion.identity);
+        Destroy(block, 0.4f);
+
+        block = Instantiate(controllers.effects[0], hitPos, Quaternion.identity);
+        Destroy(block, 0.4f);
         lastHitTime = Time.time;
 
         currentHealth -= damage;
         UpdateHealthBar();
-
+        CrowdFavour.Instance.UpdateSlider();
         //Debug.Log($"Hit by {sender}");
 
         if (currentHealth <= 0)
@@ -1697,7 +1558,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         lastDodgeTime = Time.time;
         lastHitTime = Time.time;
         animator.SetTrigger("REVIVE");
-        Transform point = playerManager.RespawnPoint();
+        Transform point = playerManager.RespawnPoint(this);
 
         transform.SetPositionAndRotation(point.position, point.rotation);
         attackTrail.SetActive(false);

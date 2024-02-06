@@ -143,12 +143,22 @@ public class Launcher : MonoBehaviourPunCallbacks
                 //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
                 Instantiate(gladItemPrefab, player1pos.position, player1pos.rotation, player1pos.transform).GetComponent<PlayerListItem>().SetUp(players[i]);
                 Instantiate(weaponSelectPrefab, team1).GetComponent<ItemCycle>().SetUp(players[i]);
+                ExitGames.Client.Photon.Hashtable props = new()
+                {
+                    { GladiatorInfo.PLAYER_TEAM, "1" }
+                };
+                players[i].SetCustomProperties(props);
             }
             else
             { 
                 //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
                 Instantiate(gladItemPrefab, player2pos.position, player2pos.rotation, player2pos.transform).GetComponent<PlayerListItem>().SetUp(players[i]);
                 Instantiate(weaponSelectPrefab, team2).GetComponent<ItemCycle>().SetUp(players[i]);
+                ExitGames.Client.Photon.Hashtable props = new()
+                {
+                    { GladiatorInfo.PLAYER_TEAM, "2" }
+                };
+                players[i].SetCustomProperties(props);
             }
             
         }
@@ -203,12 +213,22 @@ public class Launcher : MonoBehaviourPunCallbacks
             //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
             Instantiate(gladItemPrefab, player1pos.position, player1pos.rotation, player1pos.transform).GetComponent<PlayerListItem>().SetUp(newPlayer);
             Instantiate(weaponSelectPrefab, team1).GetComponent<ItemCycle>().SetUp(newPlayer);
+            ExitGames.Client.Photon.Hashtable props = new()
+            {
+                { GladiatorInfo.PLAYER_TEAM, "1"}
+            };
+            newPlayer.SetCustomProperties(props);
         }
         else
         {
             //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
             Instantiate(gladItemPrefab, player2pos.position, player2pos.rotation, player2pos.transform).GetComponent<PlayerListItem>().SetUp(newPlayer);
             Instantiate(weaponSelectPrefab, team2).GetComponent<ItemCycle>().SetUp(newPlayer);
+            ExitGames.Client.Photon.Hashtable props = new()
+            {
+                { GladiatorInfo.PLAYER_TEAM, "2" }
+            };
+            newPlayer.SetCustomProperties(props);
         }
         Player[] players = PhotonNetwork.PlayerList;
         if (players.Length >= 2)

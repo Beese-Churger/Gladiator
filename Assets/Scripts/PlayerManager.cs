@@ -34,20 +34,20 @@ public class PlayerManager : MonoBehaviour
 
     void CreateController()
     {
-        int team = PhotonNetwork.LocalPlayer.IsMasterClient ? 1 : 2;
-        Hashtable hash = new Hashtable();
-        hash.Add("team", team);
-        PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+        //int team = PhotonNetwork.LocalPlayer.IsMasterClient ? 1 : 2;
+        //Hashtable hash = new Hashtable();
+        //hash.Add("team", team);
+        //PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
 
-        Transform spawnPoint = SpawnManager.Instance.GetSpawnPoint(team);
+        Transform spawnPoint = SpawnManager.Instance.GetSpawnPoint(int.Parse(PhotonNetwork.LocalPlayer.CustomProperties[GladiatorInfo.PLAYER_TEAM].ToString()));
 
         controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"), spawnPoint.position, spawnPoint.rotation);
        
     }
 
-    public Transform RespawnPoint()
+    public Transform RespawnPoint(PlayerController playerController)
     {
-        return SpawnManager.Instance.GetSpawnPoint(PV.Owner.ActorNumber);
+        return SpawnManager.Instance.GetSpawnPoint(playerController.team);
     }
 
     public void Die()

@@ -89,7 +89,7 @@ public class MouseController : MonoBehaviourPunCallbacks
             directions[1].GetComponent<Image>().color = new Color(1, 0, 0, 100);
             directions[2].GetComponent<Image>().color = new Color(1, 0, 0, 100);
         }
-        else if(playerController.isStaggered)
+        else if(playerController.isStaggered || playerController.isBash)
         {
             directions[0].GetComponent<Image>().color = new Color(0, 0, 0, 100);
             directions[1].GetComponent<Image>().color = new Color(0, 0, 0, 100);

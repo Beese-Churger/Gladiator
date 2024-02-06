@@ -45,12 +45,11 @@ public class ItemCycle : MonoBehaviourPunCallbacks
         {
             object playerWeapon;
 
-            if (p.CustomProperties.TryGetValue(GladiatorInfo.PLAYER_LOADED_LEVEL, out playerWeapon))
+            if (p.CustomProperties.TryGetValue(GladiatorInfo.PLAYER_WEAPON, out playerWeapon))
             {
                 if (!p.Equals(PhotonNetwork.LocalPlayer))
                 {
-
-                    itemDisplay.text = playerWeapon.ToString();
+                    itemDisplay.text = itemList[int.Parse(playerWeapon.ToString())];
                 }
             }
         }
