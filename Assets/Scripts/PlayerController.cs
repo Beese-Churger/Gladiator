@@ -259,17 +259,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         attackTrail = controllers.trails[weaponId];
 
     }
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
-    {
-        if (changedProps.ContainsKey("team") && targetPlayer == PV.Owner)
-        {
-            if (targetPlayer.CustomProperties.TryGetValue("team", out object team))
-            {
-                this.team = int.Parse(team.ToString());
-            }
-        }
-    }
-
 
     private void Update()
     {
@@ -491,6 +480,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         performFeint = false;
         mixup = false;
         chase = false;
+        if(currentCollider != null)
+            currentCollider.enabled = false;
 
         lastAttack = Time.time;
         if (stagger)
@@ -656,7 +647,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                 break;
         }
 
+        int rand = Random.Range(1, 7);
+        AudioManager.Instance.PlaySFX("Hup" + rand, transform.position);
+
         UseStaminaAttack(staminaCost);
+
         // Schedule hitbox activation and deactivation using animation events
         currentCollider = collider;
         if (lightAttack != null)
@@ -750,7 +745,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                 break;
         }
 
+        int rand = Random.Range(1, 7);
+        AudioManager.Instance.PlaySFX("Hup" + rand, transform.position);
+
         UseStaminaAttack(staminaCost);
+
         // Schedule hitbox activation and deactivation using animation events
         currentCollider = collider;
         heavyAttack = PerformHeavyAttack(collider);
@@ -910,6 +909,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     [PunRPC]
     public void RPC_Bash()
     {
+        int rand = Random.Range(1, 7);
+        AudioManager.Instance.PlaySFX("Hup" + rand, transform.position);
         //isAttacking = true;
         isBash = true;
         canParry = false;
@@ -924,6 +925,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             collider = rHand;
 
         UseStaminaAttack(staminaCost);
+
         // Schedule hitbox activation and deactivation using animation events
         currentCollider = collider;
         if (bashing != null)
@@ -991,6 +993,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     void RPC_ReceiveBash()
     {
         recievedBash = true;
+        AudioManager.Instance.PlaySFX("Shove", transform.position);
         InterruptPlayer(0.8f, true);
     }
 
@@ -1011,7 +1014,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
     {
         isDodging = true;
         isInvincible = false;
-
+        AudioManager.Instance.PlaySFX("Dodge", transform.position);
         switch (_dodgeDir)
         {
             case 1:
@@ -1051,6 +1054,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         if(chase && dodgeDir == 3)
         {
+            Debug.Log("hit");
             PV.RPC(nameof(RPC_DodgeAttackCall), RpcTarget.MasterClient);
         }
         yield return new WaitForSeconds(0.1f);
@@ -1078,6 +1082,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         currDir = MouseController.DirectionalInput.TOP;
 
         float staminaCost = 10f;
+
+        int rand = Random.Range(1, 7);
+        AudioManager.Instance.PlaySFX("Hup" + rand, transform.position);
 
         UseStaminaAttack(staminaCost);
 
@@ -1267,6 +1274,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         GameObject effect = Instantiate(controllers.effects[4], rHand.transform.position, Quaternion.identity);
         Destroy(effect, 1);
+
+        int rand = Random.Range(1, 4);
+        AudioManager.Instance.PlaySFX("Parry" + rand, transform.position);
+
         StartCoroutine(Parrying());
     }
 
@@ -1417,6 +1428,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         GameObject block = Instantiate(controllers.effects[2], hitPos, Quaternion.identity);
         Destroy(block, 1);
 
+        if(_isHeavy)
+        {
+            int rand = Random.Range(1, 3);
+            AudioManager.Instance.PlaySFX("BlockHeavy" + rand, transform.position);
+        }
+        else
+        {
+            int rand = Random.Range(1, 5);
+            AudioManager.Instance.PlaySFX("Block" + rand, transform.position);
+        }
+
         StartCoroutine(Blocking(stunTime));
     }
 
@@ -1452,6 +1474,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         Destroy(block, 0.4f);
         lastHitTime = Time.time;
 
+        int rand = Random.Range(1, 6);
+        AudioManager.Instance.PlaySFX("Damage" + rand, transform.position);
+
+         rand = Random.Range(1, 7);
+        AudioManager.Instance.PlaySFX("Slash" + rand, transform.position);
+
         currentHealth -= damage;
         UpdateHealthBar();
         CrowdFavour.Instance.UpdateSlider();
@@ -1463,6 +1491,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
                 grayscale.SetActive(false);
             ResetTriggers(null);
             Die();
+            if(currentCollider!= null)
+                currentCollider.enabled = false;
             animator.SetTrigger("DEATH");
             if(PV.IsMine)
                 PlayerManager.Find(sender).GetKill();
@@ -1474,6 +1504,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         lastAttack = Time.time;
         currentStamina -= amount;
         currentStamina = Mathf.Clamp(currentStamina, 0f, 100f);
+
+        if (currentStamina <= 0)
+        {
+            int rand = Random.Range(1, 3);
+            AudioManager.Instance.PlaySFX("Exhaust" + rand, transform.position);
+        }
         UpdateStaminaBar();
     }
 

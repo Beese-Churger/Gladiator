@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         CountdownTimer.OnCountdownTimerHasExpired += OnCountdownTimerIsExpired;
         RoundTimer.OnRoundTimerHasExpired += OnRoundTimerIsExpired;
-
+        AudioManager.Instance.PlayBGMLoop("MenuLoop", true);
         StartCoroutine(WaitToGetPlayers());
     }
 
@@ -238,7 +238,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void RPC_RoundOver(int team)
     {
         roundTimer.GetComponent<RoundTimer>().OnTimerEnds();
-
+        AudioManager.Instance.PlaySFX("End");
         if (team == 1)
             team1Points++;
         else

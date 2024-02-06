@@ -20,6 +20,7 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
     [Header("Reference to a Text component for visualizing the countdown")]
     public TMP_Text Text;
 
+    public string timering = " ";
     /// <summary>
     ///     Called when the timer has expired.
     /// </summary>
@@ -52,13 +53,26 @@ public class CountdownTimer : MonoBehaviourPunCallbacks
         if (!this.isTimerRunning) return;
 
         float countdown = TimeRemaining();
-        this.Text.text = string.Format("{0}", countdown.ToString("n0"));
 
+        this.Text.text = string.Format("{0}", countdown.ToString("n0"));
+        
+        if(timering != Text.text)
+        {
+            if(Text.text == "0")
+            {
+                AudioManager.Instance.PlaySFX("Start");
+            }
+            else
+                AudioManager.Instance.PlaySFX("Drum");
+        }
         if (countdown > 0.0f) return;
 
         OnTimerEnds();
     }
-
+    public void LateUpdate()
+    {
+        timering = Text.text;
+    }
 
     public void OnTimerRuns()
     {

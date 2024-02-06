@@ -50,6 +50,8 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         Debug.Log("Connecting to Master");
         PhotonNetwork.ConnectUsingSettings();
+        AudioManager.Instance.PlayBGMLoop("MenuLoop", true);
+        AudioManager.Instance.PlayBGMLoop("MenuLoop", false);
     }
 
     public override void OnConnectedToMaster()
