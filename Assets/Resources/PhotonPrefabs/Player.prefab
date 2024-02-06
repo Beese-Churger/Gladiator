@@ -4889,7 +4889,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5635569066303058731}
-  m_LocalRotation: {x: 0.01947734, y: -0.615521, z: 0.015219264, w: 0.7877328}
+  m_LocalRotation: {x: 0.019477317, y: -0.615521, z: 0.015219245, w: 0.7877328}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -6228,6 +6228,9 @@ MonoBehaviour:
   - {fileID: 8443315704496310910, guid: 6ef35fa36e3a65043b2d800600204bdd, type: 3}
   - {fileID: 8460667080445658512, guid: a3e2c3406e02f2c4ba86cfb1604277bd, type: 3}
   - {fileID: 1834194341294532, guid: d5f26854a8904624c8073139cd2eb346, type: 3}
+  trails:
+  - {fileID: 5006389180877967719}
+  - {fileID: 1263610741581486382}
 --- !u!1 &5635569067445041444
 GameObject:
   m_ObjectHideFlags: 0
@@ -10183,6 +10186,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0d4cf54722ec30544a31746569004c6e, type: 3}
+--- !u!1 &1263610741581486382 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8186592529680437521, guid: 0d4cf54722ec30544a31746569004c6e, type: 3}
+  m_PrefabInstance: {fileID: 6923617909598914623}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3623566740062748336 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5934863660851738255, guid: 0d4cf54722ec30544a31746569004c6e, type: 3}

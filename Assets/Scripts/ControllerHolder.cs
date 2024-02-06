@@ -8,4 +8,5 @@ public class ControllerHolder : MonoBehaviour
     public List<GameObject> helms = new();
     public List<GameObject> weapons = new();
     public List<GameObject> effects = new();
+    public List<GameObject> trails = new();
 }

@@ -221,6 +221,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
         {
             helms.SetActive(false);
         }
+        foreach (GameObject trails in controllers.trails)
+        {
+            trails.SetActive(false);
+        }
 
         foreach (Player p in PhotonNetwork.PlayerList)
         {
@@ -252,6 +256,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
 
         rHand = Weapons[weaponId].GetComponent<Collider>();
         animator.runtimeAnimatorController = controllers.animators[weaponId];
+        attackTrail = controllers.trails[weaponId];
 
     }
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
@@ -597,8 +602,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable/*, IPunOb
             direction = transform.position - cameraController.enemyController.transform.position;
             moveto = cameraController.enemyController.transform.position;
         }
-        
-        transform.position = Vector3.MoveTowards(transform.position, moveto + (direction.normalized * dist), 1f * Time.fixedDeltaTime);
+        float speed = 1f;
+        if (weapon == Weapon.SHORTSWORD)
+            speed = 1.5f;
+        transform.position = Vector3.MoveTowards(transform.position, moveto + (direction.normalized * dist), speed * Time.fixedDeltaTime);
     }
     private void MyInput()
     {

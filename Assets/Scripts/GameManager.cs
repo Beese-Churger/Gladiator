@@ -325,7 +325,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (gameState == GameStates.POSTGAME)
             return;
 
-        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("team", out object team))
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue(GladiatorInfo.PLAYER_TEAM, out object team))
         {
             PV.RPC(nameof(RPC_Surrender), RpcTarget.All, int.Parse(team.ToString()));
         }
